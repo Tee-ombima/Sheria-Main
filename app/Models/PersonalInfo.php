@@ -20,4 +20,10 @@ class PersonalInfo extends Model
         'upgraded_post', 'effective_date_previous_appointment', 'on_secondment_organization', 
         'designation', 'job_group', 'terms_of_service', 'user_id'
     ];
+
+    public function user()
+{
+    return $this->belongsTo(User::class);
+}
+
 }

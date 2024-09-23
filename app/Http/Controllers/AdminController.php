@@ -34,49 +34,7 @@ class AdminController extends Controller
     // Initialize query
     $query = Listing::query();
 
-    // Apply filters
-    if ($request->filled('job_title')) {
-        $query->where('title', 'like', '%' . $request->job_title . '%');
-    }
-
-    if ($request->filled('homecounty')) {
-        $query->whereHas('applications.user.personalInfo', function ($q) use ($request) {
-            $q->where('homecounty', $request->homecounty);
-        });
-    }
-
-    if ($request->filled('constituency')) {
-        $query->whereHas('applications.user.personalInfo', function ($q) use ($request) {
-            $q->where('constituency', $request->constituency);
-        });
-    }
-
-    if ($request->filled('subcounty')) {
-        $query->whereHas('applications.user.personalInfo', function ($q) use ($request) {
-            $q->where('subcounty', $request->subcounty);
-        });
-    }
-
-    if ($request->filled('gender')) {
-        $query->whereHas('applications.user.personalInfo', function ($q) use ($request) {
-            $q->where('gender', $request->gender);
-        });
-    }
-
-    if ($request->filled('dob_from') && $request->filled('dob_to')) {
-        $query->whereHas('applications.user.personalInfo', function ($q) use ($request) {
-            $q->whereBetween('dob', [
-                Carbon::parse($request->dob_from)->startOfDay(),
-                Carbon::parse($request->dob_to)->endOfDay()
-            ]);
-        });
-    }
-
-    if ($request->filled('disability')) {
-        $query->whereHas('applications.user.personalInfo', function ($q) use ($request) {
-            $q->where('disability_question', $request->disability);
-        });
-    }
+    
 
     // Set default page and perPage values
     $page = $request->input('page', 1);
@@ -101,9 +59,42 @@ class AdminController extends Controller
 }
 
 
+ // List users with pagination and search functionality
+ public function manageUsers(Request $request)
+ {
+     // Initialize the query for users
+     $query = User::query();
 
+     // If a search term is provided, filter users by email
+     if ($request->filled('search')) {
+         $query->where('email', 'like', '%' . $request->input('search') . '%');
+     }
 
+     // Paginate users (10 per page)
+     $users = $query->paginate(10);
 
+     // Return the view with the users
+     return view('admin.manage-users', compact('users'));
+ }
+
+ // Update user role
+ public function updateUserRole(Request $request, $id)
+ {
+     // Validate the request
+     $request->validate([
+         'role' => 'required|in:user,admin',
+     ]);
+
+     // Find the user
+     $user = User::findOrFail($id);
+
+     // Update the role
+     $user->role = $request->input('role');
+     $user->save();
+
+     // Redirect back with success message
+     return redirect()->back()->with('success', 'User role updated successfully.');
+ }
 
 public function show($id)
 {

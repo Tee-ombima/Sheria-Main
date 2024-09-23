@@ -7,19 +7,17 @@
         </span>
     </h1>
         </div>
-        @if (session('success'))
-            <div class="text-green-600">{{ session('success') }}</div>
-        @endif
+       @if(session('error'))
+    <div class="alert alert-danger">
+        {{ session('error') }}
+    </div>
+@endif
+@if(session('message'))
+    <div class="alert alert-success">
+        {{ session('message') }}
+    </div>
+@endif
 
-        @if ($errors->any())
-            <div class="text-red-600">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
 
         <form action="{{ route('profile.upload-attachment') }}" method="POST" enctype="multipart/form-data">
             @csrf
@@ -36,7 +34,7 @@
                 <div class="flex-1">
                     <label for="file" class="block text-sm font-medium text-gray-700">Upload File:</label>
                     <input type="file" name="file" id="file" accept="application/pdf" required class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                    <small class="text-gray-500">PDF only, max size 10MB</small>
+                    <small class="text-gray-500">PDF only, max size 5MB</small>
                 </div>
             </div>
             <div class="flex space-x-4 mt-4">
@@ -63,7 +61,9 @@
                             <form action="{{ route('profile.delete-attachment', $attachment->id) }}" method="POST">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-danger">Delete</button>
+<button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+    Delete
+</button>
                             </form>
                         </td>
                     </tr>

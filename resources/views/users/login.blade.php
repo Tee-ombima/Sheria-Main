@@ -5,6 +5,13 @@
       <p class="mb-4">Log into your account to apply a career</p>
     </header>
 
+@if (session('message'))
+    <div class="alert alert-success">
+        {{ session('message') }}
+    </div>
+@endif
+
+
     <form method="POST" action="/users/authenticate">
       @csrf
 

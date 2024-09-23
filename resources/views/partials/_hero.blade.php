@@ -9,13 +9,6 @@
     {{-- <p class="text-2xl text-black font-bold my-4">
       Find State Law Office Career Opportunities
     </p> --}}
-    <div>
-      @auth
-      @else
-      <a href="/register"
-        class="inline-block border-2 border-white text-white py-2 px-4 rounded-xl uppercase mt-2 hover:text-black hover:border-black">Sign
-        Up to Apply</a>
-      @endauth
-    </div>
+   
   </div>
 </section>

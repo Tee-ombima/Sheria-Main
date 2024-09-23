@@ -209,7 +209,9 @@
 </div>
 
 <div class="flex space-x-4">
-<button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">Update</button>
+<button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2" style="background-color: #D68C3C; focus:ring-color: #D68C3C;">
+    Update
+</button>
     </div>
 
 
@@ -251,7 +253,9 @@
                     <td>{{ $row['end_date'] }}</td>
                     <td>{{ $row['graduation_completion_date'] }}</td>
                     <td>
-                        <button class="btn btn-danger delete-row" data-index="{{ $index }}">Delete</button>
+<button class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 delete-row" data-index="{{ $index }}">
+    Delete
+</button>
                     </td>
                 </tr>
             @endforeach
@@ -272,7 +276,9 @@
                         <form action="{{ route('delete.academic.info', $datum->id) }}" method="POST">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-danger">Delete</button>
+<button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+    Delete
+</button>
                         </form>
                     </td>
                 </tr>
@@ -282,7 +288,11 @@
 
 <form id="academic-info-form" action="{{ route('profile.save-academic-info') }}" method="POST">
         @csrf
-        <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">Save</button>
+<div class="flex justify-center"> <!-- This div will center the button -->
+    <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 ">
+        Save
+    </button>
+</div>
     </form>
     
 

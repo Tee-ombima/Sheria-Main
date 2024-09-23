@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
         // Create "user" and "admin" roles
         
         $this->call([
+            
         SalutationSeeder::class,               // Seed salutations first
         HomecountySeeder::class,               // Seed home counties before constituencies and subcounties
         ConstituencySeeder::class,             // Seed constituencies after home counties

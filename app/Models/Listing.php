@@ -24,7 +24,7 @@ class Listing extends Model
     {
         return $this->hasMany(Application::class, 'job_id');
     }
-
+    
 
     public function scopeFilter($query, array $filters) {
         if($filters['tag'] ?? false) {

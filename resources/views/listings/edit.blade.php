@@ -8,7 +8,6 @@
     <form method="POST" action="/listings/{{$listing->id}}" enctype="multipart/form-data">
       @csrf
       @method('PUT')
-      
 
       <div class="mb-6">
         <label for="title" class="inline-block text-lg mb-2">Job Title</label>
@@ -19,6 +18,7 @@
         <p class="text-red-500 text-xs mt-1">{{$message}}</p>
         @enderror
       </div>
+
       <div class="mb-6">
         <label for="job_reference_number" class="inline-block text-lg mb-2">Job Reference Number</label>
         <input type="text" class="border border-gray-200 rounded p-2 w-full" name="job_reference_number"
@@ -29,14 +29,8 @@
         @enderror
       </div>
 
-      
-
-     
-
       <div class="mb-6">
-        <label for="tags" class="inline-block text-lg mb-2">
-          Tags (Comma Separated)
-        </label>
+        <label for="tags" class="inline-block text-lg mb-2">Tags (Comma Separated)</label>
         <input type="text" class="border border-gray-200 rounded p-2 w-full" name="tags"
           placeholder="Example: Laravel, Backend, Postgres, etc" value="{{$listing->tags}}" />
 
@@ -46,13 +40,9 @@
       </div>
 
       <div class="mb-6">
-        <label for="logo" class="inline-block text-lg mb-2">
-          Company Logo
-        </label>
+        <label for="logo" class="inline-block text-lg mb-2">Company Logo</label>
         <input type="file" class="border border-gray-200 rounded p-2 w-full" name="logo" />
-
-        <img class="w-48 mr-6 mb-6"
-          src="{{$listing->logo ? asset('storage/' . $listing->logo) : asset('/images/no-image.png')}}" alt="" />
+        <img class="w-48 mr-6 mb-6" src="{{$listing->logo ? asset('storage/' . $listing->logo) : asset('/images/no-image.png')}}" alt="" />
 
         @error('logo')
         <p class="text-red-500 text-xs mt-1">{{$message}}</p>
@@ -60,10 +50,8 @@
       </div>
 
       <div class="mb-6">
-        <label for="description" class="inline-block text-lg mb-2">
-          Job Description
-        </label>
-        <textarea class="border border-gray-200 rounded p-2 w-full" name="description" rows="10"
+        <label for="description" class="inline-block text-lg mb-2">Job Description</label>
+        <textarea id="description" class="border border-gray-200 rounded p-2 w-full" name="description" rows="10"
           placeholder="Include tasks, requirements, salary, etc">{{$listing->description}}</textarea>
 
         @error('description')
@@ -72,12 +60,21 @@
       </div>
 
       <div class="mb-6">
-        <button class="bg-laravel text-white rounded py-2 px-4 hover:bg-black">
-          Update Gig
-        </button>
-
-        <a href="/" class="text-black ml-4"> Back </a>
+        <button class="bg-laravel text-white rounded py-2 px-4 hover:bg-black">Update Gig</button>
+        <a href="/" class="text-black ml-4">Back</a>
       </div>
     </form>
   </x-card>
+
+  {{-- CKEditor Script --}}
+  <script src="https://cdn.ckeditor.com/ckeditor5/34.0.0/classic/ckeditor.js"></script>
+  <script>
+    ClassicEditor
+      .create(document.querySelector('#description'), {
+        toolbar: ['bold', 'italic', 'bulletedList', 'numberedList', 'blockQuote', 'undo', 'redo'],
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  </script>
 </x-layout>

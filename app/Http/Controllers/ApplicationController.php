@@ -15,7 +15,7 @@ class ApplicationController extends Controller
 {
     public function index()
     {
-        $applications = Application::where('user_id', Auth::id())->with('job')->get();
+        $applications = Application::where('user_id', Auth::id())->with('listing')->get();
 
         return view('applications.index', compact('applications'));
     }

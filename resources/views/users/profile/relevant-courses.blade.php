@@ -118,7 +118,9 @@
                     <td>{{ $row['rel_certificate_no'] }}</td>
                     <td>{{ $row['rel_issue_date'] }}</td>
                     <td>
-                        <button class="btn btn-danger delete-row" data-index="{{ $index }}">Delete</button>
+<button class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 delete-row" data-index="{{ $index }}">
+    Delete
+</button>
                     </td>
                 </tr>
             @endforeach
@@ -132,7 +134,9 @@
                         <form action="{{ route('delete.rel.info', $datum->id) }}" method="POST">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-danger">Delete</button>
+<button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+    Delete
+</button>
                         </form>
                     </td>
                 </tr>
@@ -141,7 +145,10 @@
     </table>
 <form id="relevant-courses-form" action="{{ route('profile.save-relevant-courses') }}" method="POST">
         @csrf
-        <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">Save</button>
-    </form>
+<div class="flex justify-center"> <!-- This div will center the button -->
+    <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 ">
+        Save
+    </button>
+</div>    </form>
 </x-card>
 </x-layout>

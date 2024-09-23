@@ -1,5 +1,6 @@
 <x-layout>
-  <a href="/" class="inline-block text-black ml-4 mb-4"><i class="fa-solid fa-arrow-left"></i> Back
+  <a href="/" class="inline-block text-black ml-4 mb-4">
+    <i class="fa-solid fa-arrow-left"></i> Back
   </a>
   
   <div class="mx-4">
@@ -15,43 +16,42 @@
 
         <x-listing-tags :tagsCsv="$listing->tags" />
 
-        
         <div class="border border-gray-200 w-full mb-6"></div>
         <div>
           <h3 class="text-3xl font-bold mb-4">Job Description</h3>
           <div class="text-lg space-y-6">
-            {{$listing->description}}
-
-            
+            {!! $listing->description !!}  
           </div>
         </div>
-        @if (session('error'))
-    <div class="alert alert-danger">
-        {{ session('error') }}
-    </div>
-@endif
 
-@if (session('message'))
-    <div class="alert alert-success">
-        {{ session('message') }}
-    </div>
-@endif
+        @if (session('error'))
+            <div class="alert alert-danger">
+                {{ session('error') }}
+            </div>
+        @endif
+
+        @if (session('message'))
+            <div class="alert alert-success">
+                {{ session('message') }}
+            </div>
+        @endif
+
         @auth
-          <form id="applyForm" method="POST" action="/listings/{{ $listing->id }}/apply">
-              @csrf
-              <input type="hidden" name="personal-info-submitted" id="personal-info-submitted" value="false">
-              <input type="hidden" name="academic-info-submitted" id="academic-info-submitted" value="false">
-              <input type="hidden" name="prof-info-submitted" id="prof-info-submitted" value="false">
-              <input type="hidden" name="relevant-courses-submitted" id="relevant-courses-submitted" value="false">
-              <button type="submit" class="block bg-green-500 text-white mt-6 py-2 rounded-xl hover:opacity-80">
-                  Apply for this job
-              </button>
-          </form>
-        @endauth
+    @if(auth()->user()->role !== 'admin')
+        <form id="applyForm" method="POST" action="/listings/{{ $listing->id }}/apply">
+            @csrf
+            <button type="submit" class="block bg-green-500 text-white mt-6 py-2 rounded-xl hover:opacity-80">
+                Apply for this job
+            </button>
+        </form>
+    @endif
+@endauth
+
       </div>
     </x-card>
-      @if(auth()->user()->role === 'admin')
-    <x-card class="mt-4 p-2 flex space-x-6">
+
+    @if(auth()->user()->role === 'admin')
+      <x-card class="mt-4 p-2 flex space-x-6">
         <a href="/listings/{{$listing->id}}/edit">
             <i class="fa-solid fa-pencil"></i> Edit
         </a>
@@ -75,8 +75,19 @@
                 <button class="text-yellow-500"><i class="fa-solid fa-archive"></i> Archive</button>
             </form>
         @endif
-    </x-card>
-@endif
-
+      </x-card>
+    @endif
   </div>
+
+  <!-- Include CKEditor Script -->
+  <script src="https://cdn.ckeditor.com/ckeditor5/34.0.0/classic/ckeditor.js"></script>
+  <script>
+    ClassicEditor
+      .create(document.querySelector('textarea[name="description"]'), {
+        toolbar: ['bold', 'italic', 'bulletedList', 'numberedList', 'blockQuote', 'undo', 'redo'],
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  </script>
 </x-layout>

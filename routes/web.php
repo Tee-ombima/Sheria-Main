@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\ListingController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\Admin\UserAdminController;
+
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
@@ -22,6 +24,7 @@ Route::post('/users', [UserController::class, 'store'])->middleware('guest');
 Route::get('/login', [UserController::class, 'login'])->middleware('guest')->name('login');
 Route::post('/users/authenticate', [UserController::class, 'authenticate'])->middleware('guest');
 
+
 // Password Reset Routes
 Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])->name('password.request');
 Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])->name('password.email');
@@ -37,6 +40,7 @@ Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $requ
     $request->fulfill();
     return redirect('/');
 })->middleware(['auth', 'signed'])->name('verification.verify');
+
 
 Route::post('/email/verification-notification', function (Request $request) {
     $request->user()->sendEmailVerificationNotification();
@@ -58,9 +62,9 @@ Route::post('/email/resend', function (Request $request) {
 
 // Profile Routes (Accessible only to authenticated users)
 Route::middleware('auth')->group(function () {
-    Route::get('/profile/edit', [UserController::class, 'editProfile'])->name('profile.edit');
-    Route::put('/profile/update', [UserController::class, 'updateProfile'])->name('profile.update');
-    Route::post('/profile/submit', [UserController::class, 'submitProfile'])->name('profile.submit');
+    // Route::get('/profile/edit', [UserController::class, 'editProfile'])->name('profile.edit');
+    // Route::put('/profile/update', [UserController::class, 'updateProfile'])->name('profile.update');
+    // Route::post('/profile/submit', [UserController::class, 'submitProfile'])->name('profile.submit');
 
     // Add more profile routes here...
     Route::get('/profile/personal-info', [ProfileController::class, 'showPersonalInfo'])->name('profile.personal-info');
@@ -130,7 +134,11 @@ Route::middleware(['auth'])->group(function () {
 
 
 });
+// Route to display users (GET request)
+Route::get('/admin/manage-users', [AdminController::class, 'manageUsers'])->name('admin.manage-users');
 
+// Route to update user role (POST request)
+Route::post('/admin/users/{id}/update-role', [AdminController::class, 'updateUserRole'])->name('admin.users.update-role');
 // Admin-exclusive Routes (Accessible only to authenticated users with admin role)
 Route::middleware(['auth', 'admin'])->group(function () {
 
@@ -139,7 +147,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/reports', [AdminController::class, 'reports'])->name('admin.reports');
     Route::get('/reports/download', [AdminController::class, 'downloadPDF'])->name('reports.download');
     Route::post('/admin/update-status', [AdminController::class, 'updateStatus'])->name('admin.updateStatus');
-    
+
 
     Route::get('/admin/reports/selected', [AdminController::class, 'showSelectedForInterview'])->name('admin.reports.selected');
 Route::get('/admin/reports/appointed', [AdminController::class, 'showAppointed'])->name('admin.reports.appointed');
@@ -153,12 +161,14 @@ Route::get('/admin/reports/export/pdf', [AdminController::class, 'exportPDF'])->
     Route::put('/listings/{listing}', [ListingController::class, 'update']);
     Route::delete('/listings/{listing}', [ListingController::class, 'destroy']);
     // Add more admin-exclusive routes here...
+    
+    
 });
 
 Route::get('/constituencies', [ProfileController::class, 'getConstituencies']);
+Route::get('/subcounties', [ProfileController::class, 'getSubcounties']);
+
 Route::get('/profile-dropdown', [ProfileController::class, 'showDropdown'])->name('profile.dropdown');
 
 Route::post('/logout', [UserController::class, 'logout'])->middleware('auth')->name('logout');
-
-// Catch-all Route
 

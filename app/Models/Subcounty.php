@@ -9,10 +9,15 @@ class Subcounty extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['homecounty_id', 'name'];
+    protected $fillable = ['name', 'homecounty_id', 'constituency_id'];
 
     public function homecounty()
     {
-        return $this->belongsTo(HomeCounty::class);
+        return $this->belongsTo(Homecounty::class);
+    }
+
+    public function constituency()
+    {
+        return $this->belongsTo(Constituency::class);
     }
 }

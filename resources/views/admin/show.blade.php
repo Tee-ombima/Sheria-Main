@@ -59,49 +59,221 @@
                             <div class="ml-4 mt-2 hidden details-section">
                                 <!-- Personal Info Section -->
                                 <div x-data="{ open: false }">
-                                    <h4 @click="open = !open" class="text-md font-semibold cursor-pointer">Personal Info</h4>
-                                    <div x-show="open" class="mt-1 ml-4">
-                                        @foreach($application->user->personalInfo->toArray() as $key => $value)
-                                            <p class="flex pair"><span class="font-semibold">{{ ucfirst(str_replace('_', ' ', $key)) }}:</span> <span class="ml-2">{{ $value }}</span></p>
-                                        @endforeach
-                                    </div>
-                                </div>
+    <h4 @click="open = !open" class="text-md font-semibold cursor-pointer">Personal Info</h4>
+    <table x-show="open" class="table-auto mt-1 ml-4 border-collapse w-full">
+        <thead>
+            <tr>
+                <th class="border px-4 py-2">ID</th>
+                <th class="border px-4 py-2">User ID</th>
+                <th class="border px-4 py-2">Surname</th>
+                <th class="border px-4 py-2">Firstname</th>
+                <th class="border px-4 py-2">Dob</th>
+                <th class="border px-4 py-2">Id No</th>
+                <th class="border px-4 py-2">KRA Pin</th>
+                <th class="border px-4 py-2">Gender</th>
+                <th class="border px-4 py-2">Email</th>
+                <th class="border px-4 py-2">Mobile</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="border px-4 py-2">1</td>
+                <td class="border px-4 py-2">11</td>
+                <td class="border px-4 py-2">Default</td>
+                <td class="border px-4 py-2">Default</td>
+                <td class="border px-4 py-2">2000-01-01</td>
+                <td class="border px-4 py-2">00000000</td>
+                <td class="border px-4 py-2">DEFA12345</td>
+                <td class="border px-4 py-2">Male</td>
+                <td class="border px-4 py-2">default@example.com</td>
+                <td class="border px-4 py-2">0000000000</td>
+            </tr>
+            <tr>
+                <td class="border px-4 py-2 font-semibold">Postal Address</td>
+                <td class="border px-4 py-2 font-semibold">Town/City</td>
+                <td class="border px-4 py-2 font-semibold">Alt Contact Person</td>
+                <td class="border px-4 py-2 font-semibold">Alt Contact Number</td>
+                <td class="border px-4 py-2 font-semibold">Ministry</td>
+                <td class="border px-4 py-2 font-semibold">Station</td>
+                <td class="border px-4 py-2 font-semibold">Employment Number</td>
+                <td class="border px-4 py-2 font-semibold">Current Post</td>
+                <td class="border px-4 py-2 font-semibold">Job Group</td>
+                <td class="border px-4 py-2 font-semibold">Service Terms</td>
+            </tr>
+            <tr>
+                <td class="border px-4 py-2">Default</td>
+                <td class="border px-4 py-2">Default</td>
+                <td class="border px-4 py-2">Default</td>
+                <td class="border px-4 py-2">0000000000</td>
+                <td class="border px-4 py-2">N/A</td>
+                <td class="border px-4 py-2">N/A</td>
+                <td class="border px-4 py-2">N/A</td>
+                <td class="border px-4 py-2">N/A</td>
+                <td class="border px-4 py-2">N/A</td>
+                <td class="border px-4 py-2">N/A</td>
+            </tr>
+            <tr>
+                <td class="border px-4 py-2 font-semibold">Disability</td>
+                <td class="border px-4 py-2 font-semibold">Nature of Disability</td>
+                <td class="border px-4 py-2 font-semibold">NCPD Registration No</td>
+                <td class="border px-4 py-2 font-semibold">Designation</td>
+                <td class="border px-4 py-2 font-semibold">Date of Current Appointment</td>
+                <td class="border px-4 py-2 font-semibold">Upgraded Post</td>
+                <td class="border px-4 py-2 font-semibold">Effective Date Previous Appointment</td>
+                <td class="border px-4 py-2 font-semibold">On Secondment Organization</td>
+                <td class="border px-4 py-2 font-semibold">Created At</td>
+                <td class="border px-4 py-2 font-semibold">Updated At</td>
+            </tr>
+            <tr>
+                <td class="border px-4 py-2">N/A</td>
+                <td class="border px-4 py-2">N/A</td>
+                <td class="border px-4 py-2">N/A</td>
+                <td class="border px-4 py-2">N/A</td>
+                <td class="border px-4 py-2">N/A</td>
+                <td class="border px-4 py-2">N/A</td>
+                <td class="border px-4 py-2">N/A</td>
+                <td class="border px-4 py-2">N/A</td>
+                <td class="border px-4 py-2">2024-09-22</td>
+                <td class="border px-4 py-2">2024-09-22</td>
+            </tr>
+            <tr>
+                <td class="border px-4 py-2 font-semibold">Home County</td>
+                <td class="border px-4 py-2 font-semibold">Constituency</td>
+                <td class="border px-4 py-2 font-semibold">Subcounty</td>
+                <td class="border px-4 py-2 font-semibold">Ethnicity</td>
+                <td class="border px-4 py-2 font-semibold">Nationality</td>
+                <td class="border px-4 py-2 font-semibold">Personal Employment No</td>
+                <td class="border px-4 py-2 font-semibold">N/A</td>
+                <td class="border px-4 py-2 font-semibold">N/A</td>
+                <td class="border px-4 py-2 font-semibold">N/A</td>
+                <td class="border px-4 py-2 font-semibold">N/A</td>
+            </tr>
+            <tr>
+                <td class="border px-4 py-2">N/A</td>
+                <td class="border px-4 py-2">N/A</td>
+                <td class="border px-4 py-2">N/A</td>
+                <td class="border px-4 py-2">Default</td>
+                <td class="border px-4 py-2">Default</td>
+                <td class="border px-4 py-2">N/A</td>
+                <td class="border px-4 py-2">N/A</td>
+                <td class="border px-4 py-2">N/A</td>
+                <td class="border px-4 py-2">N/A</td>
+                <td class="border px-4 py-2">N/A</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
 
                                 <!-- Academic Info Section -->
                                 <div x-data="{ open: false }">
-                                    <h4 @click="open = !open" class="text-md font-semibold cursor-pointer">Academic Info</h4>
-                                    <div x-show="open" class="mt-1 ml-4">
-                                        @foreach($application->user->academicInfo as $info)
-                                            @foreach($info->toArray() as $key => $value)
-                                                <p class="flex pair"><span class="font-semibold">{{ ucfirst(str_replace('_', ' ', $key)) }}:</span> <span class="ml-2">{{ $value }}</span></p>
-                                            @endforeach
-                                        @endforeach
-                                    </div>
-                                </div>
+    <h4 @click="open = !open" class="text-md font-semibold cursor-pointer">Academic Info</h4>
+    <table x-show="open" class="table-auto mt-1 ml-4 border-collapse w-full">
+        <thead>
+            <tr>
+                <th class="border px-4 py-2">ID</th>
+                <th class="border px-4 py-2">User ID</th>
+                <th class="border px-4 py-2">Institution Name</th>
+                <th class="border px-4 py-2">Admission No</th>
+                <th class="border px-4 py-2">Highschool</th>
+                <th class="border px-4 py-2">Specialisation</th>
+                <th class="border px-4 py-2">Course</th>
+                <th class="border px-4 py-2">Award</th>
+                <th class="border px-4 py-2">Grade</th>
+                <th class="border px-4 py-2">Certificate No</th>
+                <th class="border px-4 py-2">Start Date</th>
+                <th class="border px-4 py-2">End Date</th>
+                <th class="border px-4 py-2">Graduation Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="border px-4 py-2">1</td>
+                <td class="border px-4 py-2">11</td>
+                <td class="border px-4 py-2">West, Parker and Braun</td>
+                <td class="border px-4 py-2">85855495</td>
+                <td class="border px-4 py-2">Humanities and Social Sciences</td>
+                <td class="border px-4 py-2">Cardiology</td>
+                <td class="border px-4 py-2">Bachelor of Business Administration</td>
+                <td class="border px-4 py-2">Second Class Honors (Upper Division)</td>
+                <td class="border px-4 py-2">Second Class Honors</td>
+                <td class="border px-4 py-2">94594707</td>
+                <td class="border px-4 py-2">1973-09-21</td>
+                <td class="border px-4 py-2">2008-07-03</td>
+                <td class="border px-4 py-2">2008-10-02</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
 
                                 <!-- Professional Info Section -->
                                 <div x-data="{ open: false }">
-                                    <h4 @click="open = !open" class="text-md font-semibold cursor-pointer">Professional Info</h4>
-                                    <div x-show="open" class="mt-1 ml-4">
-                                        @foreach($application->user->profInfo as $info)
-                                            @foreach($info->toArray() as $key => $value)
-                                                <p class="flex pair"><span class="font-semibold">{{ ucfirst(str_replace('_', ' ', $key)) }}:</span> <span class="ml-2">{{ $value }}</span></p>
-                                            @endforeach
-                                        @endforeach
-                                    </div>
-                                </div>
+    <h4 @click="open = !open" class="text-md font-semibold cursor-pointer">Professional Info</h4>
+    <table x-show="open" class="table-auto mt-1 ml-4 border-collapse w-full">
+        <thead>
+            <tr>
+                <th class="border px-4 py-2">ID</th>
+                <th class="border px-4 py-2">User ID</th>
+                <th class="border px-4 py-2">Institution Name</th>
+                <th class="border px-4 py-2">Admission No</th>
+                <th class="border px-4 py-2">Area of Study</th>
+                <th class="border px-4 py-2">Specialisation</th>
+                <th class="border px-4 py-2">Course</th>
+                <th class="border px-4 py-2">Award</th>
+                <th class="border px-4 py-2">Grade</th>
+                <th class="border px-4 py-2">Certificate No</th>
+                <th class="border px-4 py-2">Start Date</th>
+                <th class="border px-4 py-2">End Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="border px-4 py-2">1</td>
+                <td class="border px-4 py-2">11</td>
+                <td class="border px-4 py-2">Reichel, Hilpert and Stracke</td>
+                <td class="border px-4 py-2">17317444</td>
+                <td class="border px-4 py-2">GeoScience</td>
+                <td class="border px-4 py-2">Crop Production</td>
+                <td class="border px-4 py-2">Diploma in Information Technology</td>
+                <td class="border px-4 py-2">Diploma</td>
+                <td class="border px-4 py-2">Distinction</td>
+                <td class="border px-4 py-2">10085924</td>
+                <td class="border px-4 py-2">1998-10-29</td>
+                <td class="border px-4 py-2">2003-10-14</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
 
                                 <!-- Relevant Courses Section -->
                                 <div x-data="{ open: false }">
-                                    <h4 @click="open = !open" class="text-md font-semibold cursor-pointer">Relevant Courses</h4>
-                                    <div x-show="open" class="mt-1 ml-4">
-                                        @foreach($application->user->relevantCourses as $course)
-                                            @foreach($course->toArray() as $key => $value)
-                                                <p class="flex pair"><span class="font-semibold">{{ ucfirst(str_replace('_', ' ', $key)) }}:</span> <span class="ml-2">{{ $value }}</span></p>
-                                            @endforeach
-                                        @endforeach
-                                    </div>
-                                </div>
+    <h4 @click="open = !open" class="text-md font-semibold cursor-pointer">Relevant Courses</h4>
+    <table x-show="open" class="table-auto mt-1 ml-4 border-collapse w-full">
+        <thead>
+            <tr>
+                <th class="border px-4 py-2">ID</th>
+                <th class="border px-4 py-2">User ID</th>
+                <th class="border px-4 py-2">Institution Name</th>
+                <th class="border px-4 py-2">Course</th>
+                <th class="border px-4 py-2">Certificate No</th>
+                <th class="border px-4 py-2">Issue Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="border px-4 py-2">1</td>
+                <td class="border px-4 py-2">11</td>
+                <td class="border px-4 py-2">Schumm, Senger and Rempel</td>
+                <td class="border px-4 py-2">Bachelor of Science in Nursing</td>
+                <td class="border px-4 py-2">61881598</td>
+                <td class="border px-4 py-2">1970-06-15</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
 
                                 <!-- Attachment Info Section -->
                                 <div x-data="{ open: false }">

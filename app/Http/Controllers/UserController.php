@@ -52,7 +52,8 @@ class UserController extends Controller
         // return redirect()->route('verification.notice')->with('message', 'Please check your email to verify your account.');
     
         // Or, if you want to immediately log them in after verification, you can use:
-        return redirect()->route('verification.notice')->with('message', 'Please check your email to verify your account.');
+        session()->flash('message', 'Please check your email to verify your account.');
+        return redirect()->route('verification.notice');
     }
     
     
@@ -144,6 +145,7 @@ public function showPersonalInfo()
 
 
 
+ 
 
 
 

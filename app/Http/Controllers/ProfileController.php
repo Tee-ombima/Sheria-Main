@@ -22,7 +22,7 @@ use App\Models\PersonalInfo;
 use App\Models\AcademicInfo;
 use App\Models\ProfInfo;
 use App\Models\RelevantCourses;
-use App\Models\Subcounty;
+use App\Models\Constituency;
 use App\Models\FormSubmission;
 use App\Models\CountryCode;
 
@@ -119,7 +119,7 @@ public function savePersonalInfo(Request $request)
     
     
 
-    session()->flash('message', 'Your action was successful!');
+    session()->flash('message', 'Profile Information submitted successfully!');
     return redirect()->route('profile.academic-info');
 
     
@@ -132,13 +132,14 @@ public function savePersonalInfo(Request $request)
 
 
 
-public function getSubcounties(Request $request)
+public function getSubcountiesByConstituency(Request $request)
 {
-    $homecountyName = $request->query('homecounty');
-    $homecounty = Homecounty::where('name', $homecountyName)->first();
-    $subcounties = $homecounty ? $homecounty->subcounties : [];
+    $constituencyName = $request->query('constituency');
+    $constituency = Constituency::where('name', $constituencyName)->first();
+    $subcounties = $constituency ? $constituency->homecounty->subcounties : [];
     return response()->json($subcounties);
 }
+
 
 public function getConstituencies(Request $request)
 {
@@ -210,7 +211,8 @@ public function saveAcademicInfo(Request $request)
     $rows = session()->get('rows', []);
     $user_id = Auth::id();
     if (empty($rows)) {
-        return redirect()->back()->withErrors(['rows' => 'Please add at least one row of data before submitting.'])->withInput();
+        session()->flash('message', 'Please add at least one row of data before submitting');
+        return redirect()->back();
     }
 
     // Define validation rules
@@ -249,7 +251,7 @@ public function saveAcademicInfo(Request $request)
     
     // Update the form submission status in local storage
     echo "<script>localStorage.setItem('academic-info-submitted', 'true');</script>";
-    session()->flash('message', 'Your action was successful!');
+    session()->flash('message', 'Academic Information submitted successfully!');
     return redirect()->route('profile.prof-info');
 
 
@@ -262,16 +264,17 @@ public function removeSessionRow(Request $request)
         unset($rows[$index]);
         session()->put('rows', array_values($rows)); // Reindex the array
     }
-
-    return response()->json(['message' => 'Row removed successfully']);
+    session()->flash('message', 'Row removed successfully');
+    return redirect()->back();
 }
 
 public function deleteAcademicInfo($id)
 {
     $academicInfo = AcademicInfo::findOrFail($id);
     $academicInfo->delete();
+    session()->flash('message', 'Academic info deleted successfully');
 
-    return redirect()->back()->with('success', 'Academic info deleted successfully');
+    return redirect()->back();
 }
 
 
@@ -333,7 +336,8 @@ public function saveProfInfo(Request $request)
     $rows = session()->get('rows', []);
     $user_id = Auth::id();
     if (empty($rows)) {
-        return redirect()->back()->withErrors(['rows' => 'Please add at least one row of data before submitting.'])->withInput();
+        session()->flash('message', 'Please add at least one row of data before submitting.');
+        return redirect()->back();
     }
 
     // Define validation rules
@@ -371,7 +375,8 @@ public function saveProfInfo(Request $request)
     
     // Update the form submission status in local storage
     echo "<script>localStorage.setItem('academic-info-submitted', 'true');</script>";
-    session()->flash('message', 'Your action was successful!');
+    session()->flash('message', 'Professional info submitted successfully');
+    
     return redirect()->route('profile.relevant-courses');
 
 
@@ -384,16 +389,18 @@ public function removeProfSessionRow(Request $request)
         unset($rows[$index]);
         session()->put('rows', array_values($rows)); // Reindex the array
     }
+    session()->flash('message', 'Row removed successfully');
+    return redirect()->back();
 
-    return response()->json(['message' => 'Row removed successfully']);
 }
 
 public function deleteProfInfo($id)
 {
     $profInfo = ProfInfo::findOrFail($id);
     $profInfo->delete();
+    session()->flash('message', 'Row removed successfully');
 
-    return redirect()->back()->with('success', 'Academic info deleted successfully');
+    return redirect()->back();
 }
 
 
@@ -439,7 +446,9 @@ public function saveRelevantCourses(Request $request)
     $rows = session()->get('rows', []);
     $user_id = Auth::id();
     if (empty($rows)) {
-        return redirect()->back()->withErrors(['rows' => 'Please add at least one row of data before submitting.'])->withInput();
+        session()->flash('message', 'Please add at least one row of data before submitting.');
+
+        return redirect()->back();
     }
 
     // Define validation rules
@@ -471,7 +480,7 @@ public function saveRelevantCourses(Request $request)
     
     // Update the form submission status in local storage
     echo "<script>localStorage.setItem('relevant-courses-submitted', 'true');</script>";
-    session()->flash('message', 'Your action was successful!');
+    session()->flash('message', 'Relevant Courses submitted successfully');
     return redirect()->route('profile.attachments');
 
 
@@ -485,31 +494,21 @@ public function removeRelSessionRow(Request $request)
         session()->put('rows', array_values($rows)); // Reindex the array
     }
 
-    return response()->json(['message' => 'Row removed successfully']);
+    session()->flash('message', 'Row removed successfully');
+
+    return redirect()->back();
 }
 
 public function deleteRelInfo($id)
 {
     $RelInfo = RelevantCourses::findOrFail($id);
     $RelInfo->delete();
+    session()->flash('message', 'Academic info deleted successfully');
 
-    return redirect()->back()->with('success', 'Academic info deleted successfully');
+    return redirect()->back();
 }
 
-public function statusindex($userId)
-    {
-        $personalInfoSubmitted = PersonalInfo::where('user_id', $userId)->exists();
-        $academicInfoSubmitted = AcademicInfo::where('user_id', $userId)->exists();
-        $profInfoSubmitted = ProfInfo::where('user_id', $userId)->exists();
-        $relevantCoursesSubmitted = RelevantCourses::where('user_id', $userId)->exists();
 
-        return view('submission_status', compact(
-            'personalInfoSubmitted',
-            'academicInfoSubmitted',
-            'profInfoSubmitted',
-            'relevantCoursesSubmitted'
-        ));
-    }
 
 }
 

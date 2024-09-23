@@ -5,6 +5,12 @@
       <p class="mb-4">Create an account to apply for careers</p>
     </header>
 
+@if (session('message'))
+    <div class="alert alert-success">
+        {{ session('message') }}
+    </div>
+@endif
+
     <form method="POST" action="/users">
       @csrf
       <div class="mb-6">

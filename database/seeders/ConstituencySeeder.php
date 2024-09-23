@@ -61,16 +61,15 @@ class ConstituencySeeder extends Seeder
         ];
 
         foreach ($counties as $homecountyName => $constituencies) {
-            $homecounty = Homecounty::firstWhere('name', $homecountyName);
+            $homecounty = Homecounty::firstOrCreate(['name' => $homecountyName]);
 
-            if ($homecounty) {
-                foreach ($constituencies as $constituencyName) {
-                    Constituency::firstOrCreate([
-                        'name' => $constituencyName,
-                        'homecounty_id' => $homecounty->id,
-                    ]);
+            foreach ($constituencies as $constituencyName) {
+                Constituency::firstOrCreate([
+                    'name' => $constituencyName,
+                    'homecounty_id' => $homecounty->id,
+                ]);
                 }
             }
         }
     }
-}
+

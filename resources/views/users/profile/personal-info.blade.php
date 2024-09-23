@@ -239,28 +239,7 @@
   </div>
 
      <div class="flex space-x-4">
-     <!-- Subcounty Dropdown -->
-    <div class="flex-1">
-            <label for="subcounty" class="block text-sm font-medium text-gray-700">Subcounty</label>
-            <select 
-                name="subcounty" 
-                id="subcounty" 
-                
-                class="mt-1 block w-full py-2 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                <option value="" disabled>Select Subcounty</option>
-                @if (!empty($inputData['homecounty']))
-                    @foreach (\App\Models\SubCounty::where('homecounty_id', $inputData['homecounty'])->get() as $subcounty)
-                        <option value="{{ $subcounty->name }}" {{ (old('subcounty', $inputData['subcounty'] ?? '') == $subcounty->name) ? 'selected' : '' }}>{{ $subcounty->name }}</option>
-                    @endforeach
-                @endif
-                
-
-            </select>
-
-            @error('subcounty')
-                <span class="text-red-500 text-xs">{{ $message }}</span>
-            @enderror
-        </div>
+    
 
     <!-- Constituency Field -->
     <div class="flex-1">
@@ -285,6 +264,28 @@
             @enderror
         </div>
        </div>
+        <!-- Subcounty Dropdown -->
+    <div class="flex-1">
+            <label for="subcounty" class="block text-sm font-medium text-gray-700">Subcounty</label>
+            <select 
+                name="subcounty" 
+                id="subcounty" 
+                
+                class="mt-1 block w-full py-2 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                <option value="" disabled>Select Subcounty</option>
+                @if (!empty($inputData['homecounty']))
+                    @foreach (\App\Models\SubCounty::where('homecounty_id', $inputData['homecounty'])->get() as $subcounty)
+                        <option value="{{ $subcounty->name }}" {{ (old('subcounty', $inputData['subcounty'] ?? '') == $subcounty->name) ? 'selected' : '' }}>{{ $subcounty->name }}</option>
+                    @endforeach
+                @endif
+                
+
+            </select>
+
+            @error('subcounty')
+                <span class="text-red-500 text-xs">{{ $message }}</span>
+            @enderror
+        </div>
 
   <div class="flex space-x-4">
    <div class="flex-1">
@@ -417,7 +418,7 @@
                     <span class="text-red-500 text-xs">{{ $message }}</span>
                 @enderror
             </div>
-       </div>
+       
 
          <div class="flex space-x-4">
           <!-- Alternative Contact Person Field -->
@@ -437,25 +438,36 @@
                 @enderror
             </div>
 
-            <!-- Alternative Contact Person's Telephone Number Field -->
             <div class="flex-1">
-                <label for="alt_contact_telephone_num" class="block text-sm font-medium text-gray-700">Alternative Contact Person's Telephone Number<span class="text-red-500">*</span></label>
-                <input 
-                    type="tel" 
-                    name="alt_contact_telephone_num" 
-                    id="alt_contact_telephone_num" 
-                    placeholder="+254XXXXXXXXX" 
-                    pattern="\+254[0-9]{9}" 
-                    maxlength="14" 
-                    required 
-                    value="{{ old('alt_contact_telephone_num', $inputData['alt_contact_telephone_num'] ?? '') }}"
-                    class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                    <div class="invalid-feedback" style="display: none;">invalid.</div>
-                <small class="text-gray-500">Format: +254XXXXXXXXX</small>
-                @error('alt_contact_telephone_num')
-                    <span class="text-red-500 text-xs">{{ $message }}</span>
-                @enderror
-            </div>
+    <label for="alt_contact_telephone_num" class="block text-sm font-medium text-gray-700">Alternative Contact Person's Telephone Number<span class="text-red-500">*</span></label>
+    <div class="flex">
+        <!-- Country Code Select -->
+        <select name="alt_contact_country_code" id="alt_contact_country_code" class="mt-1 block py-2 px-3 border border-gray-300 bg-white rounded-l-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            @foreach($countryCodes as $code)
+                <option value="{{ $code->code }}" {{ old('alt_contact_country_code', $inputData['alt_contact_country_code'] ?? '') == $code->code ? 'selected' : '' }}>
+                    {{ $code->code }} ({{ $code->name }})
+                </option>
+            @endforeach
+        </select>
+
+        <!-- Alternative Contact Person's Telephone Number Input -->
+        <input 
+            type="tel" 
+            name="alt_contact_telephone_num" 
+            id="alt_contact_telephone_num" 
+            placeholder="XXXXXXXXX" 
+            pattern="[0-9]{9}" 
+            maxlength="9" 
+            required 
+            value="{{ old('alt_contact_telephone_num', $inputData['alt_contact_telephone_num'] ?? '') }}"
+            class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-r-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+    </div>
+    <small class="text-gray-500">Format: XXXXXXXXX</small>
+    @error('alt_contact_telephone_num')
+        <span class="text-red-500 text-xs">{{ $message }}</span>
+    @enderror
+</div>
+
        </div>
 
 <div class="flex space-x-4">
@@ -504,16 +516,12 @@
                     class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                     <div class="invalid-feedback" style="display: none;">invalid.</div>
             </div>
-      </div>
-  <div class="flex space-x-4">
-</div>
-
-<div class="flex space-x-4">
-
+            
+      
 <div class="text-center my-4">
     <h2 class="text-3xl font-bold">A Section For Applicants in the Service ONLY</h2>
 </div>
-</div>
+
 <!-- Ministry Field -->
 <div class="flex space-x-4">
             <div class="flex-1">
@@ -585,6 +593,22 @@
                 </select>
             </div>
         </div>
+
+
+
+
+      <div class="flex justify-center"> <!-- This div will center the button -->
+    <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 " >
+        Save
+    </button>
+</div>
+
+      
+  
+
+
+
+
   
 
 
@@ -593,16 +617,9 @@
       
 
   
-<div class="flex space-x-4">
-                
 
-                {{-- <a href="{{ route('profile.academic-info') }}" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
-                    Next
-                </a> --}}
-                
-                        <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">Save</button>
 
-            </div>   
+   
     </form>
     
   </x-card>

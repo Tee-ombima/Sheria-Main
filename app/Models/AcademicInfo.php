@@ -13,4 +13,10 @@ class AcademicInfo extends Model
         'specialisation', 'award', 'course', 'grade', 'certificate_no', 
         'start_date', 'end_date', 'graduation_completion_date', 'user_id'
     ];
+
+    public function academicInfo()
+{
+    return $this->hasOne(academicInfo::class);
+}
+
 }

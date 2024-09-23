@@ -37,16 +37,18 @@ public function uploadAttachment(Request $request)
     // Validate the input
     $validator = Validator::make($request->all(), [
         'document_name' => 'required|exists:document_names,name',
-        'file' => 'required|mimes:pdf|max:10240', // PDF only, max 10MB
+        'file' => 'required|mimes:pdf|max:5120', // PDF only, max 10MB
     ]);
 
     if ($validator->fails()) {
         return redirect()->back()->withErrors($validator)->withInput();
+
     }
 
     // Check if the user has already uploaded this document
     if (Attachment::where('user_id', $user_id)->where('document_name', $request->document_name)->exists()) {
-        return redirect()->back()->withErrors(['file' => 'You have already uploaded this document.'])->withInput();
+        session()->flash('message', 'You have already uploaded this document.');
+        return redirect()->back();
     }
 
     // Store the file
@@ -58,8 +60,8 @@ public function uploadAttachment(Request $request)
         'document_name' => $request->document_name,
         'file_path' => $filePath,
     ]);
-
-    return redirect()->back()->with('success', 'Document uploaded successfully.');
+    session()->flash('message', 'Document uploaded successfully.');
+    return redirect()->back();
 }
 
 public function deleteAttachment($id)
@@ -76,8 +78,9 @@ public function deleteAttachment($id)
 
     // Delete the record from the database
     $attachment->delete();
+    session()->flash('message', 'Attachment deleted successfully.');
 
-    return redirect()->back()->with('success', 'Attachment deleted successfully.');
+    return redirect()->back();
 }
 
 public function saveAttachments(Request $request)
@@ -88,7 +91,9 @@ public function saveAttachments(Request $request)
     $attachments = session()->get('attachments', []);
     
     if (empty($attachments)) {
-        return redirect()->back()->withErrors(['attachments' => 'Please upload at least one document before submitting.'])->withInput();
+        session()->flash('message', 'Please upload at least one document');
+
+        return redirect()->back();
     }
 
     // Validate each attachment

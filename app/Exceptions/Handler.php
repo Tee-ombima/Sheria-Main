@@ -4,6 +4,7 @@ namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
+use Illuminate\Http\Exceptions\PostTooLargeException;
 
 class Handler extends ExceptionHandler
 {
@@ -47,4 +48,17 @@ class Handler extends ExceptionHandler
             //
         });
     }
+   
+
+    public function render($request, Throwable $exception)
+    {
+        // Catch file upload size issues
+        if ($exception instanceof PostTooLargeException) {
+            // Redirect back with a session flash message for the file size error
+            return redirect()->back()->with('error', 'The uploaded file is too large. The maximum allowed size is 5MB.');
+        }
+
+        return parent::render($request, $exception);
+    }
+
 }

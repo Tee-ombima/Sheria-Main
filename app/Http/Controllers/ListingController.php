@@ -13,7 +13,6 @@ use App\Models\Role;
 use App\Models\Application; // Import the Application model
 use App\Models\PersonalInfo;
 use App\Models\AcademicInfo;
-use App\Models\ProfInfo;
 use App\Models\RelevantCourses;
 use Illuminate\Support\Facades\Log;
 
@@ -135,8 +134,11 @@ class ListingController extends Controller
         if (Auth::user()->role !== 'admin') {
             abort(403, 'Unauthorized Action');
         }
-        return view('listings.manage', ['listings' => auth()->listings()->get()]);
+    
+        // Use the listings relationship to get the user's listings
+        return view('listings.manage', ['listings' => Auth::user()->listings]);
     }
+    
     public function archive(Listing $listing) {
         // Only allow admins to archive listings
         if (Auth::user()->role !== 'admin') {

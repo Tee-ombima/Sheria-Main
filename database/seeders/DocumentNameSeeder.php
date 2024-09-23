@@ -25,6 +25,7 @@ class DocumentNameSeeder extends Seeder
             'NSSF Card',
             'KRA PIN Certificate',
             'CV/Resume',
+            'Cover letter',
         ];
 
         foreach ($documentNames as $documentName) {

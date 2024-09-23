@@ -69,7 +69,8 @@ class ListingFactory extends Factory
 
         return [
             'title' => $title,
-            'tags' => 'vacancies,postpupillage, pupillage', // Adjust as needed
+            'tags' => 'mid level,fulltime, remote', // Adjust as needed
+
             'job_reference_number' => $jobReferenceNumber,
             'description' => "{$jobDescriptions[$title]}\n\nDuties:\n- " . implode("\n- ", $jobDuties) . "\n\nQualifications:\n- " . $this->faker->randomElement($qualifications),
         ];
