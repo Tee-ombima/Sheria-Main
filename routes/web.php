@@ -1,70 +1,36 @@
 <?php
 
 use App\Http\Controllers\ListingController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\Admin\UserAdminController;
+use Illuminate\Support\Facades\Auth;
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ApplicationController;
-use App\Http\Controllers\Auth\PasswordResetLinkController;
-use App\Http\Controllers\Auth\NewPasswordController;
+
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AttachmentController;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Models\User;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use App\Http\Controllers\UserRoleController;
+
+use App\Http\Controllers\InternshipController;
+use App\Http\Controllers\AdminInternshipController;
+
+use App\Http\Controllers\DepartmentController;
+
+Auth::routes(['verify' => true]);
+
 
 Route::get('/', [ListingController::class, 'index'])->name('index');
 
-// Authentication Routes
-Route::get('/register', [UserController::class, 'create'])->middleware('guest')->name('register');
-Route::post('/users', [UserController::class, 'store'])->middleware('guest');
-Route::get('/login', [UserController::class, 'login'])->middleware('guest')->name('login');
-Route::post('/users/authenticate', [UserController::class, 'authenticate'])->middleware('guest');
 
-
-// Password Reset Routes
-Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])->name('password.request');
-Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])->name('password.email');
-Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])->name('password.reset');
-Route::post('reset-password', [NewPasswordController::class, 'store'])->name('password.update');
-
-// Email Verification Routes
-Route::get('/email/verify', function () {
-    return view('auth.verify-email');
-})->middleware('auth')->name('verification.notice');
-
-Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
-    $request->fulfill();
-    return redirect('/');
-})->middleware(['auth', 'signed'])->name('verification.verify');
-
-
-Route::post('/email/verification-notification', function (Request $request) {
-    $request->user()->sendEmailVerificationNotification();
-    session()->flash('message', 'Verification link sent!');
-    return back();
-})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
-
-// Show the resend email form
-Route::get('/email/resend', function () {
-    return view('auth.resend-email');
-})->middleware('auth')->name('verification.resend-form');
-
-// Resend the email verification link
-Route::post('/email/resend', function (Request $request) {
-    $request->user()->sendEmailVerificationNotification();
-    session()->flash('message', 'Verification link resent!');
-    return back();
-})->middleware(['auth', 'throttle:6,1'])->name('verification.resend');
 
 // Profile Routes (Accessible only to authenticated users)
-Route::middleware('auth')->group(function () {
-    // Route::get('/profile/edit', [UserController::class, 'editProfile'])->name('profile.edit');
-    // Route::put('/profile/update', [UserController::class, 'updateProfile'])->name('profile.update');
-    // Route::post('/profile/submit', [UserController::class, 'submitProfile'])->name('profile.submit');
+Route::middleware(['auth', 'verified'])->group(function () {   
+    
+    Route::get('/constituencies', [ProfileController::class, 'getConstituencies']);
+Route::get('/subcounties', [ProfileController::class, 'getSubcounties']);
+
+Route::get('/profile-dropdown', [ProfileController::class, 'showDropdown'])->name('profile.dropdown');
 
     // Add more profile routes here...
     Route::get('/profile/personal-info', [ProfileController::class, 'showPersonalInfo'])->name('profile.personal-info');
@@ -120,7 +86,7 @@ Route::get('/my-applications', [ApplicationController::class, 'index'])->name('a
 });
 
 // Listings Routes (Accessible only to authenticated users)
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/listings/manage', [ListingController::class, 'manage']);
 
@@ -134,13 +100,8 @@ Route::middleware(['auth'])->group(function () {
 
 
 });
-// Route to display users (GET request)
-Route::get('/admin/manage-users', [AdminController::class, 'manageUsers'])->name('admin.manage-users');
 
-// Route to update user role (POST request)
-Route::post('/admin/users/{id}/update-role', [AdminController::class, 'updateUserRole'])->name('admin.users.update-role');
-// Admin-exclusive Routes (Accessible only to authenticated users with admin role)
-Route::middleware(['auth', 'admin'])->group(function () {
+Route::middleware(['auth', 'verified', 'admin'])->group(function () {
 
     Route::get('/admin', [AdminController::class, 'index'])->name('admin.index');
     Route::get('/admin/{job}', [AdminController::class, 'show'])->name('admin.show');
@@ -150,10 +111,13 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
 
     Route::get('/admin/reports/selected', [AdminController::class, 'showSelectedForInterview'])->name('admin.reports.selected');
-Route::get('/admin/reports/appointed', [AdminController::class, 'showAppointed'])->name('admin.reports.appointed');
+    Route::get('/admin/reports/appointed', [AdminController::class, 'showAppointed'])->name('admin.reports.appointed');
 
-Route::get('/admin/reports/export/csv', [AdminController::class, 'exportCSV'])->name('export.csv');
-Route::get('/admin/reports/export/pdf', [AdminController::class, 'exportPDF'])->name('export.pdf');
+    Route::get('/admin/reports/export/csv', [AdminController::class, 'exportCSV'])->name('export.csv');
+    Route::get('/admin/reports/export/pdf', [AdminController::class, 'exportPDF'])->name('export.pdf');
+
+    Route::get('/role-management', [UserRoleController::class, 'index'])->name('admin.role-management');
+    Route::post('/role-management/{user}/toggle-role', [UserRoleController::class, 'toggleRole'])->name('admin.role-management.toggleRole');
 
     
     Route::post('/listings', [ListingController::class, 'store']);
@@ -162,13 +126,39 @@ Route::get('/admin/reports/export/pdf', [AdminController::class, 'exportPDF'])->
     Route::delete('/listings/{listing}', [ListingController::class, 'destroy']);
     // Add more admin-exclusive routes here...
     
+
+
     
 });
 
-Route::get('/constituencies', [ProfileController::class, 'getConstituencies']);
-Route::get('/subcounties', [ProfileController::class, 'getSubcounties']);
+// User Routes
+Route::middleware('auth')->group(function () {
+    Route::get('/internships/create', [InternshipController::class, 'create'])->name('internships.create');
+    Route::post('/internships', [InternshipController::class, 'store'])->name('internships.store');
+    Route::get('/internships', [InternshipController::class, 'index'])->name('internships.index'); // This route is for listing all internships
+    Route::get('/internships/apply/{department}', [InternshipController::class, 'apply'])->name('internships.apply');
 
-Route::get('/profile-dropdown', [ProfileController::class, 'showDropdown'])->name('profile.dropdown');
+});
 
-Route::post('/logout', [UserController::class, 'logout'])->middleware('auth')->name('logout');
+// Admin Routes
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/admin/internships', [AdminInternshipController::class, 'index'])->name('internships.index');
+    Route::get('/admin/internships/{department}', [AdminInternshipController::class, 'show'])->name('internships.show');
+    Route::patch('/admin/internships/{application}', [AdminInternshipController::class, 'update'])->name('internships.update');
+    Route::post('/admin/departments', [AdminInternshipController::class, 'storeDepartment'])->name('departments.store');
+
+    Route::get('/departments/create', [DepartmentController::class, 'create'])->name('departments.create');
+    
+    // Add other department-related routes if not already added
+    Route::post('/admin/departments', [DepartmentController::class, 'store'])->name('departments.store');
+    Route::get('/admin/departments', [DepartmentController::class, 'index'])->name('departments.index');
+
+    Route::resource('/admin/departments', DepartmentController::class)->except(['show']);
+    Route::patch('/admindepartments/{department}/archive', [DepartmentController::class, 'archive'])->name('departments.archive');
+    Route::patch('/admindepartments/{department}/unarchive', [DepartmentController::class, 'unarchive'])->name('departments.unarchive');
+    Route::delete('/admindepartments/{department}', [DepartmentController::class, 'destroy'])->name('departments.destroy');
+    Route::get('/admindepartments/archived', [DepartmentController::class, 'archived'])->name('departments.archived');
+
+
+});
 

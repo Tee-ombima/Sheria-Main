@@ -48,7 +48,7 @@
         @enderror
       </div>
 
-      <div class="mb-6">
+      <div class="mb-6" id="editor">
         <label for="description" class="inline-block text-lg mb-2">Job Description</label>
         <textarea id="description" class="border border-gray-200 rounded p-2 w-full" name="description" rows="10"
           placeholder="Include tasks, requirements, salary, etc">{{old('description')}}</textarea>
@@ -65,15 +65,5 @@
     </form>
   </x-card>
 
-  {{-- CKEditor Script --}}
-  <script src="https://cdn.ckeditor.com/ckeditor5/34.0.0/classic/ckeditor.js"></script>
-  <script>
-    ClassicEditor
-      .create(document.querySelector('#description'), {
-        toolbar: ['bold', 'italic', 'bulletedList', 'numberedList', 'blockQuote', 'undo', 'redo'],
-      })
-      .catch(error => {
-        console.error(error);
-      });
-  </script>
+  
 </x-layout>

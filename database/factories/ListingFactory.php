@@ -44,14 +44,33 @@ class ListingFactory extends Factory
         ];
 
         $jobDuties = [
-            'Providing support for desktop applications and network issues.',
-            'Managing and leading a team of marketing professionals.',
-            'Handling employee records and assisting with recruitment.',
-            'Conducting financial analysis and providing recommendations.',
-            'Developing and maintaining software applications.',
-            'Providing legal counsel and preparing legal documents.',
-            'Responding to customer inquiries and resolving issues.',
-            'Overseeing operational activities and ensuring compliance.',
+            'Job Title: Network Administrator
+            Overview: We are seeking a skilled Network Administrator responsible for maintaining the computer networks of various organizations. The ideal candidate will provide technical support and ensure smooth operations across the company.
+            ________________________________________
+            Key Responsibilities:
+            1.	Technical Support
+            o	Provide support for desktop applications and resolve network issues.
+            o	Respond to customer inquiries and effectively resolve any technical issues.
+            2.	Team Management
+            o	Manage and lead a team of marketing professionals.
+            o	Oversee operational activities and ensure compliance with company policies.
+            3.	Human Resources
+            o	Handle employee records and assist with recruitment processes.
+            o	Conduct financial analysis and provide recommendations for operational improvements.
+            4.	Software Development
+            o	Develop and maintain software applications to support business functions.
+            o	Provide legal counsel and prepare necessary legal documents.
+            ________________________________________
+            Qualifications:
+            •	Education: Law degree and active membership in the bar association.
+            •	Strong problem-solving skills with a keen attention to detail.
+            •	Excellent communication and interpersonal skills.
+            •	Proven ability to work effectively in a team-oriented environment.
+            ________________________________________
+            If you meet these qualifications and are passionate about technology and support, we encourage you to apply!
+            
+            ',
+            
         ];
 
         $qualifications = [

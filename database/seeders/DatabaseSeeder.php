@@ -41,6 +41,7 @@ class DatabaseSeeder extends Seeder
         ListingSeeder::class,                  // Seed job listings, after users and other essential data
         UserSeeder::class,                     // Seed users after essential data such as salutation, county, etc.
         ApplicationSeeder::class,
+        DepartmentSeeder::class,
         ]);
 
 

@@ -26,7 +26,19 @@
 <!-- Include Select2 JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
+<link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/43.2.0/ckeditor5.css" />
+    <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5-premium-features/43.2.0/ckeditor5-premium-features.css" />
+    <script type="importmap">
+        {
+            "imports": {
+                "ckeditor5": "https://cdn.ckeditor.com/ckeditor5/43.2.0/ckeditor5.js",
+                "ckeditor5/": "https://cdn.ckeditor.com/ckeditor5/43.2.0/",
+                "ckeditor5-premium-features": "https://cdn.ckeditor.com/ckeditor5-premium-features/43.2.0/ckeditor5-premium-features.js",
+                "ckeditor5-premium-features/": "https://cdn.ckeditor.com/ckeditor5-premium-features/43.2.0/"
+            }
+        }
+    </script>
+    <script type="module" src="{{ URL::asset('assets/vendor/ckeditor5.js') }}"></script>
 
   <script>
     tailwind.config = {
@@ -132,6 +144,13 @@
 </li>
 
       @if(auth()->user()->role === 'user')
+      <li class="relative group">
+        <a href="{{ route('internships.create') }}" class="hover:text-laravel text-white" style="color: #ffffff;">
+            <i class="fa-solid fa-briefcase" style="color: #ffffff;"></i> University/College Attachment
+        </a>
+        
+    </li>
+
 
       <li>
         <a href="/my-applications" class="hover:text-laravel" style="color: #ffffff;"><i class="fa-solid fa-clipboard" style="color: #ffffff;"></i> View my applications</a>
@@ -141,10 +160,16 @@
       @if(auth()->user()->role === 'admin')
     <!-- Manage Users Tab (Only for Admins) -->
     <li>
-        <a href="{{ route('admin.reports') }}" class="hover:text-laravel" style="color: #ffffff;">
+        <a href="{{ route('admin.role-management') }}" class="hover:text-laravel" style="color: #ffffff;">
             <i class="fa-solid fa-users-cog" style="color: #ffffff;"></i> Manage Users
         </a>
     </li>
+    <li>
+    <a href="{{ route('admin.internships.index') }}" class="hover:text-laravel" style="color: #ffffff;">
+        <i class="fa-solid fa-briefcase" style="color: #ffffff;"></i> Recruit Attachees
+    </a>
+</li>
+
 @endif
 
       
@@ -311,7 +336,6 @@
     }
   });
 </script>
-
 
 <script>
 // Function to save form data to localStorage

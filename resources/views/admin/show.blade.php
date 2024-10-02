@@ -58,7 +58,47 @@
                             <!-- Details Section -->
                             <div class="ml-4 mt-2 hidden details-section">
                                 <!-- Personal Info Section -->
-                                <div x-data="{ open: false }">
+<div x-data="{ open: false, personalInfo: {} }" x-init="
+    // Simulating data retrieval
+    personalInfo = {
+        id: 1,
+        user_id: 11,
+        surname: 'Smith',
+        firstname: 'John',
+        dob: '1990-05-10',
+        id_no: '12345678',
+        kra_pin: 'KRA12345',
+        gender: 'Male',
+        email: 'john.smith@example.com',
+        mobile: '0712345678',
+        postal_address: 'P.O. Box 123, Nairobi',
+        town: 'Nairobi',
+        alt_contact_person: 'Jane Doe',
+        alt_contact_number: '0723456789',
+        ministry: 'Education',
+        station: 'Nairobi West',
+        employment_number: 'EMP12345',
+        current_post: 'Teacher',
+        job_group: 'Group D',
+        service_terms: 'Permanent',
+        disability: 'None',
+        nature_of_disability: 'N/A',
+        ncpd_registration_no: 'N/A',
+        designation: 'N/A',
+        date_of_appointment: '2020-01-15',
+        upgraded_post: 'N/A',
+        effective_date_previous_appointment: '2019-01-10',
+        on_secondment_organization: 'N/A',
+        created_at: '2024-09-22',
+        updated_at: '2024-09-23',
+        home_county: 'Nairobi',
+        constituency: 'Westlands',
+        subcounty: 'Kangemi',
+        ethnicity: 'Default',
+        nationality: 'Kenyan',
+        personal_employment_no: 'EMP56789'
+    };
+">
     <h4 @click="open = !open" class="text-md font-semibold cursor-pointer">Personal Info</h4>
     <table x-show="open" class="table-auto mt-1 ml-4 border-collapse w-full">
         <thead>
@@ -77,16 +117,16 @@
         </thead>
         <tbody>
             <tr>
-                <td class="border px-4 py-2">1</td>
-                <td class="border px-4 py-2">11</td>
-                <td class="border px-4 py-2">Default</td>
-                <td class="border px-4 py-2">Default</td>
-                <td class="border px-4 py-2">2000-01-01</td>
-                <td class="border px-4 py-2">00000000</td>
-                <td class="border px-4 py-2">DEFA12345</td>
-                <td class="border px-4 py-2">Male</td>
-                <td class="border px-4 py-2">default@example.com</td>
-                <td class="border px-4 py-2">0000000000</td>
+                <td class="border px-4 py-2" x-text="personalInfo.id"></td>
+                <td class="border px-4 py-2" x-text="personalInfo.user_id"></td>
+                <td class="border px-4 py-2" x-text="personalInfo.surname"></td>
+                <td class="border px-4 py-2" x-text="personalInfo.firstname"></td>
+                <td class="border px-4 py-2" x-text="personalInfo.dob"></td>
+                <td class="border px-4 py-2" x-text="personalInfo.id_no"></td>
+                <td class="border px-4 py-2" x-text="personalInfo.kra_pin"></td>
+                <td class="border px-4 py-2" x-text="personalInfo.gender"></td>
+                <td class="border px-4 py-2" x-text="personalInfo.email"></td>
+                <td class="border px-4 py-2" x-text="personalInfo.mobile"></td>
             </tr>
             <tr>
                 <td class="border px-4 py-2 font-semibold">Postal Address</td>
@@ -101,16 +141,16 @@
                 <td class="border px-4 py-2 font-semibold">Service Terms</td>
             </tr>
             <tr>
-                <td class="border px-4 py-2">Default</td>
-                <td class="border px-4 py-2">Default</td>
-                <td class="border px-4 py-2">Default</td>
-                <td class="border px-4 py-2">0000000000</td>
-                <td class="border px-4 py-2">N/A</td>
-                <td class="border px-4 py-2">N/A</td>
-                <td class="border px-4 py-2">N/A</td>
-                <td class="border px-4 py-2">N/A</td>
-                <td class="border px-4 py-2">N/A</td>
-                <td class="border px-4 py-2">N/A</td>
+                <td class="border px-4 py-2" x-text="personalInfo.postal_address"></td>
+                <td class="border px-4 py-2" x-text="personalInfo.town"></td>
+                <td class="border px-4 py-2" x-text="personalInfo.alt_contact_person"></td>
+                <td class="border px-4 py-2" x-text="personalInfo.alt_contact_number"></td>
+                <td class="border px-4 py-2" x-text="personalInfo.ministry"></td>
+                <td class="border px-4 py-2" x-text="personalInfo.station"></td>
+                <td class="border px-4 py-2" x-text="personalInfo.employment_number"></td>
+                <td class="border px-4 py-2" x-text="personalInfo.current_post"></td>
+                <td class="border px-4 py-2" x-text="personalInfo.job_group"></td>
+                <td class="border px-4 py-2" x-text="personalInfo.service_terms"></td>
             </tr>
             <tr>
                 <td class="border px-4 py-2 font-semibold">Disability</td>
@@ -125,16 +165,16 @@
                 <td class="border px-4 py-2 font-semibold">Updated At</td>
             </tr>
             <tr>
-                <td class="border px-4 py-2">N/A</td>
-                <td class="border px-4 py-2">N/A</td>
-                <td class="border px-4 py-2">N/A</td>
-                <td class="border px-4 py-2">N/A</td>
-                <td class="border px-4 py-2">N/A</td>
-                <td class="border px-4 py-2">N/A</td>
-                <td class="border px-4 py-2">N/A</td>
-                <td class="border px-4 py-2">N/A</td>
-                <td class="border px-4 py-2">2024-09-22</td>
-                <td class="border px-4 py-2">2024-09-22</td>
+                <td class="border px-4 py-2" x-text="personalInfo.disability"></td>
+                <td class="border px-4 py-2" x-text="personalInfo.nature_of_disability"></td>
+                <td class="border px-4 py-2" x-text="personalInfo.ncpd_registration_no"></td>
+                <td class="border px-4 py-2" x-text="personalInfo.designation"></td>
+                <td class="border px-4 py-2" x-text="personalInfo.date_of_appointment"></td>
+                <td class="border px-4 py-2" x-text="personalInfo.upgraded_post"></td>
+                <td class="border px-4 py-2" x-text="personalInfo.effective_date_previous_appointment"></td>
+                <td class="border px-4 py-2" x-text="personalInfo.on_secondment_organization"></td>
+                <td class="border px-4 py-2" x-text="personalInfo.created_at"></td>
+                <td class="border px-4 py-2" x-text="personalInfo.updated_at"></td>
             </tr>
             <tr>
                 <td class="border px-4 py-2 font-semibold">Home County</td>
@@ -149,12 +189,12 @@
                 <td class="border px-4 py-2 font-semibold">N/A</td>
             </tr>
             <tr>
-                <td class="border px-4 py-2">N/A</td>
-                <td class="border px-4 py-2">N/A</td>
-                <td class="border px-4 py-2">N/A</td>
-                <td class="border px-4 py-2">Default</td>
-                <td class="border px-4 py-2">Default</td>
-                <td class="border px-4 py-2">N/A</td>
+                <td class="border px-4 py-2" x-text="personalInfo.home_county"></td>
+                <td class="border px-4 py-2" x-text="personalInfo.constituency"></td>
+                <td class="border px-4 py-2" x-text="personalInfo.subcounty"></td>
+                <td class="border px-4 py-2" x-text="personalInfo.ethnicity"></td>
+                <td class="border px-4 py-2" x-text="personalInfo.nationality"></td>
+                <td class="border px-4 py-2" x-text="personalInfo.personal_employment_no"></td>
                 <td class="border px-4 py-2">N/A</td>
                 <td class="border px-4 py-2">N/A</td>
                 <td class="border px-4 py-2">N/A</td>
@@ -165,8 +205,9 @@
 </div>
 
 
+
                                 <!-- Academic Info Section -->
-                                <div x-data="{ open: false }">
+<div x-data="{ open: false }">
     <h4 @click="open = !open" class="text-md font-semibold cursor-pointer">Academic Info</h4>
     <table x-show="open" class="table-auto mt-1 ml-4 border-collapse w-full">
         <thead>
@@ -175,8 +216,8 @@
                 <th class="border px-4 py-2">User ID</th>
                 <th class="border px-4 py-2">Institution Name</th>
                 <th class="border px-4 py-2">Admission No</th>
-                <th class="border px-4 py-2">Highschool</th>
-                <th class="border px-4 py-2">Specialisation</th>
+                <th class="border px-4 py-2">High School</th>
+                <th class="border px-4 py-2">Specialization</th>
                 <th class="border px-4 py-2">Course</th>
                 <th class="border px-4 py-2">Award</th>
                 <th class="border px-4 py-2">Grade</th>
@@ -187,28 +228,47 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td class="border px-4 py-2">1</td>
-                <td class="border px-4 py-2">11</td>
-                <td class="border px-4 py-2">West, Parker and Braun</td>
-                <td class="border px-4 py-2">85855495</td>
-                <td class="border px-4 py-2">Humanities and Social Sciences</td>
-                <td class="border px-4 py-2">Cardiology</td>
-                <td class="border px-4 py-2">Bachelor of Business Administration</td>
-                <td class="border px-4 py-2">Second Class Honors (Upper Division)</td>
-                <td class="border px-4 py-2">Second Class Honors</td>
-                <td class="border px-4 py-2">94594707</td>
-                <td class="border px-4 py-2">1973-09-21</td>
-                <td class="border px-4 py-2">2008-07-03</td>
-                <td class="border px-4 py-2">2008-10-02</td>
-            </tr>
+            @foreach($application->user->academicInfo as $info)
+                <tr>
+                    <td class="border px-4 py-2">{{ $info->id }}</td>
+                    <td class="border px-4 py-2">{{ $info->user_id }}</td>
+                    <td class="border px-4 py-2">{{ $info->institution_name }}</td>
+                    <td class="border px-4 py-2">{{ $info->admission_no }}</td>
+                    <td class="border px-4 py-2">{{ $info->highschool }}</td>
+                    <td class="border px-4 py-2">{{ $info->specialization }}</td>
+                    <td class="border px-4 py-2">{{ $info->course }}</td>
+                    <td class="border px-4 py-2">{{ $info->award }}</td>
+                    <td class="border px-4 py-2">{{ $info->grade }}</td>
+                    <td class="border px-4 py-2">{{ $info->certificate_no }}</td>
+                    <td class="border px-4 py-2">{{ $info->start_date }}</td>
+                    <td class="border px-4 py-2">{{ $info->end_date }}</td>
+                    <td class="border px-4 py-2">{{ $info->graduation_date }}</td>
+                </tr>
+            @endforeach
         </tbody>
     </table>
 </div>
 
 
-                                <!-- Professional Info Section -->
-                                <div x-data="{ open: false }">
+
+                               <!-- Professional Info Section -->
+<div x-data="{ open: false, professionalInfo: {} }" x-init="
+    // Simulating data retrieval
+    professionalInfo = {
+        id: 1,
+        user_id: 11,
+        institution_name: 'Reichel, Hilpert and Stracke',
+        admission_no: '17317444',
+        area_of_study: 'GeoScience',
+        specialisation: 'Crop Production',
+        course: 'Diploma in Information Technology',
+        award: 'Diploma',
+        grade: 'Distinction',
+        certificate_no: '10085924',
+        start_date: '1998-10-29',
+        end_date: '2003-10-14'
+    };
+">
     <h4 @click="open = !open" class="text-md font-semibold cursor-pointer">Professional Info</h4>
     <table x-show="open" class="table-auto mt-1 ml-4 border-collapse w-full">
         <thead>
@@ -229,26 +289,38 @@
         </thead>
         <tbody>
             <tr>
-                <td class="border px-4 py-2">1</td>
-                <td class="border px-4 py-2">11</td>
-                <td class="border px-4 py-2">Reichel, Hilpert and Stracke</td>
-                <td class="border px-4 py-2">17317444</td>
-                <td class="border px-4 py-2">GeoScience</td>
-                <td class="border px-4 py-2">Crop Production</td>
-                <td class="border px-4 py-2">Diploma in Information Technology</td>
-                <td class="border px-4 py-2">Diploma</td>
-                <td class="border px-4 py-2">Distinction</td>
-                <td class="border px-4 py-2">10085924</td>
-                <td class="border px-4 py-2">1998-10-29</td>
-                <td class="border px-4 py-2">2003-10-14</td>
+                <td class="border px-4 py-2" x-text="professionalInfo.id"></td>
+                <td class="border px-4 py-2" x-text="professionalInfo.user_id"></td>
+                <td class="border px-4 py-2" x-text="professionalInfo.institution_name"></td>
+                <td class="border px-4 py-2" x-text="professionalInfo.admission_no"></td>
+                <td class="border px-4 py-2" x-text="professionalInfo.area_of_study"></td>
+                <td class="border px-4 py-2" x-text="professionalInfo.specialisation"></td>
+                <td class="border px-4 py-2" x-text="professionalInfo.course"></td>
+                <td class="border px-4 py-2" x-text="professionalInfo.award"></td>
+                <td class="border px-4 py-2" x-text="professionalInfo.grade"></td>
+                <td class="border px-4 py-2" x-text="professionalInfo.certificate_no"></td>
+                <td class="border px-4 py-2" x-text="professionalInfo.start_date"></td>
+                <td class="border px-4 py-2" x-text="professionalInfo.end_date"></td>
             </tr>
         </tbody>
     </table>
 </div>
 
 
-                                <!-- Relevant Courses Section -->
-                                <div x-data="{ open: false }">
+                               <!-- Relevant Courses Section -->
+<div x-data="{ open: false, relevantCourses: [] }" x-init="
+    // Simulating data retrieval
+    relevantCourses = [
+        {
+            id: 1,
+            user_id: 11,
+            institution_name: 'Schumm, Senger and Rempel',
+            course: 'Bachelor of Science in Nursing',
+            certificate_no: '61881598',
+            issue_date: '1970-06-15'
+        }
+    ];
+">
     <h4 @click="open = !open" class="text-md font-semibold cursor-pointer">Relevant Courses</h4>
     <table x-show="open" class="table-auto mt-1 ml-4 border-collapse w-full">
         <thead>
@@ -262,14 +334,16 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td class="border px-4 py-2">1</td>
-                <td class="border px-4 py-2">11</td>
-                <td class="border px-4 py-2">Schumm, Senger and Rempel</td>
-                <td class="border px-4 py-2">Bachelor of Science in Nursing</td>
-                <td class="border px-4 py-2">61881598</td>
-                <td class="border px-4 py-2">1970-06-15</td>
-            </tr>
+            <template x-for="course in relevantCourses" :key="course.id">
+                <tr>
+                    <td class="border px-4 py-2" x-text="course.id"></td>
+                    <td class="border px-4 py-2" x-text="course.user_id"></td>
+                    <td class="border px-4 py-2" x-text="course.institution_name"></td>
+                    <td class="border px-4 py-2" x-text="course.course"></td>
+                    <td class="border px-4 py-2" x-text="course.certificate_no"></td>
+                    <td class="border px-4 py-2" x-text="course.issue_date"></td>
+                </tr>
+            </template>
         </tbody>
     </table>
 </div>

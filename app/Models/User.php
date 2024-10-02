@@ -13,6 +13,9 @@ class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable, HasRoles;
 
+    // Custom method to check if the user has verified their email
+    
+
     protected $fillable = [
         'name', 'email', 'password', 'role',
     ];

@@ -59,42 +59,6 @@ class AdminController extends Controller
 }
 
 
- // List users with pagination and search functionality
- public function manageUsers(Request $request)
- {
-     // Initialize the query for users
-     $query = User::query();
-
-     // If a search term is provided, filter users by email
-     if ($request->filled('search')) {
-         $query->where('email', 'like', '%' . $request->input('search') . '%');
-     }
-
-     // Paginate users (10 per page)
-     $users = $query->paginate(10);
-
-     // Return the view with the users
-     return view('admin.manage-users', compact('users'));
- }
-
- // Update user role
- public function updateUserRole(Request $request, $id)
- {
-     // Validate the request
-     $request->validate([
-         'role' => 'required|in:user,admin',
-     ]);
-
-     // Find the user
-     $user = User::findOrFail($id);
-
-     // Update the role
-     $user->role = $request->input('role');
-     $user->save();
-
-     // Redirect back with success message
-     return redirect()->back()->with('success', 'User role updated successfully.');
- }
 
 public function show($id)
 {
