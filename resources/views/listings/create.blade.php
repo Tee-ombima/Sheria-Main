@@ -48,7 +48,7 @@
         @enderror
       </div>
 
-      <div class="mb-6" id="editor">
+      <div class="mb-6" >
         <label for="description" class="inline-block text-lg mb-2">Job Description</label>
         <textarea id="description" class="border border-gray-200 rounded p-2 w-full" name="description" rows="10"
           placeholder="Include tasks, requirements, salary, etc">{{old('description')}}</textarea>
@@ -65,5 +65,11 @@
     </form>
   </x-card>
 
-  
+  <script>
+  tinymce.init({
+    selector: 'textarea#description', // Replace this CSS selector to match the placeholder element for TinyMCE
+    plugins: 'code table lists',
+    toolbar: 'undo redo | blocks | bold italic | alignleft aligncenter alignright | indent outdent | bullist numlist | code | table'
+  });
+</script>
 </x-layout>

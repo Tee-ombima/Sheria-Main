@@ -26,19 +26,8 @@
 <!-- Include Select2 JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/43.2.0/ckeditor5.css" />
-    <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5-premium-features/43.2.0/ckeditor5-premium-features.css" />
-    <script type="importmap">
-        {
-            "imports": {
-                "ckeditor5": "https://cdn.ckeditor.com/ckeditor5/43.2.0/ckeditor5.js",
-                "ckeditor5/": "https://cdn.ckeditor.com/ckeditor5/43.2.0/",
-                "ckeditor5-premium-features": "https://cdn.ckeditor.com/ckeditor5-premium-features/43.2.0/ckeditor5-premium-features.js",
-                "ckeditor5-premium-features/": "https://cdn.ckeditor.com/ckeditor5-premium-features/43.2.0/"
-            }
-        }
-    </script>
-    <script type="module" src="{{ URL::asset('assets/vendor/ckeditor5.js') }}"></script>
+<script src="https://cdn.tiny.cloud/1/tinp8l8r4f831q57swl337li0czi689fr5bajwmv0j2qu8tw/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
+
 
   <script>
     tailwind.config = {
@@ -53,6 +42,16 @@
   </script>
   <title>Sheriaportal | Find AG Jobs & Programmes</title>
   <style>
+  .text-lg ul,
+.text-lg ol {
+    margin-left: 20px;
+    list-style: disc outside; /* For bullets */
+}
+
+.text-lg ol {
+    list-style: decimal outside; /* For numbers */
+}
+
         table {
             border-collapse: collapse;
             width: 100%;
