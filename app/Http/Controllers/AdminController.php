@@ -63,7 +63,7 @@ class AdminController extends Controller
 public function show($id)
 {
     $listing = Listing::with([
-        'applications.user.personalInfo', 
+        'applications.user.personalInfo',
         'applications.user.academicInfo',
         'applications.user.profInfo',
         'applications.user.relevantCourses',

@@ -186,16 +186,16 @@ public function addRow(Request $request)
 {
     // Save each row to the session temporarily
     $row = $request->only([
-        'institution_name', 
-        'student_admission_no', 
-        'highschool', 
-        'specialisation', 
-        'course', 
-        'award', 
-        'grade', 
-        'certificate_no', 
-        'start_date', 
-        'end_date', 
+        'institution_name',
+        'student_admission_no',
+        'highschool',
+        'specialisation',
+        'course',
+        'award',
+        'grade',
+        'certificate_no',
+        'start_date',
+        'end_date',
         'graduation_completion_date'
     ]);
 

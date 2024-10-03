@@ -238,29 +238,7 @@
 
   </div>
 
-     <div class="flex space-x-4">
-     <!-- Subcounty Dropdown -->
-    <div class="flex-1">
-            <label for="subcounty" class="block text-sm font-medium text-gray-700">Subcounty</label>
-            <select 
-                name="subcounty" 
-                id="subcounty" 
-                
-                class="mt-1 block w-full py-2 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                <option value="" disabled>Select Subcounty</option>
-                @if (!empty($inputData['homecounty']))
-                    @foreach (\App\Models\SubCounty::where('homecounty_id', $inputData['homecounty'])->get() as $subcounty)
-                        <option value="{{ $subcounty->name }}" {{ (old('subcounty', $inputData['subcounty'] ?? '') == $subcounty->name) ? 'selected' : '' }}>{{ $subcounty->name }}</option>
-                    @endforeach
-                @endif
-                
-
-            </select>
-
-            @error('subcounty')
-                <span class="text-red-500 text-xs">{{ $message }}</span>
-            @enderror
-        </div>
+     
 
     <!-- Constituency Field -->
     <div class="flex-1">

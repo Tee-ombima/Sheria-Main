@@ -15,6 +15,6 @@ class Department extends Model
     protected $fillable = ['name','archived'];
     public function applications()
     {
-        return $this->hasMany(InternshipApplication::class); // Assuming Internship is the model for applications
+        return $this->hasMany(InternshipApplication::class); // Assuming Attachment is the model for applications
     }
 }

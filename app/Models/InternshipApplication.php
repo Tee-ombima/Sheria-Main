@@ -10,6 +10,6 @@ class InternshipApplication extends Model
     use HasFactory;
     public function department()
     {
-        return $this->belongsTo(Department::class); // Assuming each internship belongs to one department
+        return $this->belongsTo(Department::class); // Assuming each Attachment belongs to one department
     }
 }

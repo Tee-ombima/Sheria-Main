@@ -1,7 +1,7 @@
 <x-layout>
     <x-card class="p-10 max-w-lg mx-auto mt-24">
         <header class="text-center mb-6">
-            <h2 class="text-2xl font-bold uppercase">Your Internship Applications</h2>
+            <h2 class="text-2xl font-bold uppercase">Your Attachment Applications</h2>
         </header>
 
         @if ($internships->isEmpty())
