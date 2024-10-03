@@ -147,7 +147,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::patch('/admin/internships/{application}', [AdminInternshipController::class, 'update'])->name('internships.update');
     Route::post('/admin/departments', [AdminInternshipController::class, 'storeDepartment'])->name('departments.store');
 
-    Route::get('/departments/create', [DepartmentController::class, 'create'])->name('departments.create');
+    Route::get('/departments/create', [DepartmentController::class, 'create'])->name('admin.departments.create');
     
     // Add other department-related routes if not already added
     Route::post('/admin/departments', [DepartmentController::class, 'store'])->name('departments.store');
@@ -156,7 +156,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('/admin/departments', DepartmentController::class)->except(['show']);
     Route::patch('/admindepartments/{department}/archive', [DepartmentController::class, 'archive'])->name('departments.archive');
     Route::patch('/admindepartments/{department}/unarchive', [DepartmentController::class, 'unarchive'])->name('departments.unarchive');
-    Route::delete('/admindepartments/{department}', [DepartmentController::class, 'destroy'])->name('departments.destroy');
+    Route::delete('/admindepartments/{department}', [DepartmentController::class, 'destroy'])->name('admin.departments.destroy');
     Route::get('/admindepartments/archived', [DepartmentController::class, 'archived'])->name('departments.archived');
 
 
