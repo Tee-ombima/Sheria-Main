@@ -118,6 +118,8 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
 
     Route::get('/role-management', [UserRoleController::class, 'index'])->name('admin.role-management');
     Route::post('/role-management/{user}/toggle-role', [UserRoleController::class, 'toggleRole'])->name('admin.role-management.toggleRole');
+    Route::delete('admin/users/{user}', [UserRoleController::class, 'destroy'])->name('admin.users.destroy');
+
 
     
     Route::post('/listings', [ListingController::class, 'store']);
@@ -146,6 +148,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/admin/internships/{department}', [AdminInternshipController::class, 'show'])->name('internships.show');
     Route::patch('/admin/internships/{application}', [AdminInternshipController::class, 'update'])->name('internships.update');
     Route::post('/admin/departments', [AdminInternshipController::class, 'storeDepartment'])->name('departments.store');
+    Route::delete('/admin/internships/{application}', [AdminInternshipController::class, 'destroy'])->name('internships.destroy');
+
 
     Route::get('/departments/create', [DepartmentController::class, 'create'])->name('admin.departments.create');
     

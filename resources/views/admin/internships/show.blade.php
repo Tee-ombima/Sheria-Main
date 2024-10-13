@@ -1,4 +1,3 @@
-<!-- resources/views/admin/internships/show.blade.php -->
 <x-layout>
     <x-card class="p-10 max-w-full mx-auto mt-24 bg-white rounded-lg shadow-lg">
 
@@ -7,6 +6,7 @@
         <table class="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
             <thead class="bg-gray-100 text-gray-700 uppercase text-sm">
                 <tr>
+                    <th class="py-3 px-5 text-left">#</th> <!-- Numbering Column -->
                     <th class="py-3 px-5 text-left">Full Name</th>
                     <th class="py-3 px-5 text-left">Email</th>
                     <th class="py-3 px-5 text-left">Phone Number</th>
@@ -20,8 +20,9 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($applications as $application)
+                @foreach ($applications as $index => $application) <!-- Add index for numbering -->
                     <tr class="border-t border-gray-200">
+                        <td class="py-3 px-5 text-gray-600">{{ $index + 1 }}</td> <!-- Numbering -->
                         <td class="py-3 px-5 text-gray-600">{{ $application->full_name }}</td>
                         <td class="py-3 px-5 text-gray-600">{{ $application->email }}</td>
                         <td class="py-3 px-5 text-gray-600">{{ $application->phone }}</td>
@@ -40,6 +41,13 @@
                             <a href="{{ asset('storage/' . $application->insurance) }}" target="_blank" class="text-blue-500 underline">View Document</a>
                         </td>
                         <td class="py-3 px-5">
+                            <form action="{{ route('admin.internships.destroy', $application->id) }}" method="POST" class="space-y-2">
+                                @csrf
+                                @method('DELETE') <!-- Use DELETE method for removal -->
+                                <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded-lg shadow hover:bg-red-600 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-500">
+                                    Remove from List
+                                </button>
+                            </form>
                             <form action="{{ route('admin.internships.update', $application->id) }}" method="POST" class="space-y-2">
                                 @csrf
                                 @method('PATCH')
@@ -66,8 +74,8 @@
         </table>
 
         <!-- Pagination Links -->
-        <div class="mt-5">
-            {{ $applications->links('pagination::bootstrap-5') }}
+        <div class="mt-4">
+            {{ $applications->links() }}
         </div>
 
     </x-card>

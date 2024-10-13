@@ -42,6 +42,7 @@ class DatabaseSeeder extends Seeder
         UserSeeder::class,                     // Seed users after essential data such as salutation, county, etc.
         ApplicationSeeder::class,
         DepartmentSeeder::class,
+        
         ]);
 
 

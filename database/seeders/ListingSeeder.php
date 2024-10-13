@@ -9,7 +9,7 @@ class ListingSeeder extends Seeder
 {
     public function run()
     {
-        Listing::factory()->count(10)->create();
+        // Listing::factory()->count(10)->create();
     }
 }
 

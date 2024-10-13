@@ -15,10 +15,10 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->bigIncrements('id'); // Adds an auto-incrementing ID column
-            $table->string('name');
+            $table->string('name')->default('Tony');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
+            $table->string('password')->default('password');
             $table->string('role')->default('user');
             $table->timestamps();
         });

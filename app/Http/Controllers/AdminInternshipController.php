@@ -35,6 +35,15 @@ public function update(Request $request, InternshipApplication $application)
 
     return back();
 }
+public function destroy(InternshipApplication $application)
+{
+    // You can choose to just delete the application or change its status to inactive
+    $application->delete();
+
+    session()->flash('message', 'Application removed successfully!');
+    return back();
+}
+
 
 public function storeDepartment(Request $request)
 {

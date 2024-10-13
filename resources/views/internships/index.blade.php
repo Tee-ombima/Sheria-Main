@@ -5,7 +5,7 @@
         </header>
 
         @if ($internships->isEmpty())
-            <p class="text-center text-gray-600">You have not applied for any internships yet.</p>
+            <p class="text-center text-gray-600">You have not applied for any 3 months internships yet.</p>
         @else
             <table class="min-w-full bg-white border-collapse">
                 <thead>

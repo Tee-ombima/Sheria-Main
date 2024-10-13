@@ -1,4 +1,26 @@
 <x-layout>
+    <!-- Display User Statistics -->
+    <div class="p-4 bg-gray-100 rounded-lg text-center mb-6">
+        <h3 class="text-lg font-semibold">User Statistics</h3>
+        <div class="flex justify-around mt-4">
+            <div class="text-center">
+                <p class="text-xl font-bold">{{ $totalUsers }}</p>
+                <p>Total Users</p>
+            </div>
+            <div class="text-center">
+                <p class="text-xl font-bold">{{ $verifiedUsers }}</p>
+                <p>Verified Users</p>
+            </div>
+            <div class="text-center">
+                <p class="text-xl font-bold">{{ $unverifiedUsers }}</p>
+                <p>Unverified Users</p>
+            </div>
+            <div class="text-center">
+                <p class="text-xl font-bold">{{ $adminUsers }}</p>
+                <p>Admins</p>
+            </div>
+        </div>
+    </div>
     <x-card class="p-10 max-w-6xl mx-auto mt-24">
         <header class="text-center mb-6">
             <h2 class="text-2xl font-bold uppercase">User Role Management</h2>
@@ -37,7 +59,7 @@
                         <td class="px-4 py-2">{{ $user->name }}</td>
                         <td class="px-4 py-2">{{ $user->email }}</td>
                         <td class="px-4 py-2">{{ ucfirst($user->role) }}</td>
-                        <td class="px-4 py-2">
+                        <td class="px-4 py-2 flex space-x-2">
                             <form method="POST" action="{{ route('admin.role-management.toggleRole', $user->id) }}">
                                 @csrf
                                 <label class="inline-flex items-center">
@@ -46,6 +68,13 @@
                                            onchange="this.form.submit()">
                                     <span class="ml-2">{{ $user->role === 'admin' ? 'Admin' : 'User' }}</span>
                                 </label>
+                            </form>
+                            <form method="POST" action="{{ route('admin.users.destroy', $user->id) }}" onsubmit="return confirm('Are you sure you want to delete this user?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-300 ease-in-out">
+                                    Delete
+                                </button>
                             </form>
                         </td>
                     </tr>

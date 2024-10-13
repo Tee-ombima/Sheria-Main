@@ -262,7 +262,7 @@
                 <span class="text-red-500 text-xs">{{ $message }}</span>
             @enderror
         </div>
-       </div>
+       
 
   <div class="flex space-x-4">
    <div class="flex-1">
