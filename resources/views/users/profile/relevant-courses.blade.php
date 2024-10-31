@@ -131,6 +131,11 @@
                     <td>{{ $datum->rel_certificate_no }}</td>
                     <td>{{ $datum->rel_issue_date }}</td>
                     <td>
+
+                    <!-- Edit button -->
+            <a href="{{ route('edit.rel.info', $datum->id) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Edit
+            </a>
                         <form action="{{ route('delete.rel.info', $datum->id) }}" method="POST">
                             @csrf
                             @method('DELETE')
@@ -143,6 +148,10 @@
             @endforeach
         </tbody>
     </table>
+    <!-- Pagination Links -->
+        <div class="mt-4">
+            {{ $relevantCourses->links() }}
+        </div>
 <form id="relevant-courses-form" action="{{ route('profile.save-relevant-courses') }}" method="POST">
         @csrf
 <div class="flex justify-center"> <!-- This div will center the button -->

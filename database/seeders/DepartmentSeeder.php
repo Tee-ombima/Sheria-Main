@@ -32,9 +32,9 @@ class DepartmentSeeder extends Seeder
             // Create the department
             $createdDepartment = Department::create(['name' => $department]);
 
-            // Create 30 applicants for each department
-            InternshipApplication::factory()->count(30)->create([
-                'department_id' => $createdDepartment->id, // Assign the created department
+            // Create 10 applicants for each department
+            InternshipApplication::factory()->count(10)->create([
+                'department_id' => null, // Assign the created department
                 'user_id' => \App\Models\User::factory(), // Create a user for the application
             ]);
         }

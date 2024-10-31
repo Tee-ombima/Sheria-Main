@@ -60,23 +60,52 @@ class AdminController extends Controller
 
 
 
-public function show($id)
+public function show(Request $request, $id)
 {
-    $listing = Listing::with([
-        'applications.user.personalInfo',
-        'applications.user.academicInfo',
-        'applications.user.profInfo',
-        'applications.user.relevantCourses',
-        'applications.user.attachmentInfo'
-    ])->findOrFail($id);
+    // Get filter inputs
+    $filterIdno = $request->input('filter_idno');
+    $filterEmail = $request->input('filter_email');
 
-    $applications = $listing->applications()->paginate(13);
+    // Base query for applications
+    $applicationsQuery = Application::with([
+        'user.personalInfo.homeCounty',
+        'user.personalInfo.constituency',
+        'user.personalInfo.subcounty',
+        'user.personalInfo',
+        'user.academicInfo',
+        'user.profInfo',
+        'user.relevantCourses',
+        'user.attachmentInfo'
+    ])->where('job_id', $id);
+
+    // Apply filters if present
+if ($filterIdno) {
+    $applicationsQuery->whereHas('user.personalInfo', function ($query) use ($filterIdno) {
+        $query->where('idno', 'like', '%' . $filterIdno . '%');
+    });
+}
+
+
+    if ($filterEmail) {
+        $applicationsQuery->whereHas('user', function ($query) use ($filterEmail) {
+            $query->where('email', 'like', '%' . $filterEmail . '%');
+        });
+    }
+
+    // Clone the base query for counts
+    $baseQueryForCounts = clone $applicationsQuery;
+
+    // Paginate the results
+    $applications = $applicationsQuery->paginate(13);
+
+    // Fetch the listing
+    $listing = Listing::findOrFail($id);
 
     // Count the applications by status
-    $processingCount = $listing->applications()->where('job_status', 'Processing')->count();
-    $selectedCount = $listing->applications()->where('job_status', 'Selected')->count();
-    $appointedCount = $listing->applications()->where('job_status', 'Appointed')->count();
-    $rejectedCount = $listing->applications()->where('job_status', 'Rejected')->count();
+    $processingCount = (clone $baseQueryForCounts)->where('job_status', 'Processing')->count();
+    $selectedCount = (clone $baseQueryForCounts)->where('job_status', 'Selected')->count();
+    $appointedCount = (clone $baseQueryForCounts)->where('job_status', 'Appointed')->count();
+    $rejectedCount = (clone $baseQueryForCounts)->where('job_status', 'Not_Successful')->count();
 
     // Total sum of all counts
     $sumCount = $processingCount + $selectedCount + $appointedCount + $rejectedCount;
@@ -92,33 +121,29 @@ public function show($id)
     ));
 }
 
+
+
 public function updateStatus(Request $request)
 {
+    // Validate the incoming request
     $validated = $request->validate([
-        'status.*' => 'required|string',  // Status for each user
-        'remarks.*' => 'nullable|string',  // Remarks for each user
-        'job_id' => 'required|integer',    // The job ID to ensure we update the correct job
+        'application_id' => 'required|integer|exists:applications,id',
+        'job_status' => 'required|string',
+        'remarks' => 'nullable|string',
     ]);
 
-    // Retrieve the job ID
-    $jobId = $request->input('job_id');
+    // Retrieve the application
+    $application = Application::findOrFail($validated['application_id']);
 
-    // Loop through each status and update the corresponding application
-    foreach ($validated['status'] as $userId => $status) {
-        $remarks = $validated['remarks'][$userId] ?? null;
-
-        // Update the application for this user and job
-        Application::where('user_id', $userId)
-            ->where('job_id', $jobId)
-            ->update([
-                'job_status' => $status,
-                'remarks' => $remarks,
-            ]);
-    }
+    // Update the application
+    $application->job_status = $validated['job_status'];
+    $application->remarks = $validated['remarks'];
+    $application->save();
 
     // Redirect back with a success message
-    return redirect()->route('admin.show', ['job' => $jobId])->with('success', 'Statuses updated successfully.');
+    return redirect()->back()->with('message', 'Application updated successfully.');
 }
+
 
 
 

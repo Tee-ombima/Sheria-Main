@@ -19,7 +19,7 @@ class AttachmentFactory extends Factory
         return [
             'user_id' => User::factory(),
             'document_name' => $documentName->name, // Use the name from the existing records
-            'file_path' => $this->faker->filePath(), // For example purposes, adjust this to your logic for file paths
+            'file_path' => 'files/5-mb-example-file.pdf', // Specify the actual path to the file
         ];
     }
 }

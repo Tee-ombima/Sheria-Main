@@ -5,9 +5,9 @@
         <h1 class="text-3xl font-bold mb-6">Departments</h1>
 
         <!-- Success message -->
-        @if(session('success'))
+        @if(session('message'))
             <div class="mb-4 text-green-600 font-semibold">
-                {{ session('success') }}
+                {{ session('message') }}
             </div>
         @endif
 

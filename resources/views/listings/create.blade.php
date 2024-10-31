@@ -28,35 +28,38 @@
       </div>
 
       <div class="mb-6">
-        <label for="tags" class="inline-block text-lg mb-2">
-          Tags (Comma Separated)
-        </label>
-        <input type="text" class="border border-gray-200 rounded p-2 w-full" name="tags"
-          placeholder="Example: Laravel, Backend, Postgres, etc" value="{{old('tags')}}" />
+    <label for="vacancies" class="inline-block text-lg mb-2">Number of Vacancies</label>
+    <input type="number" class="border border-gray-200 rounded p-2 w-full" name="vacancies"
+      placeholder="Enter number of vacancies" value="{{old('vacancies')}}" />
 
-        @error('tags')
-        <p class="text-red-500 text-xs mt-1">{{$message}}</p>
-        @enderror
-      </div>
+    @error('vacancies')
+    <p class="text-red-500 text-xs mt-1">{{$message}}</p>
+    @enderror
+</div>
+
+<div class="mb-6">
+    <label for="deadline" class="inline-block text-lg mb-2">Application Deadline</label>
+    <input type="datetime-local" class="border border-gray-200 rounded p-2 w-full" name="deadline" required
+    value="{{ old('deadline', isset($listing) ? date('Y-m-d\TH:i', strtotime($listing->deadline)) : '') }}" />
+
+    @error('deadline')
+        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+    @enderror
+</div>
+
+
+
+      
 
       <div class="mb-6">
-        <label for="logo" class="inline-block text-lg mb-2">Company Logo</label>
-        <input type="file" class="border border-gray-200 rounded p-2 w-full" name="logo" />
+    <label for="file" class="inline-block text-lg mb-2">Upload Job Description (PDF)</label>
+    <input type="file" class="border border-gray-200 rounded p-2 w-full" name="file" accept=".pdf" />
 
-        @error('logo')
-        <p class="text-red-500 text-xs mt-1">{{$message}}</p>
-        @enderror
-      </div>
+    @error('file')
+        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+    @enderror
+</div>
 
-      <div class="mb-6" >
-        <label for="description" class="inline-block text-lg mb-2">Job Description</label>
-        <textarea id="description" class="border border-gray-200 rounded p-2 w-full" name="description" rows="10"
-          placeholder="Include tasks, requirements, salary, etc">{{old('description')}}</textarea>
-
-        @error('description')
-        <p class="text-red-500 text-xs mt-1">{{$message}}</p>
-        @enderror
-      </div>
 
       <div class="mb-6">
         <button class="bg-laravel text-white rounded py-2 px-4 hover:bg-black">Create Gig</button>
@@ -65,11 +68,5 @@
     </form>
   </x-card>
 
-  <script>
-  tinymce.init({
-    selector: 'textarea#description', // Replace this CSS selector to match the placeholder element for TinyMCE
-    plugins: 'code table lists',
-    toolbar: 'undo redo | blocks | bold italic | alignleft aligncenter alignright | indent outdent | bullist numlist | code | table'
-  });
-</script>
+  
 </x-layout>

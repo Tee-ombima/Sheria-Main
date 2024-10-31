@@ -20,13 +20,15 @@ class DepartmentController extends Controller
         // Validate input
         $request->validate([
             'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255', // Add email validation
+
         ]);
 
         // Create and save department
-        Department::create($request->only('name'));
+        Department::create($request->only('name','email'));
 
         // Redirect with success message
-        return redirect()->route('admin.departments.index')->with('success', 'Department created successfully.');
+        return redirect()->route('admin.departments.index')->with('message', 'Department created successfully.');
     }
 
     // Other methods (index, edit, etc.)
@@ -51,12 +53,14 @@ class DepartmentController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255', // Add email validation
+
         ]);
 
         $department = Department::findOrFail($id);
-        $department->update($request->only('name'));
+        $department->update($request->only('name','email'));
 
-        return redirect()->route('admin.departments.index')->with('success', 'Department updated successfully.');
+        return redirect()->route('admin.departments.index')->with('message', 'Department updated successfully.');
     }
     // Archive a department
     public function archive($id)
@@ -65,7 +69,7 @@ class DepartmentController extends Controller
         $department->archived = true;
         $department->save();
 
-        return redirect()->route('admin.departments.index')->with('success', 'Department archived successfully.');
+        return redirect()->route('admin.departments.index')->with('message', 'Department archived successfully.');
     }
 
     // Unarchive a department
@@ -75,7 +79,7 @@ class DepartmentController extends Controller
         $department->archived = false;
         $department->save();
 
-        return redirect()->route('admin.departments.index')->with('success', 'Department unarchived successfully.');
+        return redirect()->route('admin.departments.index')->with('message', 'Department unarchived successfully.');
     }
 
     // Soft delete a department
@@ -84,7 +88,7 @@ class DepartmentController extends Controller
         $department = Department::findOrFail($id);
         $department->delete();
 
-        return redirect()->route('admin.departments.index')->with('success', 'Department deleted successfully.');
+        return redirect()->route('admin.departments.index')->with('message', 'Department deleted successfully.');
     }
 
     // Show archived departments

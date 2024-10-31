@@ -2,25 +2,19 @@
 <x-layout>
     <x-card class="p-10 max-w-lg mx-auto mt-24 bg-white rounded-lg shadow-lg">
 
-        <h1 class="text-3xl font-bold text-center mb-8 text-gray-800">Apply for University/College Attachment</h1>
+        <h1 class="text-3xl font-bold text-center mb-8 text-gray-800">Apply for University Attachment</h1>
  <!-- Button to View My Attachments -->
         <div class="flex justify-center mb-4">
             <a href="{{ route('internships.index') }}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 View My Attachment Applications
             </a>
         </div>
+
+     
         <form action="{{ route('internships.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
             @csrf
 
-            <!-- Department Selection -->
-            <div>
-                <label for="department" class="block text-sm font-medium text-gray-700">Select Department</label>
-                <select name="department_id" id="department" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
-                    @foreach ($departments as $department)
-                        <option value="{{ $department->id }}">{{ $department->name }}</option>
-                    @endforeach
-                </select>
-            </div>
+            
 
             <!-- Full Name -->
             <div>
@@ -58,7 +52,7 @@
             </div>
 
             <div>
-                <label for="kra_pin" class="block text-sm font-medium text-gray-700">KRA PIN</label>
+                <label for="kra_pin" class="block text-sm font-medium text-gray-700">Own Application Letter</label>
                 <input type="file" name="kra_pin" id="kra_pin" accept="application/pdf" class="mt-1 block w-full text-gray-700 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
             </div>
 
@@ -66,6 +60,17 @@
                 <label for="insurance" class="block text-sm font-medium text-gray-700">Insurance</label>
                 <input type="file" name="insurance" id="insurance" accept="application/pdf" class="mt-1 block w-full text-gray-700 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
             </div>
+            <!-- Additional Fields for Internship (Optional) -->
+<div>
+    <label for="good_conduct" class="block text-sm font-medium text-gray-700">Good Conduct</label>
+    <input type="file" name="good_conduct" id="good_conduct" accept="application/pdf" class="mt-1 block w-full text-gray-700 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+</div>
+
+<div>
+    <label for="cv" class="block text-sm font-medium text-gray-700">Curriculum Vitae (CV)</label>
+    <input type="file" name="cv" id="cv" accept="application/pdf" class="mt-1 block w-full text-gray-700 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+</div>
+
 
             <!-- Submit Button -->
             <div class="flex justify-end">

@@ -26,9 +26,9 @@
             <h2 class="text-2xl font-bold uppercase">User Role Management</h2>
         </header>
 
-        @if (session('success'))
+        @if (session('message'))
             <div class="bg-green-500 text-white p-3 rounded mb-4">
-                {{ session('success') }}
+                {{ session('message') }}
             </div>
         @endif
 

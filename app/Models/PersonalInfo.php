@@ -11,8 +11,8 @@ class PersonalInfo extends Model
 
     protected $fillable = [
         'surname', 'firstname', 'lastname', 'salutation', 'dob', 'idno', 
-        'kra_pin', 'gender', 'nationality', 'ethnicity', 'homecounty', 
-        'subcounty', 'constituency', 'postal_address', 'code', 'town_city', 
+        'kra_pin', 'gender', 'nationality', 'ethnicity', 'homecounty_id', 
+        'subcounty_id', 'constituency_id', 'postal_address', 'code', 'town_city', 
         'telephone_num', 'mobile_num', 'email_address', 'alt_contact_person', 
         'alt_contact_telephone_num', 'disability_question', 'nature_of_disability', 
         'ncpd_registration_no', 'ministry', 'station', 'personal_employment_number', 
@@ -25,5 +25,23 @@ class PersonalInfo extends Model
 {
     return $this->belongsTo(User::class);
 }
+// Relationship to HomeCounty
+public function homeCounty()
+{
+    return $this->belongsTo(Homecounty::class, 'homecounty_id');
+}
+
+// Relationship to Constituency
+public function constituency()
+{
+    return $this->belongsTo(Constituency::class, 'constituency_id');
+}
+
+// Relationship to Subcounty
+public function subcounty()
+{
+    return $this->belongsTo(Subcounty::class, 'subcounty_id');
+}
+
 
 }

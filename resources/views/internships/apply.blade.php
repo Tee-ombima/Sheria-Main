@@ -41,7 +41,7 @@
             </div>
 
             <div >
-                <label for="kra_pin" class="block text-lg mb-2">KRA PIN (PDF)</label>
+                <label for="kra_pin" class="block text-lg mb-2">Own Application Letter (PDF)</label>
                 <input type="file" name="kra_pin" required class="border border-gray-200 rounded p-2 w-full">
             </div>
 

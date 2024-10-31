@@ -7,14 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Subcounty extends Model
 {
-    use HasFactory;
-
-    protected $fillable = ['name', 'homecounty_id', 'constituency_id'];
-
-    public function homecounty()
-    {
-        return $this->belongsTo(Homecounty::class);
-    }
+    use HasFactory;   
+    protected $fillable = ['name', 'constituency_id','added_by_user'];
 
     public function constituency()
     {

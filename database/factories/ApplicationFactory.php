@@ -25,8 +25,8 @@ class ApplicationFactory extends Factory
             'name' => $this->faker->name,
             'job_title' => $this->faker->jobTitle,
             'job_reference_number' => $this->faker->unique()->bothify('REF-###-??'), // e.g., REF-123-AB
-            'remarks' => $this->faker->sentence,
-            'job_status' => $this->faker->randomElement(['Processing', 'Appointed', 'Rejected']),
+            'remarks' => $this->faker->realText(50),
+            'job_status' => $this->faker->randomElement(['Processing', 'Appointed', 'Not_Successful']),
         ];
     }
 

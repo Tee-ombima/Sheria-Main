@@ -41,48 +41,105 @@
             </div>
         </div>
 
-        <!-- Area of Study and High School Level -->
-        <div class="flex space-x-4">
-            <div class="flex-1">
-    <label for="prof_area_of_study_high_school_level" class="block text-sm font-medium text-gray-700">Area of Study:<span class="text-red-500">*</span></label>
-    <select 
-        name="prof_area_of_study_high_school_level" 
-        id="prof_area_of_study_high_school_level" 
-        required 
-        class="mt-1 block w-full py-2 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-        <option value="" disabled selected>Select Area of Study</option>
-        @foreach($prof_area_of_study_high_school_levels as $prof_area_of_study_high_school_level)
-            <option value="{{ $prof_area_of_study_high_school_level->name }}" {{ old('prof_area_of_study_high_school_level') == $prof_area_of_study_high_school_level->name ? 'selected' : '' }}>{{ $prof_area_of_study_high_school_level->name }}</option>
-        @endforeach
-    </select>
+        <!-- Area of Study -->
+<div class="flex space-x-4">
+    <div class="flex-1">
+        <label for="prof_area_of_study_high_school_level" class="block text-sm font-medium text-gray-700">
+            Area of Study:<span class="text-red-500">*</span>
+        </label>
+        @php
+            $areaOfStudyOptions = $prof_area_of_study_high_school_levels->pluck('name')->toArray();
+            $selectedAreaOfStudy = old('prof_area_of_study_high_school_level');
+            $isAreaOfStudyOther = $selectedAreaOfStudy === 'other' || (!empty($selectedAreaOfStudy) && !in_array($selectedAreaOfStudy, $areaOfStudyOptions));
+        @endphp
+        <select 
+            name="prof_area_of_study_high_school_level" 
+            id="prof_area_of_study_high_school_level" 
+            required 
+            class="mt-1 block w-full py-2 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none sm:text-sm">
+            <option value="" disabled>Select Area of Study</option>
+            @foreach($prof_area_of_study_high_school_levels as $prof_area_of_study_high_school_level)
+                <option value="{{ $prof_area_of_study_high_school_level->name }}" {{ $selectedAreaOfStudy == $prof_area_of_study_high_school_level->name ? 'selected' : '' }}>
+                    {{ $prof_area_of_study_high_school_level->name }}
+                </option>
+            @endforeach
+            <option value="other" {{ $isAreaOfStudyOther ? 'selected' : '' }}>Other</option>
+        </select>
 
-    @error('prof_area_of_study_high_school_level')
-        <span class="text-red-500 text-xs">{{ $message }}</span>
-    @enderror
-</div>
-        </div>
-
-        <!-- Area of Specialisation -->
-        <div class="flex space-x-4">
-            <div class="flex-1">
-    <label for="prof_area_of_specialisation" class="block text-sm font-medium text-gray-700">Area of Specialisation:<span class="text-red-500">*</span></label>
-    <select 
-        name="prof_area_of_specialisation" 
-        id="prof_area_of_specialisation" 
-        required 
-        class="mt-1 block w-full py-2 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-        <option value="" disabled selected>Select Area of Specialisation</option>
-        @foreach($prof_area_of_specialisations as $prof_area_of_specialisation)
-            <option value="{{ $prof_area_of_specialisation->name }}" {{ old('prof_area_of_specialisation') == $prof_area_of_specialisation->name ? 'selected' : '' }}>{{ $prof_area_of_specialisation->name }}</option>
-        @endforeach
-    </select>
-
-    @error('prof_area_of_specialisation')
-        <span class="text-red-500 text-xs">{{ $message }}</span>
-    @enderror
+        @error('prof_area_of_study_high_school_level')
+            <span class="text-red-500 text-xs">{{ $message }}</span>
+        @enderror
+    </div>
 </div>
 
-        </div>
+<!-- Input Field for "Other" Area of Study -->
+<div class="flex space-x-4" id="prof_area_of_study_other_div" style="{{ $isAreaOfStudyOther ? '' : 'display: none;' }}">
+    <div class="flex-1">
+        <label for="prof_area_of_study_high_school_level_other" class="block text-sm font-medium text-gray-700">
+            Please Specify Area of Study<span class="text-red-500">*</span>
+        </label>
+        <input 
+            type="text" 
+            name="prof_area_of_study_high_school_level_other" 
+            id="prof_area_of_study_high_school_level_other" 
+            value="{{ old('prof_area_of_study_high_school_level_other', $isAreaOfStudyOther ? $selectedAreaOfStudy : '') }}"
+            class="mt-1 block w-full py-2 px-4 border border-gray-300 rounded-md shadow-sm focus:outline-none sm:text-sm">
+        @error('prof_area_of_study_high_school_level_other')
+            <span class="text-red-500 text-xs">{{ $message }}</span>
+        @enderror
+    </div>
+</div>
+
+
+       <!-- Area of Specialisation -->
+<div class="flex space-x-4">
+    <div class="flex-1">
+        <label for="prof_area_of_specialisation" class="block text-sm font-medium text-gray-700">
+            Area of Specialisation:<span class="text-red-500">*</span>
+        </label>
+        @php
+            $specialisationOptions = $prof_area_of_specialisations->pluck('name')->toArray();
+            $selectedSpecialisation = old('prof_area_of_specialisation');
+            $isSpecialisationOther = $selectedSpecialisation === 'other' || (!empty($selectedSpecialisation) && !in_array($selectedSpecialisation, $specialisationOptions));
+        @endphp
+        <select 
+            name="prof_area_of_specialisation" 
+            id="prof_area_of_specialisation" 
+            required 
+            class="mt-1 block w-full py-2 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none sm:text-sm">
+            <option value="" disabled>Select Area of Specialisation</option>
+            @foreach($prof_area_of_specialisations as $prof_area_of_specialisation)
+                <option value="{{ $prof_area_of_specialisation->name }}" {{ $selectedSpecialisation == $prof_area_of_specialisation->name ? 'selected' : '' }}>
+                    {{ $prof_area_of_specialisation->name }}
+                </option>
+            @endforeach
+            <option value="other" {{ $isSpecialisationOther ? 'selected' : '' }}>Other</option>
+        </select>
+
+        @error('prof_area_of_specialisation')
+            <span class="text-red-500 text-xs">{{ $message }}</span>
+        @enderror
+    </div>
+</div>
+
+<!-- Input Field for "Other" Area of Specialisation -->
+<div class="flex space-x-4" id="prof_area_of_specialisation_other_div" style="{{ $isSpecialisationOther ? '' : 'display: none;' }}">
+    <div class="flex-1">
+        <label for="prof_area_of_specialisation_other" class="block text-sm font-medium text-gray-700">
+            Please Specify Area of Specialisation<span class="text-red-500">*</span>
+        </label>
+        <input 
+            type="text" 
+            name="prof_area_of_specialisation_other" 
+            id="prof_area_of_specialisation_other" 
+            value="{{ old('prof_area_of_specialisation_other', $isSpecialisationOther ? $selectedSpecialisation : '') }}"
+            class="mt-1 block w-full py-2 px-4 border border-gray-300 rounded-md shadow-sm focus:outline-none sm:text-sm">
+        @error('prof_area_of_specialisation_other')
+            <span class="text-red-500 text-xs">{{ $message }}</span>
+        @enderror
+    </div>
+</div>
+
 
         
 
@@ -105,41 +162,104 @@
     </div>
         </div>
 
-        <!-- Grade -->
-        <div class="flex space-x-4">
-            <div class="flex-1">
-        <label for="prof_award" class="block text-sm font-medium text-gray-700">Professional Award:<span class="text-red-500">*</span></label>
-        <select name="prof_award" id="prof_award" required class="mt-1 block w-full py-2 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-            <option value="" disabled selected>Select Professional Award</option>
+        <!-- Professional Award -->
+<div class="flex space-x-4">
+    <div class="flex-1">
+        <label for="prof_award" class="block text-sm font-medium text-gray-700">
+            Professional Award:<span class="text-red-500">*</span>
+        </label>
+        @php
+            $awardOptions = $prof_awards->pluck('name')->toArray();
+            $selectedAward = old('prof_award');
+            $isAwardOther = $selectedAward === 'other' || (!empty($selectedAward) && !in_array($selectedAward, $awardOptions));
+        @endphp
+        <select 
+            name="prof_award" 
+            id="prof_award" 
+            required 
+            class="mt-1 block w-full py-2 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none sm:text-sm">
+            <option value="" disabled>Select Professional Award</option>
             @foreach($prof_awards as $prof_award)
-                <option value="{{ $prof_award->name }}" {{ old('prof_award') == $prof_award->name ? 'selected' : '' }}>{{ $prof_award->name }}</option>
+                <option value="{{ $prof_award->name }}" {{ $selectedAward == $prof_award->name ? 'selected' : '' }}>
+                    {{ $prof_award->name }}
+                </option>
             @endforeach
+            <option value="other" {{ $isAwardOther ? 'selected' : '' }}>Other</option>
         </select>
         @error('prof_award')
             <span class="text-red-500 text-xs">{{ $message }}</span>
         @enderror
     </div>
-        </div>
-
-        <div class="flex space-x-4">
-            <div class="flex-1">
-    <label for="prof_grade" class="block text-sm font-medium text-gray-700">Grade:<span class="text-red-500">*</span></label>
-    <select 
-        name="prof_grade" 
-        id="prof_grade" 
-        required 
-        class="mt-1 block w-full py-2 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-        <option value="" disabled selected>Select Grade</option>
-        @foreach($prof_grades as $prof_grade)
-            <option value="{{ $prof_grade->name }}" {{ old('prof_grade') == $prof_grade->name ? 'selected' : '' }}>{{ $prof_grade->name }}</option>
-        @endforeach
-    </select>
-
-    @error('prof_grade')
-        <span class="text-red-500 text-xs">{{ $message }}</span>
-    @enderror
 </div>
+
+<!-- Input Field for "Other" Professional Award -->
+<div class="flex space-x-4" id="prof_award_other_div" style="{{ $isAwardOther ? '' : 'display: none;' }}">
+    <div class="flex-1">
+        <label for="prof_award_other" class="block text-sm font-medium text-gray-700">
+            Please Specify Professional Award<span class="text-red-500">*</span>
+        </label>
+        <input 
+            type="text" 
+            name="prof_award_other" 
+            id="prof_award_other" 
+            value="{{ old('prof_award_other', $isAwardOther ? $selectedAward : '') }}"
+            class="mt-1 block w-full py-2 px-4 border border-gray-300 rounded-md shadow-sm focus:outline-none sm:text-sm">
+        @error('prof_award_other')
+            <span class="text-red-500 text-xs">{{ $message }}</span>
+        @enderror
+    </div>
 </div>
+
+
+        <!-- Grade -->
+<div class="flex space-x-4">
+    <div class="flex-1">
+        <label for="prof_grade" class="block text-sm font-medium text-gray-700">
+            Grade:<span class="text-red-500">*</span>
+        </label>
+        @php
+            $gradeOptions = $prof_grades->pluck('name')->toArray();
+            $selectedGrade = old('prof_grade');
+            $isGradeOther = $selectedGrade === 'other' || (!empty($selectedGrade) && !in_array($selectedGrade, $gradeOptions));
+        @endphp
+        <select 
+            name="prof_grade" 
+            id="prof_grade" 
+            required 
+            class="mt-1 block w-full py-2 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none sm:text-sm">
+            <option value="" disabled>Select Grade</option>
+            @foreach($prof_grades as $prof_grade)
+                <option value="{{ $prof_grade->name }}" {{ $selectedGrade == $prof_grade->name ? 'selected' : '' }}>
+                    {{ $prof_grade->name }}
+                </option>
+            @endforeach
+            <option value="other" {{ $isGradeOther ? 'selected' : '' }}>Other</option>
+        </select>
+
+        @error('prof_grade')
+            <span class="text-red-500 text-xs">{{ $message }}</span>
+        @enderror
+    </div>
+</div>
+
+<!-- Input Field for "Other" Grade -->
+<div class="flex space-x-4" id="prof_grade_other_div" style="{{ $isGradeOther ? '' : 'display: none;' }}">
+    <div class="flex-1">
+        <label for="prof_grade_other" class="block text-sm font-medium text-gray-700">
+            Please Specify Grade<span class="text-red-500">*</span>
+        </label>
+        <input 
+            type="text" 
+            name="prof_grade_other" 
+            id="prof_grade_other" 
+            value="{{ old('prof_grade_other', $isGradeOther ? $selectedGrade : '') }}"
+            class="mt-1 block w-full py-2 px-4 border border-gray-300 rounded-md shadow-sm focus:outline-none sm:text-sm">
+        @error('prof_grade_other')
+            <span class="text-red-500 text-xs">{{ $message }}</span>
+        @enderror
+    </div>
+</div>
+
 
         <!-- Certificate No. -->
         <div class="flex space-x-4">
@@ -200,6 +320,10 @@
                     <td>{{ $row['prof_start_date'] }}</td>
                     <td>{{ $row['prof_end_date'] }}</td>
                     <td>
+                    
+
+
+                    
 <button class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 delete-row" data-index="{{ $index }}">
     Delete
 </button>
@@ -219,6 +343,11 @@
                     <td>{{ $datum->prof_start_date }}</td>
                     <td>{{ $datum->prof_end_date }}</td>
                     <td>
+                    <a href="{{ route('edit.prof.info', $datum->id) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+    Edit
+</a>
+
+
                         <form action="{{ route('delete.prof.info', $datum->id) }}" method="POST">
                             @csrf
                             @method('DELETE')
@@ -232,6 +361,11 @@
             @endforeach
         </tbody>
     </table>
+
+    <!-- Pagination Links -->
+        <div class="mt-4">
+            {{ $profInfos->links() }}
+        </div>
 
 <form id="prof-info-form" action="{{ route('profile.save-prof-info') }}" method="POST">
         @csrf

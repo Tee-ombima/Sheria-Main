@@ -21,11 +21,20 @@ class DocumentNameSeeder extends Seeder
             'KCSE Certificate',
             'Birth Certificate',
             'Certificate of Good Conduct',
-            'NHIF Card',
+            'SHIF Card',
             'NSSF Card',
             'KRA PIN Certificate',
             'CV/Resume',
             'Cover letter',
+            'Diploma Certificate',
+            'Masters certificate',
+            'Higher Diploma Certficate',
+            'Professional Certificate',
+            'Member to professional body Certificate',
+            'PHD certificate',
+            'Kcpe Certificate',
+            'Recommendation Letter',
+
         ];
 
         foreach ($documentNames as $documentName) {

@@ -28,5 +28,10 @@
             @endforeach
         </tbody>
     </table>
+
+    <!-- Pagination Links -->
+    <div class="mt-4">
+        {{ $applications->links() }}
+    </div>
 </x-card>
 </x-layout>

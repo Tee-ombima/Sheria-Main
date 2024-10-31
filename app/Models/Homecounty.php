@@ -8,11 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class Homecounty extends Model
 {
     use HasFactory;
-    protected $fillable = ['name'];
-    public function subcounties()
-    {
-        return $this->hasMany(Subcounty::class);
-    }
+    protected $fillable = ['name','added_by_user'];
+
     public function constituencies()
     {
         return $this->hasMany(Constituency::class);

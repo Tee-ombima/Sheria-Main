@@ -24,10 +24,11 @@ class ListingController extends Controller
     public function index() {
         $query = Listing::latest()->filter(request(['tag', 'search']));
     
-        // If the user is not authenticated or is not an admin, only show non-archived listings
-        if (!Auth::check() || Auth::user()->role !== 'admin') {
-            $query->where('archived', false);
-        }
+        // If the user is not authenticated or is not an admin
+    if (!Auth::check() || Auth::user()->role !== 'admin') {
+        // Use the 'active' scope to get only active listings
+        $query->active();
+    }
     
         return view('listings.index', [
             'listings' => $query->paginate(6)
@@ -39,10 +40,14 @@ class ListingController extends Controller
 
     // Show single listing
     public function show(Listing $listing) {
-        // Only allow non-admins to view the listing if it is not archived
-        if ($listing->archived && Auth::user()->role !== 'admin') {
-            abort(403, 'Unauthorized Access - This listing is archived.');
+        // Only allow non-admins to view the listing if it is not archived and deadline has not passed
+    // If the user is not an admin
+    if (!Auth::check() || Auth::user()->role !== 'admin') {
+        // Check if the listing is active
+        if (!$listing->isActive) {
+            abort(403, 'Unauthorized Access - This listing is archived or has expired.');
         }
+    }
     
         return view('listings.show', [
             'listing' => $listing
@@ -58,29 +63,30 @@ class ListingController extends Controller
         return view('listings.create');
     }
 
-    // Store Listing Data
-    public function store(Request $request) {
-        // Only allow admins to create listings
-        if (Auth::user()->role !== 'admin') {
-            abort(403, 'Unauthorized Action');
-        }
-
-        $formFields = $request->validate([
-            'title' => 'required',
-            'job_reference_number' => ['required', Rule::unique('listings', 'job_reference_number')],
-            'tags' => 'required',
-            'description' => 'required'
-        ]);
-
-        if($request->hasFile('logo')) {
-            $formFields['logo'] = $request->file('logo')->store('logos', 'public');
-        }
-
-
-        Listing::create($formFields);
-
-        return redirect('/')->with('message', 'Listing created successfully!');
+    public function store(Request $request)
+{
+    // Only allow admins to create listings
+    if (Auth::user()->role !== 'admin') {
+        abort(403, 'Unauthorized Action');
     }
+
+    $formFields = $request->validate([
+        'title' => 'required',
+        'job_reference_number' => ['required', Rule::unique('listings', 'job_reference_number')],
+        'vacancies' => 'required',
+        'deadline' => 'required|date|after:now',
+        'file' => 'required|mimes:pdf|max:2048', // Validate PDF file upload
+    ]);
+
+    // Handle file upload
+    if ($request->hasFile('file')) {
+        $formFields['file'] = $request->file('file')->store('files', 'public');
+    }
+
+    Listing::create($formFields);
+
+    return redirect('/')->with('message', 'Listing created successfully!');
+}
 
     // Show Edit Form
     public function edit(Listing $listing) {
@@ -91,28 +97,35 @@ class ListingController extends Controller
         return view('listings.edit', ['listing' => $listing]);
     }
 
-    // Update Listing Data
-    public function update(Request $request, Listing $listing) {
-        // Only allow admins to update listings
-        if (Auth::user()->role !== 'admin') {
-            abort(403, 'Unauthorized Action');
-        }
-
-        $formFields = $request->validate([
-            'title' => 'required',
-            'job_reference_number' => ['required'],
-            'tags' => 'required',
-            'description' => 'required'
-        ]);
-
-        if($request->hasFile('logo')) {
-            $formFields['logo'] = $request->file('logo')->store('logos', 'public');
-        }
-
-        $listing->update($formFields);
-
-        return back()->with('message', 'Listing updated successfully!');
+    public function update(Request $request, Listing $listing)
+{
+    // Only allow admins to update listings
+    if (Auth::user()->role !== 'admin') {
+        abort(403, 'Unauthorized Action');
     }
+
+    $formFields = $request->validate([
+        'title' => 'required',
+        'job_reference_number' => ['required'],
+        'vacancies' => 'required',
+        'deadline' => 'required|date|after:now',
+        'file' => 'sometimes|mimes:pdf|max:2048', // Optional PDF file upload
+    ]);
+
+    // Handle file upload
+    if ($request->hasFile('file')) {
+        // Delete old file if it exists
+        if ($listing->file) {
+            Storage::disk('public')->delete($listing->file);
+        }
+
+        $formFields['file'] = $request->file('file')->store('files', 'public');
+    }
+
+    $listing->update($formFields);
+
+    return back()->with('message', 'Listing updated successfully!');
+}
 
     // Delete Listing
     public function destroy(Listing $listing) {
@@ -121,9 +134,7 @@ class ListingController extends Controller
             abort(403, 'Unauthorized Action');
         }
 
-        if($listing->logo && Storage::disk('public')->exists($listing->logo)) {
-            Storage::disk('public')->delete($listing->logo);
-        }
+        
         $listing->delete();
         return redirect('/')->with('message', 'Listing deleted successfully');
     }

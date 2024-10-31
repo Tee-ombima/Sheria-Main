@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
 {
     Schema::table('listings', function (Blueprint $table) {
-        $table->boolean('archived')->default(false)->after('description');
+        $table->boolean('archived')->default(false)->after('file');
     });
 }
 

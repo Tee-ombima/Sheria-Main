@@ -16,6 +16,15 @@
                 <input type="text" name="name" id="name" value="{{ $department->name }}" required
                     class="border border-gray-400 p-2 w-full">
             </div>
+            <!-- Department Email Input -->
+            <div class="mb-6">
+                <label for="email" class="block mb-2 uppercase font-bold text-xs text-gray-700">
+                    Department Email
+                </label>
+                <input type="email" name="email" id="email" value="{{ $department->email }}" required
+                    class="border border-gray-400 p-2 w-full">
+            </div>
+
 
             <!-- Submit Button -->
             <div class="mb-6">

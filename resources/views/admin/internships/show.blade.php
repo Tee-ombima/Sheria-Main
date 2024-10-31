@@ -1,82 +1,101 @@
 <x-layout>
     <x-card class="p-10 max-w-full mx-auto mt-24 bg-white rounded-lg shadow-lg">
 
-        <h1 class="text-3xl font-bold text-center mb-8 text-gray-800">{{ $department->name }} Applications</h1>
+        <h1 class="text-3xl font-bold mb-6">Application Details</h1>
 
-        <table class="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
-            <thead class="bg-gray-100 text-gray-700 uppercase text-sm">
-                <tr>
-                    <th class="py-3 px-5 text-left">#</th> <!-- Numbering Column -->
-                    <th class="py-3 px-5 text-left">Full Name</th>
-                    <th class="py-3 px-5 text-left">Email</th>
-                    <th class="py-3 px-5 text-left">Phone Number</th>
-                    <th class="py-3 px-5 text-left">Institution Name</th>
-                    <th class="py-3 px-5 text-left">Status</th>
-                    <th class="py-3 px-5 text-left">ID File</th>
-                    <th class="py-3 px-5 text-left">University Letter</th>
-                    <th class="py-3 px-5 text-left">KRA PIN</th>
-                    <th class="py-3 px-5 text-left">Insurance</th>
-                    <th class="py-3 px-5 text-left">Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($applications as $index => $application) <!-- Add index for numbering -->
-                    <tr class="border-t border-gray-200">
-                        <td class="py-3 px-5 text-gray-600">{{ $index + 1 }}</td> <!-- Numbering -->
-                        <td class="py-3 px-5 text-gray-600">{{ $application->full_name }}</td>
-                        <td class="py-3 px-5 text-gray-600">{{ $application->email }}</td>
-                        <td class="py-3 px-5 text-gray-600">{{ $application->phone }}</td>
-                        <td class="py-3 px-5 text-gray-600">{{ $application->institution }}</td>
-                        <td class="py-3 px-5 text-gray-600">{{ $application->status }}</td>
-                        <td class="py-3 px-5 text-gray-600">
-                            <a href="{{ asset('storage/' . $application->id_file) }}" target="_blank" class="text-blue-500 underline">View Document</a>
-                        </td>
-                        <td class="py-3 px-5 text-gray-600">
-                            <a href="{{ asset('storage/' . $application->university_letter) }}" target="_blank" class="text-blue-500 underline">View Document</a>
-                        </td>
-                        <td class="py-3 px-5 text-gray-600">
-                            <a href="{{ asset('storage/' . $application->kra_pin) }}" target="_blank" class="text-blue-500 underline">View Document</a>
-                        </td>
-                        <td class="py-3 px-5 text-gray-600">
-                            <a href="{{ asset('storage/' . $application->insurance) }}" target="_blank" class="text-blue-500 underline">View Document</a>
-                        </td>
-                        <td class="py-3 px-5">
-                            <form action="{{ route('admin.internships.destroy', $application->id) }}" method="POST" class="space-y-2">
-                                @csrf
-                                @method('DELETE') <!-- Use DELETE method for removal -->
-                                <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded-lg shadow hover:bg-red-600 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-500">
-                                    Remove from List
-                                </button>
-                            </form>
-                            <form action="{{ route('admin.internships.update', $application->id) }}" method="POST" class="space-y-2">
-                                @csrf
-                                @method('PATCH')
-                                <div>
-                                    <select name="status" class="w-full py-2 px-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                        <option value="Pending" {{ $application->status == 'Pending' ? 'selected' : '' }}>Pending</option>
-                                        <option value="Accepted" {{ $application->status == 'Accepted' ? 'selected' : '' }}>Accepted</option>
-                                        <option value="Rejected" {{ $application->status == 'Rejected' ? 'selected' : '' }}>Rejected</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <input type="text" name="remarks" value="{{ $application->remarks }}" placeholder="Enter remarks" class="w-full py-2 px-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                </div>
-                                <div class="flex justify-end">
-                                    <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-lg shadow hover:bg-green-600 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-500">
-                                        Update
-                                    </button>
-                                </div>
-                            </form>
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
+<div class="bg-white shadow-md rounded-lg mb-6">
+    <div class="p-4">
+        <h2 class="text-2xl font-semibold mb-4">Applicant Information</h2>
+        <p><strong>Full Name:</strong> {{ $application->full_name }}</p>
+        <p><strong>Email:</strong> {{ $application->email }}</p>
+        <p><strong>Phone Number:</strong> {{ $application->phone }}</p>
+        <p><strong>Institution Name:</strong> {{ $application->institution }}</p>
 
-        <!-- Pagination Links -->
-        <div class="mt-4">
-            {{ $applications->links() }}
-        </div>
+        <h3 class="text-xl font-semibold mt-6 mb-4">Uploaded Documents</h3>
+        <ul class="list-disc ml-6">
+            <li>
+                <strong>ID File:</strong>
+                @if($application->id_file)
+                    <a href="{{ asset('storage/' . $application->id_file) }}" target="_blank" class="text-blue-600">View Document</a>
+                @else
+                    Not Provided
+                @endif
+            </li>
+            <li>
+                <strong>University Letter:</strong>
+                @if($application->university_letter)
+                    <a href="{{ asset('storage/' . $application->university_letter) }}" target="_blank" class="text-blue-600">View Document</a>
+                @else
+                    Not Provided
+                @endif
+            </li>
+            <li>
+                <strong>Own Application Letter:</strong>
+                @if($application->kra_pin)
+                    <a href="{{ asset('storage/' . $application->kra_pin) }}" target="_blank" class="text-blue-600">View Document</a>
+                @else
+                    Not Provided
+                @endif
+            </li>
+            <li>
+                <strong>Insurance:</strong>
+                @if($application->insurance)
+                    <a href="{{ asset('storage/' . $application->insurance) }}" target="_blank" class="text-blue-600">View Document</a>
+                @else
+                    Not Provided
+                @endif
+            </li>
+            <li>
+                <strong>Good Conduct:</strong>
+                @if($application->good_conduct)
+                    <a href="{{ asset('storage/' . $application->good_conduct) }}" target="_blank" class="text-blue-600">View Document</a>
+                @else
+                    Not Provided
+                @endif
+            </li>
+            <li>
+                <strong>Curriculum Vitae (CV):</strong>
+                @if($application->cv)
+                    <a href="{{ asset('storage/' . $application->cv) }}" target="_blank" class="text-blue-600">View Document</a>
+                @else
+                    Not Provided
+                @endif
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="bg-white shadow-md rounded-lg mb-6">
+    <div class="p-4">
+        <form action="{{ route('admin.internships.update', $application->id) }}" method="POST">
+            @csrf
+            <div class="mb-4">
+                <label for="status" class="block text-sm font-medium text-gray-700">Application Status</label>
+                <select name="status" id="status" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                    <option value="Pending" @if($application->status == 'Pending') selected @endif>Pending</option>
+                    <option value="Accepted" @if($application->status == 'Accepted') selected @endif>Accepted</option>
+                    <option value="Not_Successful" @if($application->status == 'Not_Successful') selected @endif>Not Successful</option>
+                </select>
+            </div>
+            <div class="mb-4">
+    <label for="department_id" class="block text-sm font-medium text-gray-700">Assign to Department</label>
+    <select name="department_id" id="department_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+        <option value="">-- Select Department --</option>
+        @foreach($departments as $department)
+            <option value="{{ $department->id }}" @if($application->department_id == $department->id) selected @endif>
+                {{ $department->name }} ({{ $department->email }})
+            </option>
+        @endforeach
+    </select>
+</div>
+
+            <div class="flex justify-end">
+                <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg shadow">
+                    Update Application
+                </button>
+            </div>
+        </form>
+    </div>
 
     </x-card>
 </x-layout>

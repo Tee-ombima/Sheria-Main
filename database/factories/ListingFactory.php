@@ -20,30 +20,40 @@ class ListingFactory extends Factory
         $departmentAbbreviations = ['ICT', 'HR', 'FIN', 'MK', 'DEV', 'LEG', 'CS', 'OPS'];
         $department = $this->faker->randomElement($departmentAbbreviations);
         $year = date('Y');
-        $uniqueId = $this->faker->unique()->numberBetween(10000, 99999);        $jobReferenceNumber = "$department/$year/$uniqueId";
+        $uniqueId = $this->faker->unique()->numberBetween(10000, 99999);
+        $jobReferenceNumber = "$department/$year/$uniqueId";
 
-        // Randomly generate a job description
-        $description = $this->faker->paragraphs($this->faker->numberBetween(2, 5), true); // 2 to 5 paragraphs
+        // Generate a detailed job description with sections
+        $jobOverview = $this->faker->paragraphs(3, true);  // 3 paragraphs for job overview
+        $jobDuties = $this->faker->sentences(6); // 6 duties
+        $qualifications = $this->faker->sentences(5); // 5 qualifications
+        $salary = $this->faker->numberBetween(50000, 150000);  // Salary example
+        $deadline = $this->faker->dateTimeBetween('-10 days', '+30 days');
 
-        // Generate random job duties
-        $dutiesCount = $this->faker->numberBetween(3, 6);
-        $jobDuties = [];
-        for ($i = 0; $i < $dutiesCount; $i++) {
-            $jobDuties[] = $this->faker->sentence();
-        }
 
-        // Generate random qualifications
-        $qualificationsCount = $this->faker->numberBetween(1, 3);
-        $qualifications = [];
-        for ($i = 0; $i < $qualificationsCount; $i++) {
-            $qualifications[] = $this->faker->sentence();
-        }
+        // Create the formatted job description
+        $description = "
+            **Job Overview:**
+
+            $jobOverview
+
+            **Key Job Duties:**
+            - " . implode("\n            - ", $jobDuties) . "
+
+            **Qualifications:**
+            - " . implode("\n            - ", $qualifications) . "
+
+            **Salary:** \$" . number_format($salary) . " per annum
+        ";
+        $filePath = 'files/5-mb-example-file.pdf';
+
 
         return [
             'title' => $jobTitle,
-            'tags' => 'mid level, fulltime, remote', // Adjust as needed
             'job_reference_number' => $jobReferenceNumber,
-            'description' => "$description\n\nDuties:\n- " . implode("\n- ", $jobDuties) . "\n\nQualifications:\n- " . implode("\n- ", $qualifications),
+            'vacancies' => $this->faker->numberBetween(1, 10), // Random number of vacancies
+            'deadline' => $deadline,
+            'file' => $filePath,
         ];
     }
 }

@@ -16,7 +16,6 @@ return new class extends Migration
         Schema::create('internship_applications', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('department_id')->constrained()->onDelete('cascade');
             $table->string('full_name');
             $table->string('phone');
             $table->string('institution');
@@ -25,8 +24,10 @@ return new class extends Migration
             $table->string('university_letter');
             $table->string('kra_pin');
             $table->string('insurance');
+            $table->string('good_conduct'); // Add this line
+            $table->string('cv'); // Add this line
             $table->string('status')->default('Pending');
-            $table->string('remarks')->nullable();
+            
             $table->timestamps();
         });
         

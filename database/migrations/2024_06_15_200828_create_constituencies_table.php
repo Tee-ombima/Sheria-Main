@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('constituencies', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
-            $table->foreignId('homecounty_id')->constrained()->onDelete('cascade');
+            $table->foreignId('homecounty_id')->constrained('homecounties')->onDelete('cascade'); // Foreign key linking to homecounties table
             $table->timestamps();
         });
     }

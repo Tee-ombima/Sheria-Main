@@ -2,14 +2,18 @@
 
 <x-card>
   <div class="flex">
-    <img class="hidden w-48 mr-6 md:block"
-      src="{{$listing->logo ? asset('storage/' . $listing->logo) : asset('/images/no-image.png')}}" alt="" />
+    
     <div>
-      <h3 class="text-2xl">
+      <h3 class="text-2x1">
         <a href="/listings/{{$listing->id}}">{{$listing->title}}</a>
+        <span class="text-sm text-blue-500">
+        <a href="/listings/{{$listing->id}}" class="ml-2">View</a>
+    </span>
       </h3>
-      <div class="text-xl font-bold mb-4">{{$listing->company}}</div>
-      <x-listing-tags :tagsCsv="$listing->tags" />
+      <div class="flex items-center justify-center rounded-xl py-1 px-3 mr-2 text-xs" style="background-color: #D68C3C; color: #FFFFFF;">
+        Number of vacancies available: {{ $listing->vacancies }}
+      </div>
+
       
     </div>
   </div>

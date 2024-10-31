@@ -19,6 +19,8 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         // Create "user" and "admin" roles
+        putenv('TMPDIR=' . storage_path('app/temp'));
+
         
         $this->call([
             
@@ -42,6 +44,7 @@ class DatabaseSeeder extends Seeder
         UserSeeder::class,                     // Seed users after essential data such as salutation, county, etc.
         ApplicationSeeder::class,
         DepartmentSeeder::class,
+        FooterTableSeeder::class,
         
         ]);
 

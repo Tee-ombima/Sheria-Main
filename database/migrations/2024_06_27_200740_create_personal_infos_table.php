@@ -27,7 +27,7 @@ return new class extends Migration
             $table->string('idno', 8)->default('00000000');
             $table->string('kra_pin', 11)->default('DEFA12345');
             $table->enum('gender', ['male', 'female'])->default('male');
-            $table->string('nationality', 50)->default('Default');
+            $table->string('nationality', 255)->default('Default');
             $table->string('ethnicity')->default('Default');
             $table->string('postal_address')->default('Default');
             $table->string('code')->nullable();

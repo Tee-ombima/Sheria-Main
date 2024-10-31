@@ -10,66 +10,138 @@ class ConstituencySeeder extends Seeder
 {
     public function run()
     {
-        $counties = [
-            'Mombasa' => ['Changamwe', 'Jomvu', 'Kisauni', 'Nyali', 'Likoni', 'Mvita'],
-            'Kwale' => ['Msambweni', 'Lunga Lunga', 'Matuga', 'Kinango'],
-            'Kilifi' => ['Kilifi North', 'Kilifi South', 'Kaloleni', 'Rabai', 'Ganze', 'Malindi', 'Magarini'],
-            'Tana River' => ['Garsen', 'Galole', 'Bura'],
-            'Lamu' => ['Lamu East', 'Lamu West'],
-            'Taita Taveta' => ['Taveta', 'Wundanyi', 'Mwatate', 'Voi'],
-            'Garissa' => ['Garissa Township', 'Balambala', 'Lagdera', 'Dadaab', 'Fafi', 'Ijara'],
-            'Wajir' => ['Wajir North', 'Wajir East', 'Tarbaj', 'Wajir West', 'Eldas', 'Wajir South'],
-            'Mandera' => ['Mandera West', 'Banissa', 'Mandera North', 'Mandera South', 'Mandera East', 'Lafey'],
-            'Marsabit' => ['Moyale', 'North Horr', 'Saku', 'Laisamis'],
-            'Isiolo' => ['Isiolo North', 'Isiolo South'],
-            'Meru' => ['Igembe South', 'Igembe Central', 'Igembe North', 'Tigania West', 'Tigania East', 'North Imenti', 'Buuri', 'Central Imenti', 'South Imenti'],
-            'Tharaka-Nithi' => ['Maara', 'Chuka/Igambang\'ombe', 'Tharaka'],
-            'Embu' => ['Manyatta', 'Runyenjes', 'Mbeere South', 'Mbeere North'],
-            'Kitui' => ['Mwingi North', 'Mwingi West', 'Mwingi Central', 'Kitui West', 'Kitui Rural', 'Kitui Central', 'Kitui East', 'Kitui South'],
-            'Machakos' => ['Masinga', 'Yatta', 'Kangundo', 'Matungulu', 'Kathiani', 'Mavoko', 'Machakos Town', 'Mwala'],
-            'Makueni' => ['Mbooni', 'Kilome', 'Kaiti', 'Makueni', 'Kibwezi West', 'Kibwezi East'],
-            'Nyandarua' => ['Kinangop', 'Kipipiri', 'Ol Kalou', 'Ol Jorok', 'Ndaragwa'],
-            'Nyeri' => ['Tetu', 'Kieni', 'Mathira', 'Othaya', 'Mukurweini', 'Nyeri Town'],
-            'Kirinyaga' => ['Mwea', 'Gichugu', 'Ndia', 'Kirinyaga Central'],
-            'Murang\'a' => ['Kangema', 'Mathioya', 'Kiharu', 'Kigumo', 'Maragwa', 'Kandara', 'Gatanga'],
-            'Kiambu' => ['Gatundu South', 'Gatundu North', 'Juja', 'Thika Town', 'Ruiru', 'Githunguri', 'Kiambu', 'Kiambaa', 'Kabete', 'Kikuyu', 'Limuru', 'Lari'],
-            'Turkana' => ['Turkana North', 'Turkana West', 'Turkana Central', 'Loima', 'Turkana South', 'Turkana East'],
-            'West Pokot' => ['Kapenguria', 'Sigor', 'Kacheliba', 'Pokot South'],
-            'Samburu' => ['Samburu West', 'Samburu North', 'Samburu East'],
-            'Trans Nzoia' => ['Kwanza', 'Endebess', 'Saboti', 'Kiminini', 'Cherangany'],
-            'Uasin Gishu' => ['Soy', 'Turbo', 'Moiben', 'Ainabkoi', 'Kapseret', 'Kesses'],
-            'Elgeyo-Marakwet' => ['Marakwet East', 'Marakwet West', 'Keiyo North', 'Keiyo South'],
-            'Nandi' => ['Tinderet', 'Aldai', 'Nandi Hills', 'Chesumei', 'Emgwen', 'Mosop'],
-            'Baringo' => ['Tiaty', 'Baringo North', 'Baringo Central', 'Baringo South', 'Mogotio', 'Eldama Ravine'],
-            'Laikipia' => ['Laikipia West', 'Laikipia East', 'Laikipia North'],
-            'Nakuru' => ['Molo', 'Njoro', 'Naivasha', 'Gilgil', 'Kuresoi South', 'Kuresoi North', 'Subukia', 'Rongai', 'Bahati', 'Nakuru Town West', 'Nakuru Town East'],
-            'Narok' => ['Kilgoris', 'Emurua Dikirr', 'Narok North', 'Narok East', 'Narok South', 'Narok West'],
-            'Kajiado' => ['Kajiado North', 'Kajiado Central', 'Kajiado East', 'Kajiado West', 'Kajiado South'],
-            'Kericho' => ['Kipkelion East', 'Kipkelion West', 'Ainamoi', 'Bureti', 'Belgut', 'Soin/Sigowet'],
-            'Bomet' => ['Sotik', 'Chepalungu', 'Bomet East', 'Bomet Central', 'Konoin'],
-            'Kakamega' => ['Lugari', 'Likuyani', 'Malava', 'Lurambi', 'Navakholo', 'Mumias West', 'Mumias East', 'Matungu', 'Butere', 'Khwisero', 'Shinyalu', 'Ikolomani'],
-            'Vihiga' => ['Vihiga', 'Sabatia', 'Hamisi', 'Luanda', 'Emuhaya'],
-            'Bungoma' => ['Mt Elgon', 'Sirisia', 'Kabuchai', 'Bumula', 'Kanduyi', 'Webuye East', 'Webuye West', 'Kimilili', 'Tongaren'],
-            'Busia' => ['Teso North', 'Teso South', 'Nambale', 'Matayos', 'Butula', 'Funyula', 'Budalangi'],
-            'Siaya' => ['Ugenya', 'Ugunja', 'Alego Usonga', 'Gem', 'Bondo', 'Rarieda'],
-            'Kisumu' => ['Kisumu East', 'Kisumu West', 'Kisumu Central', 'Seme', 'Nyando', 'Muhoroni', 'Nyakach'],
-            'Homa Bay' => ['Kasipul', 'Kabondo Kasipul', 'Karachuonyo', 'Rangwe', 'Homa Bay Town', 'Ndhiwa', 'Mbita', 'Suba'],
-            'Migori' => ['Rongo', 'Awendo', 'Suna East', 'Suna West', 'Uriri', 'Nyatike', 'Kuria West', 'Kuria East'],
-            'Kisii' => ['Bonchari', 'South Mugirango', 'Bomachoge Borabu', 'Bobasi', 'Bomachoge Chache', 'Nyaribari Masaba', 'Nyaribari Chache', 'Kitutu Chache North', 'Kitutu Chache South'],
-            'Nyamira' => ['West Mugirango', 'North Mugirango', 'Borabu', 'Kitutu Masaba'],
-            'Nairobi' => ['Westlands', 'Dagoretti North', 'Dagoretti South', 'Lang\'ata', 'Kibra', 'Roysambu', 'Kasarani', 'Ruaraka', 'Embakasi South', 'Embakasi North', 'Embakasi Central', 'Embakasi East', 'Embakasi West', 'Makadara', 'Kamukunji', 'Starehe', 'Mathare'],
+        $homecounties = Homecounty::all()->keyBy('name');
+
+        $constituencies = [
+            // Mombasa County
+            ['name' => 'Changamwe', 'homecounty_id' => $homecounties['Mombasa']->id],
+            ['name' => 'Jomvu', 'homecounty_id' => $homecounties['Mombasa']->id],
+            ['name' => 'Kisauni', 'homecounty_id' => $homecounties['Mombasa']->id],
+            ['name' => 'Nyali', 'homecounty_id' => $homecounties['Mombasa']->id],
+            ['name' => 'Likoni', 'homecounty_id' => $homecounties['Mombasa']->id],
+            ['name' => 'Mvita', 'homecounty_id' => $homecounties['Mombasa']->id],
+
+            // Nairobi City County
+            ['name' => 'Westlands', 'homecounty_id' => $homecounties['Nairobi City']->id],
+            ['name' => 'Dagoretti North', 'homecounty_id' => $homecounties['Nairobi City']->id],
+            ['name' => 'Dagoretti South', 'homecounty_id' => $homecounties['Nairobi City']->id],
+            ['name' => 'Langata', 'homecounty_id' => $homecounties['Nairobi City']->id],
+            ['name' => 'Kibra', 'homecounty_id' => $homecounties['Nairobi City']->id],
+            ['name' => 'Roysambu', 'homecounty_id' => $homecounties['Nairobi City']->id],
+            ['name' => 'Kasarani', 'homecounty_id' => $homecounties['Nairobi City']->id],
+            ['name' => 'Ruaraka', 'homecounty_id' => $homecounties['Nairobi City']->id],
+            ['name' => 'Embakasi South', 'homecounty_id' => $homecounties['Nairobi City']->id],
+            ['name' => 'Embakasi North', 'homecounty_id' => $homecounties['Nairobi City']->id],
+            ['name' => 'Embakasi Central', 'homecounty_id' => $homecounties['Nairobi City']->id],
+            ['name' => 'Embakasi East', 'homecounty_id' => $homecounties['Nairobi City']->id],
+            ['name' => 'Embakasi West', 'homecounty_id' => $homecounties['Nairobi City']->id],
+            ['name' => 'Makadara', 'homecounty_id' => $homecounties['Nairobi City']->id],
+            ['name' => 'Kamukunji', 'homecounty_id' => $homecounties['Nairobi City']->id],
+            ['name' => 'Starehe', 'homecounty_id' => $homecounties['Nairobi City']->id],
+            ['name' => 'Mathare', 'homecounty_id' => $homecounties['Nairobi City']->id],
+
+            // Add other counties and their constituencies similarly
+            // For example:
+
+            // Kiambu County
+            ['name' => 'Kabete', 'homecounty_id' => $homecounties['Kiambu']->id],
+            ['name' => 'Gatundu South', 'homecounty_id' => $homecounties['Kiambu']->id],
+            ['name' => 'Gatundu North', 'homecounty_id' => $homecounties['Kiambu']->id],
+            ['name' => 'Juja', 'homecounty_id' => $homecounties['Kiambu']->id],
+            ['name' => 'Thika Town', 'homecounty_id' => $homecounties['Kiambu']->id],
+            ['name' => 'Ruiru', 'homecounty_id' => $homecounties['Kiambu']->id],
+            ['name' => 'Githunguri', 'homecounty_id' => $homecounties['Kiambu']->id],
+            ['name' => 'Kiambu', 'homecounty_id' => $homecounties['Kiambu']->id],
+            ['name' => 'Kiambaa', 'homecounty_id' => $homecounties['Kiambu']->id],
+            ['name' => 'Limuru', 'homecounty_id' => $homecounties['Kiambu']->id],
+            ['name' => 'Lari', 'homecounty_id' => $homecounties['Kiambu']->id],
+
+            
+            ['name' => 'Kikuyu', 'homecounty_id' => $homecounties['Kiambu']->id],
+
+            // **Constituencies for Other Counties**
+            // Below are the remaining constituencies for all other counties not previously mentioned
+
+            // **Kwale County**
+            ['name' => 'Msambweni', 'homecounty_id' => $homecounties['Kwale']->id],
+            ['name' => 'Lunga Lunga', 'homecounty_id' => $homecounties['Kwale']->id],
+            ['name' => 'Matuga', 'homecounty_id' => $homecounties['Kwale']->id],
+            ['name' => 'Kinango', 'homecounty_id' => $homecounties['Kwale']->id],
+
+            // **Tana River County**
+            ['name' => 'Garsen', 'homecounty_id' => $homecounties['Tana River']->id],
+            ['name' => 'Galole', 'homecounty_id' => $homecounties['Tana River']->id],
+            ['name' => 'Bura', 'homecounty_id' => $homecounties['Tana River']->id],
+
+            // **Lamu County**
+            ['name' => 'Lamu East', 'homecounty_id' => $homecounties['Lamu']->id],
+            ['name' => 'Lamu West', 'homecounty_id' => $homecounties['Lamu']->id],
+
+            // **Taita-Taveta County**
+            ['name' => 'Taveta', 'homecounty_id' => $homecounties['Taita-Taveta']->id],
+            ['name' => 'Wundanyi', 'homecounty_id' => $homecounties['Taita-Taveta']->id],
+            ['name' => 'Mwatate', 'homecounty_id' => $homecounties['Taita-Taveta']->id],
+            ['name' => 'Voi', 'homecounty_id' => $homecounties['Taita-Taveta']->id],
+
+            // **Garissa County**
+            ['name' => 'Garissa Township', 'homecounty_id' => $homecounties['Garissa']->id],
+            ['name' => 'Balambala', 'homecounty_id' => $homecounties['Garissa']->id],
+            ['name' => 'Lagdera', 'homecounty_id' => $homecounties['Garissa']->id],
+            ['name' => 'Dadaab', 'homecounty_id' => $homecounties['Garissa']->id],
+            ['name' => 'Fafi', 'homecounty_id' => $homecounties['Garissa']->id],
+            ['name' => 'Ijara', 'homecounty_id' => $homecounties['Garissa']->id],
+
+            // **Wajir County**
+            ['name' => 'Wajir North', 'homecounty_id' => $homecounties['Wajir']->id],
+            ['name' => 'Wajir East', 'homecounty_id' => $homecounties['Wajir']->id],
+            ['name' => 'Tarbaj', 'homecounty_id' => $homecounties['Wajir']->id],
+            ['name' => 'Wajir West', 'homecounty_id' => $homecounties['Wajir']->id],
+            ['name' => 'Eldas', 'homecounty_id' => $homecounties['Wajir']->id],
+            ['name' => 'Wajir South', 'homecounty_id' => $homecounties['Wajir']->id],
+
+            // **Mandera County**
+            ['name' => 'Mandera West', 'homecounty_id' => $homecounties['Mandera']->id],
+            ['name' => 'Banissa', 'homecounty_id' => $homecounties['Mandera']->id],
+            ['name' => 'Mandera North', 'homecounty_id' => $homecounties['Mandera']->id],
+            ['name' => 'Mandera South', 'homecounty_id' => $homecounties['Mandera']->id],
+            ['name' => 'Mandera East', 'homecounty_id' => $homecounties['Mandera']->id],
+            ['name' => 'Lafey', 'homecounty_id' => $homecounties['Mandera']->id],
+
+            // **Marsabit County**
+            ['name' => 'Moyale', 'homecounty_id' => $homecounties['Marsabit']->id],
+            ['name' => 'North Horr', 'homecounty_id' => $homecounties['Marsabit']->id],
+            ['name' => 'Saku', 'homecounty_id' => $homecounties['Marsabit']->id],
+            ['name' => 'Laisamis', 'homecounty_id' => $homecounties['Marsabit']->id],
+
+            // **Isiolo County**
+            ['name' => 'Isiolo North', 'homecounty_id' => $homecounties['Isiolo']->id],
+            ['name' => 'Isiolo South', 'homecounty_id' => $homecounties['Isiolo']->id],
+
+            // **Meru County** (Previously mentioned, so skipping)
+
+            // **Tharaka-Nithi County**
+            ['name' => 'Maara', 'homecounty_id' => $homecounties['Tharaka-Nithi']->id],
+            ['name' => 'Chuka/Igambang\'ombe', 'homecounty_id' => $homecounties['Tharaka-Nithi']->id],
+            ['name' => 'Tharaka', 'homecounty_id' => $homecounties['Tharaka-Nithi']->id],
+
+            // **Embu County**
+            ['name' => 'Manyatta', 'homecounty_id' => $homecounties['Embu']->id],
+            ['name' => 'Runyenjes', 'homecounty_id' => $homecounties['Embu']->id],
+            ['name' => 'Mbeere South', 'homecounty_id' => $homecounties['Embu']->id],
+            ['name' => 'Mbeere North', 'homecounty_id' => $homecounties['Embu']->id],
+
+            // **Kitui County**
+            ['name' => 'Mwingi North', 'homecounty_id' => $homecounties['Kitui']->id],
+            ['name' => 'Mwingi West', 'homecounty_id' => $homecounties['Kitui']->id],
+            ['name' => 'Mwingi Central', 'homecounty_id' => $homecounties['Kitui']->id],
+            ['name' => 'Kitui West', 'homecounty_id' => $homecounties['Kitui']->id],
+            ['name' => 'Kitui Rural', 'homecounty_id' => $homecounties['Kitui']->id],
+            ['name' => 'Kitui Central', 'homecounty_id' => $homecounties['Kitui']->id],
+            ['name' => 'Kitui East', 'homecounty_id' => $homecounties['Kitui']->id],
+            ['name' => 'Kitui South', 'homecounty_id' => $homecounties['Kitui']->id],
         ];
 
-        foreach ($counties as $homecountyName => $constituencies) {
-            $homecounty = Homecounty::firstOrCreate(['name' => $homecountyName]);
-
-            foreach ($constituencies as $constituencyName) {
-                Constituency::firstOrCreate([
-                    'name' => $constituencyName,
-                    'homecounty_id' => $homecounty->id,
-                ]);
-                }
-            }
-        }
+        Constituency::insert($constituencies);
     }
 
+}

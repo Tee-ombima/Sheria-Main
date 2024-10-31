@@ -6,23 +6,44 @@
   <div class="mx-4">
     <x-card class="p-10">
       <div class="flex flex-col items-center justify-center text-center">
-        <img class="w-48 mr-6 mb-6"
-          src="{{$listing->logo ? asset('storage/' . $listing->logo) : asset('/images/no-image.png')}}" alt="" />
 
+
+@if($listing->isActive)
+    <!-- Display Countdown Timer -->
+    <p id="countdown" class="text-sm text-red-500 font-bold"></p>
+@else
+    <!-- Listing has expired or is archived -->
+    <p class="text-red-500">This job is no longer available.</p>
+@endif
+        
         <h3 class="text-2xl mb-2">
           {{$listing->title}}
         </h3>
+
+        
+
+
+
+
         <div class="text-xl font-bold mb-4">{{$listing->job_reference_number}}</div>
 
-        <x-listing-tags :tagsCsv="$listing->tags" />
+
+
+        <div class="flex items-center justify-center rounded-xl py-1 px-3 mr-2 text-xs" style="background-color: #D68C3C; color: #FFFFFF;">
+        Number of vacancies available: {{ $listing->vacancies }}
+      </div>
+
 
         <div class="border border-gray-200 w-full mb-6"></div>
-        <div>
-          <h3 class="text-3xl font-bold mb-4">Job Description</h3>
-          <div class="text-lg space-y-6">
-            {!! $listing->description !!}  
-          </div>
-        </div>
+        @if($listing->file)
+    <div class="mb-6">
+        <label class="inline-block text-lg mb-2">Job Description</label>
+        <a href="{{ asset('storage/' . $listing->file) }}" target="_blank" class="text-blue-500 underline">
+            Download Job Description (PDF)
+        </a>
+    </div>
+@endif
+
 
         @if (session('error'))
             <div class="alert alert-danger">
@@ -90,4 +111,31 @@
         console.error(error);
       });
   </script>
+
+  <script>
+@if($listing->isActive)
+    // JavaScript for Countdown Timer
+    var countDownDate = new Date("{{ $listing->deadline }}").getTime();
+
+    var x = setInterval(function() {
+
+        var now = new Date().getTime();
+
+        var distance = countDownDate - now;
+
+        var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        var minutes = Math.floor((distance % (1000 * 60 * 60) ) / (1000 * 60));
+        var seconds = Math.floor((distance % (1000 * 60) ) / 1000);
+
+        document.getElementById("countdown").innerHTML = "Time left: " + days + "d " + hours + "h "
+        + minutes + "m " + seconds + "s ";
+
+        if (distance < 0) {
+            clearInterval(x);
+            document.getElementById("countdown").innerHTML = "Application deadline has passed.";
+        }
+    }, 1000);
+@endif
+</script>
 </x-layout>

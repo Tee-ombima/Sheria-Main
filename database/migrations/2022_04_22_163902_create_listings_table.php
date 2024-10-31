@@ -16,10 +16,10 @@ return new class extends Migration
         Schema::create('listings', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->string('logo')->nullable();
             $table->string('job_reference_number')->unique();
-            $table->string('tags');
-            $table->longText('description');
+            $table->integer('vacancies')->default(0); // Add vacancies column
+            
+            $table->string('file')->nullable();
             $table->timestamps();
         });
     }

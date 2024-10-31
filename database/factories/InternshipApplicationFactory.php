@@ -6,6 +6,8 @@ use App\Models\InternshipApplication;
 use App\Models\User;
 use App\Models\Department;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class InternshipApplicationFactory extends Factory
 {
@@ -22,7 +24,10 @@ class InternshipApplicationFactory extends Factory
             'id_file' => $this->generateDummyFilePath('id_file'), // Generate dummy file paths
             'university_letter' => $this->generateDummyFilePath('university_letter'), // Generate dummy file paths
             'kra_pin' => $this->generateDummyFilePath('kra_pin'), // Generate dummy file paths
-            'insurance' => $this->generateDummyFilePath('insurance'), // Generate dummy file paths
+            'insurance' => $this->generateDummyFilePath(fileType: 'insurance'), // Generate dummy file paths
+            'good_conduct' => $this->generateDummyFilePath(fileType: 'good_conduct'), // Generate dummy file paths
+            'cv' => $this->generateDummyFilePath(fileType: 'cv'), // Generate dummy file paths
+
         ];
     }
 
@@ -33,7 +38,14 @@ class InternshipApplicationFactory extends Factory
      * @return string
      */
     private function generateDummyFilePath(string $fileType): string
-    {
-        return 'documents/' . $this->faker->uuid() . "_{$fileType}.pdf"; // Use UUID to ensure unique file names
-    }
+{
+    $fileName = Str::uuid() . "_{$fileType}.pdf";
+    $filePath = 'files/5-mb-example-file.pdf';
+
+    // Create an empty PDF file for testing purposes
+    Storage::disk('public')->put($filePath, '');
+
+    return $filePath;
+}
+
 }

@@ -2,7 +2,8 @@
 <html lang="en">
 
 <head>
-  <link href="/public/css/app.css" rel="stylesheet">
+<link href="{{ asset('css/app.css') }}" rel="stylesheet">
+<script src="//unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -16,7 +17,7 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script> --}}
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Include jQuery (required for Select2) -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@2.x.x/dist/alpine.min.js" defer></script>
 
 
@@ -25,8 +26,6 @@
 
 <!-- Include Select2 JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.tiny.cloud/1/tinp8l8r4f831q57swl337li0czi689fr5bajwmv0j2qu8tw/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
 
 
   <script>
@@ -53,10 +52,11 @@
 }
 
         table {
-            border-collapse: collapse;
-            width: 100%;
-            margin-top: 20px;
-        }
+        border-collapse: collapse;
+        width: 100%;
+        margin-top: 20px;
+        overflow-x: auto;
+    }
         th, td {
             border: 1px solid #dddddd;
             text-align: left;
@@ -86,12 +86,60 @@
     border-radius: 5px;
     white-space: nowrap; /* Prevent line break in email addresses */
 }
+/* Overlay to cover the page */
+.loader-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Spinner style */
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #ccc;
+    border-top-color: #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* Keyframes for spinner animation */
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
     </style>
 
 </head>
 
-<body class="mb-48">
-<nav class="flex justify-between items-center mb-4 p-4 shadow-md" style="background-color: #3a4f29;">
+<body class="mb-48 mt-16"> <!-- Adjust the margin-top to match the height of your navbar -->
+<!-- Flash Message -->
+
+<!-- Loading Spinner HTML -->
+    <div id="loader" class="loader-overlay">
+        <div class="spinner"></div>
+    </div>
+    @if(session()->has('message'))
+        <div 
+            x-data="{ show: true }" 
+            x-init="setTimeout(() => show = false, 5000)" 
+            x-show="show"
+            class="fixed top-0 left-1/2 transform -translate-x-1/2 bg-laravel text-white px-4 py-2 rounded shadow-md"
+            style="z-index: 1000;"
+        >
+            {{ session('message') }}
+        </div>
+    @endif
+<nav class="flex justify-between items-center p-4 shadow-md fixed w-full top-0 z-50" style="background-color: #3a4f29;">
     <a href="/"><img class="w-24" src="{{asset('images/logo.jpg')}}" alt="logo" /></a>
     <button class="text-3xl md:hidden cursor-pointer" onclick="document.getElementById('nav-links').classList.toggle('hidden')">
       <i class="fa-solid fa-bars" style="color: #ffffff;"></i>
@@ -106,7 +154,7 @@
       @if(auth()->user()->role === 'user')
 
       <li class="relative">
-        <button onclick="toggleDropdown()" class="hover:text-laravel flex items-center" id="menu-button" aria-expanded="true" aria-haspopup="true">
+        <button onclick="toggleUserProfileDropdown()" class="hover:text-laravel flex items-center" id="menu-button" aria-expanded="true" aria-haspopup="true">
           <i class="fa-solid fa-user" style="color: #ffffff;"></i>
           <span class="ml-2" style="color: #ffffff;">My Profile</span>
           <!-- Heroicon name: solid/chevron-down -->
@@ -144,8 +192,8 @@
 
       @if(auth()->user()->role === 'user')
       <li class="relative group">
-        <a href="{{ route('internships.create') }}" class="hover:text-laravel text-white" style="color: #ffffff;">
-            <i class="fa-solid fa-briefcase" style="color: #ffffff;"></i> University/College Attachment
+        <a href="{{ route('internships.index') }}" class="hover:text-laravel text-white" style="color: #ffffff;">
+            <i class="fa-solid fa-briefcase" style="color: #ffffff;"></i> Attachee/Pupillage Programs
         </a>
         
     </li>
@@ -165,7 +213,7 @@
     </li>
     <li>
     <a href="{{ route('admin.internships.index') }}" class="hover:text-laravel" style="color: #ffffff;">
-        <i class="fa-solid fa-briefcase" style="color: #ffffff;"></i> Recruit Attachees
+        <i class="fa-solid fa-briefcase" style="color: #ffffff;"></i> Attachees/Pupillage Programs
     </a>
 </li>
 
@@ -175,7 +223,7 @@
       @if(auth()->user()->role === 'admin')
       <!-- Admin-specific dropdown -->
       <li class="relative">
-        <button onclick="toggleDropdown('admin-dropdown')" class="hover:text-laravel flex items-center" id="admin-menu-button" aria-expanded="true" aria-haspopup="true">
+        <button onclick="toggleAdminReportsDropdown('admin-dropdown')" class="hover:text-laravel flex items-center" id="admin-menu-button" aria-expanded="true" aria-haspopup="true">
           <i class="fa-solid fa-chart-line" style="color: #ffffff;"></i>
           <span class="ml-2" style="color: #ffffff;">Admin Reports</span>
           <!-- Heroicon name: solid/chevron-down -->
@@ -232,53 +280,76 @@
   </footer> --}}
 <footer class="fixed bottom-0 left-0 w-full flex flex-col md:flex-row items-center justify-between font-bold h-auto md:h-24 mt-24 opacity-90 md:justify-center p-4" style="background-color: #2c1a1a; color: #D4AF37;">
     <!-- Copyright Info -->
-    <p class="ml-2">&copy; {{ date('Y') }}, All Rights Reserved</p>
+    <a href="https://www.statelaw.go.ke/" class="ml-2">
+        <p>&copy; {{ date('Y') }}, All Rights Reserved</p>
+    </a> 
 
     <!-- Additional Footer Sections -->
     <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-6">
 
         <!-- Contact Info Section -->
-        <div class="flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+        <a href="https://www.statelaw.go.ke/" class="flex items-center">
+            <!-- SVG Icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
+                <!-- SVG path data -->
                 <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 7.5l8.25 8.25 8.25-8.25" />
             </svg>
-            <p class="ml-2">Contact: +123 456 7890 | info@example.com</p>
-        </div>
+            <!-- Contact Info -->
+            <p class="ml-2">About Us</p>
+        </a>
 
         <!-- Vision Section -->
-        <div class="flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+        <a href="https://www.statelaw.go.ke/" class="flex items-center">
+            <!-- SVG Icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
+                <!-- SVG path data -->
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4.5 2.25M18.364 5.636a9 9 0 10.001 12.728 9 9 0 00-.001-12.728z" />
             </svg>
-            <p class="ml-2">Vision: To be the leading provider of quality services.</p>
-        </div>
+            <!-- Vision -->
+            <p class="ml-2">Contact Us</p>
+        </a>
 
         <!-- Mission Section -->
-        <div class="flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+        <a href="https://www.statelaw.go.ke/" class="flex items-center">
+            <!-- SVG Icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
+                <!-- SVG path data -->
                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h18M9 6h6m-6 6h6m-6 6h6" />
             </svg>
-            <p class="ml-2">Mission: To innovate and provide exceptional service to our clients.</p>
-        </div>
+            <!-- Mission -->
+            <p class="ml-2">Our Services</p>
+        </a>
 
     </div>
 
-    <!-- Post Job Button for Admin -->
-    @auth
+
+
+    <!-- Admin Actions -->
+@auth
     @if(auth()->user()->role === 'admin')
-        <a href="/listings/create" class="bg-[#D68C3C] text-white py-2 px-5 hover:bg-[#bf7a2e] rounded-md">
-            Post Job
-        </a>
+        <div class="flex space-x-2">
+            <!-- Post Job Button for Admin -->
+            <a href="/listings/create" class="bg-[#D68C3C] text-white py-2 px-5 hover:bg-[#bf7a2e] rounded-md">
+                Post Job
+            </a>
+
+            
+        </div>
     @endif
-    @endauth
+@endauth
+
 
 </footer>
 
-
-  <x-flash-message />
+<!-- loading icon -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.getElementById("loader").style.display = "none";
+        });
+    </script>
 <script>
   //overall tick listener
-    function toggleDropdown() {
+    function toggleUserProfileDropdown() {
         const dropdownMenu = document.getElementById('dropdownMenu');
         dropdownMenu.classList.toggle('hidden');
     }
@@ -316,11 +387,218 @@
         });
     </script>
 
-  
+<script>
+$(document).ready(function(){
+
+    function toggleHomeCountyOther() {
+        if ($('#homecounty').val() === 'other') {
+            $('#homecounty_other_div').show();
+            $('#constituency_div').hide();
+            $('#constituency_other_div').hide();
+            $('#subcounty_div').hide();
+            $('#subcounty_other_div').hide();
+        } else {
+            $('#homecounty_other_div').hide();
+            $('#constituency_div').show();
+        }
+    }
+
+    function toggleConstituencyOther() {
+        if ($('#constituency').val() === 'other') {
+            $('#constituency_other_div').show();
+            $('#subcounty_div').hide();
+            $('#subcounty_other_div').hide();
+        } else {
+            $('#constituency_other_div').hide();
+            $('#subcounty_div').show();
+        }
+    }
+
+    function toggleSubcountyOther() {
+        if ($('#subcounty').val() === 'other') {
+            $('#subcounty_other_div').show();
+        } else {
+            $('#subcounty_other_div').hide();
+        }
+    }
+
+    $('#homecounty').change(function(){
+        toggleHomeCountyOther();
+        var homecountyID = $(this).val();
+        if (homecountyID && homecountyID !== 'other') {
+            $.ajax({
+                type:"GET",
+                url:"/getConstituencies/"+homecountyID,
+                success:function(res){               
+                    if(res){
+                        $("#constituency").empty();
+                        $("#constituency").append('<option value="" disabled selected>Select Constituency</option>');
+                        $.each(res,function(key,value){
+                            $("#constituency").append('<option value="'+value.id+'">'+value.name+'</option>');
+                        });
+                        $("#constituency").append('<option value="other">Other</option>');
+                        $("#subcounty").empty();
+                        $("#subcounty").append('<option value="" disabled selected>Select Subcounty</option>');
+                    } else {
+                        $("#constituency").empty();
+                    }
+                }
+            });
+        } else {
+            $("#constituency").empty();
+            $("#constituency").append('<option value="" disabled selected>Select Constituency</option>');
+            $("#constituency").append('<option value="other">Other</option>');
+            $("#subcounty").empty();
+            $("#subcounty").append('<option value="" disabled selected>Select Subcounty</option>');
+            $("#subcounty").append('<option value="other">Other</option>');
+        }      
+    });
+
+    $('#constituency').change(function(){
+        toggleConstituencyOther();
+        var constituencyID = $(this).val();
+        if (constituencyID && constituencyID !== 'other') {
+            $.ajax({
+                type:"GET",
+                url:"/getSubcounties/"+constituencyID,
+                success:function(res){               
+                    if(res){
+                        $("#subcounty").empty();
+                        $("#subcounty").append('<option value="" disabled selected>Select Subcounty</option>');
+                        $.each(res,function(key,value){
+                            $("#subcounty").append('<option value="'+value.id+'">'+value.name+'</option>');
+                        });
+                        $("#subcounty").append('<option value="other">Other</option>');
+                    } else {
+                        $("#subcounty").empty();
+                    }
+                }
+            });
+        } else {
+            $("#subcounty").empty();
+            $("#subcounty").append('<option value="" disabled selected>Select Subcounty</option>');
+            $("#subcounty").append('<option value="other">Other</option>');
+        }
+    });
+
+    $('#subcounty').change(function(){
+        toggleSubcountyOther();
+    });
+
+    // Initial load
+    toggleHomeCountyOther();
+    toggleConstituencyOther();
+    toggleSubcountyOther();
+
+});
+</script>
+
+<script>
+$(document).ready(function(){
+    function toggleOtherField(selectId, otherDivId) {
+        if ($('#' + selectId).val() === 'other') {
+            $('#' + otherDivId).show();
+        } else {
+            $('#' + otherDivId).hide();
+        }
+    }
+
+    $('#ethnicity').change(function(){
+        toggleOtherField('ethnicity', 'ethnicity_other_div');
+    });
+
+    
+
+    $('#salutation').change(function(){
+        toggleOtherField('salutation', 'salutation_other_div');
+    });
+
+    // Initial load to handle pre-selected values
+    toggleOtherField('ethnicity', 'ethnicity_other_div');
+    toggleOtherField('salutation', 'salutation_other_div');
+});
+</script>
+
+<script>
+$(document).ready(function(){
+    function toggleOtherField(selectId, otherDivId) {
+        if ($('#' + selectId).val() === 'other') {
+            $('#' + otherDivId).show();
+        } else {
+            $('#' + otherDivId).hide();
+        }
+    }
+
+    $('#highschool').change(function(){
+        toggleOtherField('highschool', 'highschool_other_div');
+    });
+
+    $('#specialisation').change(function(){
+        toggleOtherField('specialisation', 'specialisation_other_div');
+    });
+
+    $('#course').change(function(){
+        toggleOtherField('course', 'course_other_div');
+    });
+
+    $('#award').change(function(){
+        toggleOtherField('award', 'award_other_div');
+    });
+
+    $('#grade').change(function(){
+        toggleOtherField('grade', 'grade_other_div');
+    });
+
+    // Initial load to handle pre-selected values
+    toggleOtherField('highschool', 'highschool_other_div');
+    toggleOtherField('specialisation', 'specialisation_other_div');
+    toggleOtherField('course', 'course_other_div');
+    toggleOtherField('award', 'award_other_div');
+    toggleOtherField('grade', 'grade_other_div');
+});
+</script>
+
+<!-- Rest of your listing details -->
+
 
 
 <script>
-  function toggleDropdown() {
+$(document).ready(function(){
+    function toggleOtherField(selectId, otherDivId) {
+        if ($('#' + selectId).val() === 'other') {
+            $('#' + otherDivId).show();
+        } else {
+            $('#' + otherDivId).hide();
+        }
+    }
+
+    $('#prof_area_of_study_high_school_level').change(function(){
+        toggleOtherField('prof_area_of_study_high_school_level', 'prof_area_of_study_other_div');
+    });
+
+    $('#prof_area_of_specialisation').change(function(){
+        toggleOtherField('prof_area_of_specialisation', 'prof_area_of_specialisation_other_div');
+    });
+
+    $('#prof_award').change(function(){
+        toggleOtherField('prof_award', 'prof_award_other_div');
+    });
+
+    $('#prof_grade').change(function(){
+        toggleOtherField('prof_grade', 'prof_grade_other_div');
+    });
+
+    // Initial load to handle pre-selected values
+    toggleOtherField('prof_area_of_study_high_school_level', 'prof_area_of_study_other_div');
+    toggleOtherField('prof_area_of_specialisation', 'prof_area_of_specialisation_other_div');
+    toggleOtherField('prof_award', 'prof_award_other_div');
+    toggleOtherField('prof_grade', 'prof_grade_other_div');
+});
+</script>
+
+
+<script>
+  function toggleUserProfileDropdown() {
     document.getElementById('dropdownMenu').classList.toggle('hidden');
   }
 
@@ -459,31 +737,6 @@ document.getElementById('personal-info').addEventListener('submit', function() {
         });
       });
 
-      document.getElementById('homecounty').addEventListener('change', function() {
-        var homecountyName = this.value;
-
-var subcountySelect = document.getElementById('subcounty');
-        subcountySelect.innerHTML = '<option value="" disabled selected>Select Subcounty</option>';
-
-        var constituencySelect = document.getElementById('constituency');
-        constituencySelect.innerHTML = '<option value="" disabled selected>Select Constituency</option>';
-        if (homecountyName) {
-        
-
-
-        fetch(`/constituencies?homecounty=${homecountyName}`)
-            .then(response => response.json())
-            .then(data => {
-                data.forEach(constituency => {
-                    var option = document.createElement('option');
-                    option.value = constituency.name;
-                    option.text = constituency.name;
-                    constituencySelect.appendChild(option);
-                });
-            });
-    }
-      });
-
       var disabilityQuestion = document.getElementById('disability_question');
       var natureOfDisabilityContainer = document.getElementById('nature_of_disability_container');
       var ncpdRegistrationNoContainer = document.getElementById('ncpd_registration_no_container');
@@ -502,36 +755,8 @@ var subcountySelect = document.getElementById('subcounty');
       toggleDisabilityFields();
     });
 
-  
-
-    
-
 
   </script>
-
-<!-- Add this script to your view, likely at the bottom of the file -->
-<script>
-    document.getElementById('constituency').addEventListener('change', function () {
-        var constituencyName = this.value;
-        var subcountySelect = document.getElementById('subcounty');
-
-        // Clear existing options
-        subcountySelect.innerHTML = '<option value="" disabled selected>Select Subcounty</option>';
-
-        // Fetch subcounties based on selected constituency
-        fetch(`/api/subcounties?constituency=${constituencyName}`)
-            .then(response => response.json())
-            .then(data => {
-                data.forEach(function(subcounty) {
-                    var option = document.createElement('option');
-                    option.value = subcounty.name;
-                    option.textContent = subcounty.name;
-                    subcountySelect.appendChild(option);
-                });
-            })
-            .catch(error => console.error('Error fetching subcounties:', error));
-    });
-</script>
 
 
 
@@ -563,13 +788,53 @@ var subcountySelect = document.getElementById('subcounty');
 
 
 
+<!--attachment edit button -->
 
+<script>
+        function showOtherField(select) {
+            const otherField = document.getElementById('other-document-name');
+            if (select.value === 'other') {
+                otherField.style.display = 'flex';
+            } else {
+                otherField.style.display = 'none';
+            }
+        }
 
+        function editAttachment(id, documentName) {
+            // Populate modal fields
+            document.getElementById('editAttachmentId').value = id;
+            document.getElementById('edit_document_name').value = documentName;
 
+            // Show the modal
+            document.getElementById('editModal').classList.remove('hidden');
+        }
+
+        function closeEditModal() {
+            // Hide the modal
+            document.getElementById('editModal').classList.add('hidden');
+        }
+    </script>
 
     
+<!--academic edit button -->
 
+ <script>
+        // Function to open the edit modal and populate the form with the selected row's data
+        function openEditModal(datum) {
+            document.getElementById('academic_id').value = datum.id;
+            document.getElementById('edit_institution_name').value = datum.institution_name;
+            document.getElementById('edit_student_admission_no').value = datum.student_admission_no;
+            // Populate other fields as needed
 
+            // Show the modal
+            document.getElementById('editModal').classList.remove('hidden');
+        }
+
+        // Function to close the edit modal
+        function closeEditModal() {
+            document.getElementById('editModal').classList.add('hidden');
+        }
+    </script>
 
 
 
@@ -638,7 +903,7 @@ var subcountySelect = document.getElementById('subcounty');
 </script>
 
 <script>
-    function toggleDropdown(menuId = 'dropdownMenu') {
+    function toggleAdminReportsDropdown(menuId = 'dropdownMenu') {
         const dropdownMenu = document.getElementById(menuId);
         dropdownMenu.classList.toggle('hidden');
     }

@@ -62,4 +62,11 @@
       </div>
     </form>
   </x-card>
+
+  <script>
+      document.querySelector("form").addEventListener("submit", function() {
+          // Show the loader
+          document.getElementById("loader").style.display = "flex";
+      });
+  </script>
 </x-layout>

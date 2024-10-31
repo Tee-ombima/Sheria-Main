@@ -9,6 +9,13 @@ use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AttachmentController;
 
+use App\Http\Controllers\LocationController;
+use App\Http\Controllers\FooterController;
+use App\Http\Controllers\AdminPupillageController;
+
+use Illuminate\Support\Facades\Mail;
+
+use App\Models\InternshipApplication;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserRoleController;
 
@@ -16,21 +23,35 @@ use App\Http\Controllers\InternshipController;
 use App\Http\Controllers\AdminInternshipController;
 
 use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\PupillageController;
+
 
 Auth::routes(['verify' => true]);
 
 
 Route::get('/', [ListingController::class, 'index'])->name('index');
 
+Route::middleware(['auth','verified'])->group(function () {
+    // Existing routes...
+
+    // Edit Internship Application
+    Route::get('/internships/{id}/edit', [InternshipController::class, 'edit'])->name('internships.edit');
+    Route::put('/internships/{id}', [InternshipController::class, 'update'])->name('internships.update');
+    Route::get('/pupillages/{id}/edit', [PupillageController::class, 'edit'])->name('pupillages.edit');
+    Route::put('/pupillages/{id}', [PupillageController::class, 'update'])->name('pupillages.update');
+
+    Route::delete('/internships/{id}', [InternshipController::class, 'destroy'])->name('internships.destroy');
+    Route::delete('/pupillages/{id}', [PupillageController::class, 'destroy'])->name('pupillages.destroy');
+
+});
 
 
 // Profile Routes (Accessible only to authenticated users)
 Route::middleware(['auth', 'verified'])->group(function () {   
     
-    Route::get('/constituencies', [ProfileController::class, 'getConstituencies']);
-Route::get('/subcounties', [ProfileController::class, 'getSubcounties']);
-
-Route::get('/profile-dropdown', [ProfileController::class, 'showDropdown'])->name('profile.dropdown');
+    Route::get('/getConstituencies/{homecounty_id}', [LocationController::class, 'getConstituencies']);
+    Route::get('/getSubcounties/{constituency_id}', [LocationController::class, 'getSubcounties']);
+    Route::get('/profile-dropdown', [ProfileController::class, 'showDropdown'])->name('profile.dropdown');
 
     // Add more profile routes here...
     Route::get('/profile/personal-info', [ProfileController::class, 'showPersonalInfo'])->name('profile.personal-info');
@@ -42,6 +63,9 @@ Route::post('/profile/academic-info', [ProfileController::class, 'saveAcademicIn
 Route::post('/add-row', [ProfileController::class, 'addRow'])->name('add.row');
 Route::post('/remove-session-row', [ProfileController::class, 'removeSessionRow'])->name('remove.session.row');
 Route::delete('/delete-academic-info/{id}', [ProfileController::class, 'deleteAcademicInfo'])->name('delete.academic.info');
+Route::get('/profile/academic-info/edit/{id}', [ProfileController::class, 'editAcademicInfo'])->name('edit.academic.info');
+Route::post('/profile/academic-info/update/{id}', [ProfileController::class, 'updateAcademicInfo'])->name('update.academic.info');
+
 
 // Repeat for other sections
 Route::get('/profile/prof-info', [ProfileController::class, 'showProfInfo'])->name('profile.prof-info');
@@ -49,6 +73,10 @@ Route::post('/profile/prof-info', [ProfileController::class, 'saveProfInfo'])->n
 Route::post('/add-profrow', [ProfileController::class, 'addProfRow'])->name('add.profrow');
 Route::post('/remove-profsession-row', [ProfileController::class, 'removeProfSessionRow'])->name('remove.profsession.row');
 Route::delete('/delete-prof-info/{id}', [ProfileController::class, 'deleteProfInfo'])->name('delete.prof.info');
+Route::get('/profile/prof-info/edit/{id}', [ProfileController::class, 'editProfInfo'])->name('edit.prof.info');
+Route::post('/profile/prof-info/update/{id}', [ProfileController::class, 'updateProfInfo'])->name('update.prof.info');
+
+
 
 // Repeat for other sections
 Route::get('/profile/relevant-courses', [ProfileController::class, 'showRelevantCourses'])->name('profile.relevant-courses');
@@ -56,9 +84,14 @@ Route::post('/profile/relevant-courses', [ProfileController::class, 'saveRelevan
 Route::post('/add-relrow', [ProfileController::class, 'addRelRow'])->name('add.relrow');
 Route::post('/remove-relsession-row', [ProfileController::class, 'removeRelSessionRow'])->name('remove.relsession.row');
 Route::delete('/delete-rel-info/{id}', [ProfileController::class, 'deleteRelInfo'])->name('delete.rel.info');
+Route::get('/profile/relevant-courses/edit/{id}', [ProfileController::class, 'editRelevantCourse'])->name('edit.rel.info');
+Route::post('/profile/relevant-courses/update/{id}', [ProfileController::class, 'updateRelevantCourse'])->name('update.rel.info');
+
+
 
 Route::get('/profile/attachments', [AttachmentController::class, 'showAttachmentForm'])->name('profile.attachments');
     Route::post('/profile/upload-attachment', [AttachmentController::class, 'uploadAttachment'])->name('profile.upload-attachment');
+    Route::post('/profile/edit-attachment', [AttachmentController::class, 'editAttachment'])->name('profile.edit-attachment');
     Route::delete('/profile/delete-attachment/{id}', [AttachmentController::class, 'deleteAttachment'])->name('profile.delete-attachment');
     Route::post('/profile/save-attachments', [AttachmentController::class, 'saveAttachments'])->name('profile.save-attachments');
 
@@ -142,14 +175,24 @@ Route::middleware('auth')->group(function () {
 
 });
 
+Route::middleware(['auth'])->group(function () {
+    Route::get('/pupillages/create', [PupillageController::class, 'create'])->name('pupillages.create');
+    Route::post('/pupillages', [PupillageController::class, 'store'])->name('pupillages.store');
+    Route::get('/pupillages', [PupillageController::class, 'index'])->name('pupillages.index');
+});
+
 // Admin Routes
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/admin/internships', [AdminInternshipController::class, 'index'])->name('internships.index');
     Route::get('/admin/internships/{department}', [AdminInternshipController::class, 'show'])->name('internships.show');
-    Route::patch('/admin/internships/{application}', [AdminInternshipController::class, 'update'])->name('internships.update');
     Route::post('/admin/departments', [AdminInternshipController::class, 'storeDepartment'])->name('departments.store');
     Route::delete('/admin/internships/{application}', [AdminInternshipController::class, 'destroy'])->name('internships.destroy');
+    Route::post('/admin/internships/{application}/archive', [AdminInternshipController::class, 'archive'])->name('internships.archive');
+    Route::get('/admin/archived-applications', [AdminInternshipController::class, 'archivedApplications'])->name('archived.applications');
+    Route::patch('/admin/internships/{application}/unarchive', [AdminInternshipController::class, 'unarchive'])->name('internships.unarchive');
+    Route::get('/internships/non-pending', [AdminInternshipController::class, 'nonPending'])->name('internships.nonPending');
 
+    Route::post('/admin/internships/{application}/update', [AdminInternshipController::class, 'update'])->name('internships.update');
 
     Route::get('/departments/create', [DepartmentController::class, 'create'])->name('admin.departments.create');
     
@@ -166,3 +209,17 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
 });
 
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+
+    // Pupillage Applications
+    Route::get('/admin/pupillages', [AdminPupillageController::class, 'index'])->name('pupillages.index');
+    Route::get('/admin/pupillages/{application}', [AdminPupillageController::class, 'show'])->name('pupillages.show');
+    Route::post('/admin/pupillages/departments', [AdminPupillageController::class, 'storeDepartment'])->name('pupillage.departments.store');
+    Route::delete('/admin/pupillages/{application}', [AdminPupillageController::class, 'destroy'])->name('pupillages.destroy');
+    Route::post('/admin/pupillages/{application}/archive', [AdminPupillageController::class, 'archive'])->name('pupillages.archive');
+    Route::get('/admin/pupillages/archived-applications', [AdminPupillageController::class, 'archivedApplications'])->name('pupillages.archived.applications');
+    Route::patch('/admin/pupillages/{application}/unarchive', [AdminPupillageController::class, 'unarchive'])->name('pupillages.unarchive');
+    Route::get('/pupillages/non-pending', [AdminPupillageController::class, 'nonPending'])->name('pupillages.nonPending');
+
+    // Other admin routes...
+});

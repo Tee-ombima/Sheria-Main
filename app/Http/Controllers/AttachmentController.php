@@ -34,21 +34,25 @@ public function uploadAttachment(Request $request)
 {
     $user_id = Auth::id();
     
+    // Determine if the user selected "Other"
+    $document_name = $request->document_name === 'other' 
+        ? $request->custom_document_name 
+        : $request->document_name;
+    
     // Validate the input
     $validator = Validator::make($request->all(), [
-        'document_name' => 'required|exists:document_names,name',
-        'file' => 'required|mimes:pdf|max:5120', // PDF only, max 10MB
+        'document_name' => 'required_without:custom_document_name',
+        'custom_document_name' => 'nullable|string|required_if:document_name,other',
+        'file' => 'required|mimes:pdf|max:5120', // PDF only, max 5MB
     ]);
 
     if ($validator->fails()) {
         return redirect()->back()->withErrors($validator)->withInput();
-
     }
 
     // Check if the user has already uploaded this document
-    if (Attachment::where('user_id', $user_id)->where('document_name', $request->document_name)->exists()) {
-        session()->flash('message', 'You have already uploaded this document.');
-        return redirect()->back();
+    if (Attachment::where('user_id', $user_id)->where('document_name', $document_name)->exists()) {
+        return redirect()->back()->with('message','You have already uploaded this document.');
     }
 
     // Store the file
@@ -57,11 +61,50 @@ public function uploadAttachment(Request $request)
     // Save to the database
     Attachment::create([
         'user_id' => $user_id,
-        'document_name' => $request->document_name,
+        'document_name' => $document_name,
         'file_path' => $filePath,
     ]);
-    session()->flash('message', 'Document uploaded successfully.');
-    return redirect()->back();
+    
+    return redirect()->back()->with('message','Document Saved successfully.');
+}
+
+public function editAttachment(Request $request)
+{
+    $user_id = Auth::id();
+
+    // Validate the input
+    $validator = Validator::make($request->all(), [
+        'attachment_id' => 'required|exists:attachments,id',
+        'edit_document_name' => 'required|string|max:255',
+        'edit_file' => 'nullable|mimes:pdf|max:5120', // PDF only, max size 5MB
+    ]);
+
+    if ($validator->fails()) {
+        return redirect()->back()->withErrors($validator)->withInput();
+    }
+
+    // Find the existing attachment
+    $attachment = Attachment::where('id', $request->attachment_id)->where('user_id', $user_id)->firstOrFail();
+
+    // If a new file is uploaded, handle file replacement
+    if ($request->hasFile('edit_file')) {
+        // Delete the old file from storage
+        Storage::disk('public')->delete($attachment->file_path);
+
+        // Store the new file
+        $filePath = $request->file('edit_file')->store('attachments', 'public');
+
+        // Update the attachment with the new file path
+        $attachment->file_path = $filePath;
+    }
+
+    // Update the document name
+    $attachment->document_name = $request->edit_document_name;
+
+    // Save the updated attachment
+    $attachment->save();
+
+    return redirect()->back()->with('message','Document updated successfully.');
 }
 
 public function deleteAttachment($id)
@@ -78,9 +121,8 @@ public function deleteAttachment($id)
 
     // Delete the record from the database
     $attachment->delete();
-    session()->flash('message', 'Attachment deleted successfully.');
 
-    return redirect()->back();
+    return redirect()->back()->with('message','Attachment deleted successfully.');
 }
 
 public function saveAttachments(Request $request)
@@ -91,9 +133,8 @@ public function saveAttachments(Request $request)
     $attachments = session()->get('attachments', []);
     
     if (empty($attachments)) {
-        session()->flash('message', 'Please upload at least one document');
 
-        return redirect()->back();
+        return redirect()->back()->with('message','Please upload at least one document');
     }
 
     // Validate each attachment
@@ -118,8 +159,7 @@ public function saveAttachments(Request $request)
     session()->forget('attachments');
 
     // Redirect to the next step or back with a success message
-    session()->flash('message', 'Attachments were submitted successfully!');
-    return redirect()->route('index'); // Change this to the next step in your flow
+    return redirect()->route('index')->with('message','Attachments were submitted successfully!');
 }
 
 

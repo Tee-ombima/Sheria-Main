@@ -75,25 +75,46 @@
 
 </div>
 
-    <!-- Salutation/Title Field -->
-    <div class="flex-1">
-    <label for="salutation" class="block text-sm font-medium text-gray-700">Salutation/Title<span class="text-red-500">*</span></label>
+<!-- Salutation/Title Field -->
+<div class="flex-1">
+    <label for="salutation" class="block text-sm font-medium text-gray-700">
+        Salutation/Title<span class="text-red-500">*</span>
+    </label>
     <select 
         name="salutation" 
         id="salutation" 
         required 
         class="mt-1 block w-full py-2 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-        <option value=""disabled selected>Select Salutation</option>
-        @foreach($salutations as $salutation)
-            <option value="{{ $salutation->name }}" {{ (old('salutation', $inputData['salutation'] ?? '') == $salutation->name) ? 'selected' : '' }}>{{ $salutation->name }}</option>
-
+        <option value="" disabled selected>Select Salutation</option>
+        @foreach($salutations as $salutationOption)
+            <option value="{{ $salutationOption->name }}" {{ (old('salutation', $inputData['salutation'] ?? '') == $salutationOption->name) ? 'selected' : '' }}>
+                {{ $salutationOption->name }}
+            </option>
         @endforeach
+        <option value="other" {{ (old('salutation', $inputData['salutation'] ?? '') == 'other') ? 'selected' : '' }}>Other</option>
     </select>
 
     @error('salutation')
         <span class="text-red-500 text-xs">{{ $message }}</span>
     @enderror
 </div>
+
+<!-- Input Field for "Other" Salutation -->
+<div class="flex-1" id="salutation_other_div" style="display: none;">
+    <label for="salutation_other" class="block text-sm font-medium text-gray-700">
+        Please Specify Salutation<span class="text-red-500">*</span>
+    </label>
+    <input 
+        type="text" 
+        name="salutation_other" 
+        id="salutation_other" 
+        value="{{ old('salutation_other', $inputData['salutation_other'] ?? '') }}"
+        class="mt-1 block w-full py-2 px-4 border border-gray-300 rounded-md shadow-sm focus:outline-none sm:text-sm">
+    @error('salutation_other')
+        <span class="text-red-500 text-xs">{{ $message }}</span>
+    @enderror
+</div>
+
 
 </div>
 
@@ -139,9 +160,8 @@
 </div>
 
 
-    <!-- KRA PIN Field -->
     <div class="flex-1">
-    <label for="kra_pin" class="block text-sm font-medium text-gray-700">KRA PIN<span class="text-red-500">*</span></label>
+    <label for="kra_pin" class="block text-sm font-medium text-gray-700">Own Application Letter<span class="text-red-500">*</span></label>
     <input 
         type="text" 
         name="kra_pin" 
@@ -159,7 +179,7 @@
 </div>
 
 
-    <!-- Gender Field -->
+ <!-- Gender Field -->
     <div class="flex-1">
     <label for="gender" class="block text-sm font-medium text-gray-700">Gender<span class="text-red-500">*</span></label>
     <select name="gender" id="gender" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
@@ -172,6 +192,8 @@
         <span class="text-red-500 text-xs">{{ $message }}</span>
     @enderror
 </div>
+
+
 
   </div>
 
@@ -194,9 +216,11 @@
 </div>
 
 
-    <!-- Ethnicity Field -->
-    <div class="flex-1">
-    <label for="ethnicity" class="block text-sm font-medium text-gray-700">Ethnicity<span class="text-red-500">*</span></label>
+<!-- Ethnicity Field -->
+<div class="flex-1">
+    <label for="ethnicity" class="block text-sm font-medium text-gray-700">
+        Ethnicity<span class="text-red-500">*</span>
+    </label>
     <select 
         name="ethnicity" 
         id="ethnicity" 
@@ -204,9 +228,11 @@
         class="mt-1 block w-full py-2 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
         <option value="" disabled selected>Select Ethnicity</option>
         @foreach($ethnicities as $ethnicity)
-            <option value="{{ $ethnicity->name }}" {{ (old('ethnicity', $inputData['ethnicity'] ?? '') == $ethnicity->name) ? 'selected' : '' }}>{{ $ethnicity->name }}</option>
-
+            <option value="{{ $ethnicity->name }}" {{ (old('ethnicity', $inputData['ethnicity'] ?? '') == $ethnicity->name) ? 'selected' : '' }}>
+                {{ $ethnicity->name }}
+            </option>
         @endforeach
+        <option value="other" {{ (old('ethnicity', $inputData['ethnicity'] ?? '') == 'other') ? 'selected' : '' }}>Other</option>
     </select>
 
     @error('ethnicity')
@@ -214,54 +240,143 @@
     @enderror
 </div>
 
+<!-- Input Field for "Other" Ethnicity -->
+<div class="flex-1" id="ethnicity_other_div" style="display: none;">
+    <label for="ethnicity_other" class="block text-sm font-medium text-gray-700">
+        Please Specify Ethnicity<span class="text-red-500">*</span>
+    </label>
+    <input 
+        type="text" 
+        name="ethnicity_other" 
+        id="ethnicity_other" 
+        value="{{ old('ethnicity_other', $inputData['ethnicity_other'] ?? '') }}"
+        class="mt-1 block w-full py-2 px-4 border border-gray-300 rounded-md shadow-sm focus:outline-none sm:text-sm">
+    @error('ethnicity_other')
+        <span class="text-red-500 text-xs">{{ $message }}</span>
+    @enderror
+</div>
 
-    <!-- Home County Field -->
-    <div class="flex-1">
-            <label for="homecounty" class="block text-sm font-medium text-gray-700">Home County<span class="text-red-500">*</span></label>
-            <select 
-                name="homecounty" 
-                id="homecounty" 
-                required 
-                class="mt-1 block w-full py-2 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                <option value="" disabled selected>Select Home County</option>
-                @foreach($homecounties as $homecounty)
-                    <option value="{{ $homecounty->name }}" {{ (old('homecounty', $inputData['homecounty'] ?? '') == $homecounty->name) ? 'selected' : '' }}>{{ $homecounty->name }}</option>
 
-                @endforeach
-            </select>
 
-            @error('homecounty')
-                <span class="text-red-500 text-xs">{{ $message }}</span>
-            @enderror
-        </div>
+<!-- Home County Field -->
+<div class="flex-1">
+    <label for="homecounty" class="block text-sm font-medium text-gray-700">
+        Home County<span class="text-red-500">*</span>
+    </label>
+    <select 
+        name="homecounty_id" 
+        id="homecounty" 
+        required 
+        class="mt-1 block w-full py-2 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+        <option value="" disabled selected>Select Home County</option>
+        @foreach($homecounties as $homecounty)
+            <option value="{{ $homecounty->id }}" {{ (old('homecounty_id') == $homecounty->id) ? 'selected' : '' }}>
+                {{ $homecounty->name }}
+            </option>
+        @endforeach
+        <option value="other" {{ (old('homecounty_id') == 'other') ? 'selected' : '' }}>Other</option>
+    </select>
+    @error('homecounty_id')
+        <span class="text-red-500 text-xs">{{ $message }}</span>
+    @enderror
+</div>
+
+<!-- Input Field for "Other" Home County -->
+<div class="flex-1" id="homecounty_other_div" style="display: none;">
+    <label for="homecounty_other" class="block text-sm font-medium text-gray-700">
+        Please Specify Home County<span class="text-red-500">*</span>
+    </label>
+    <input 
+        type="text" 
+        name="homecounty_other" 
+        id="homecounty_other" 
+        value="{{ old('homecounty_other') }}"
+        class="mt-1 block w-full py-2 px-4 border border-gray-300 rounded-md shadow-sm focus:outline-none sm:text-sm">
+    @error('homecounty_other')
+        <span class="text-red-500 text-xs">{{ $message }}</span>
+    @enderror
+</div>
+
+
+<!-- Constituency Field -->
+<div class="flex-1">
+    <label for="constituency" class="block text-sm font-medium text-gray-700">
+        Constituency<span class="text-red-500">*</span>
+    </label>
+    <select 
+        name="constituency_id" 
+        id="constituency" 
+        required 
+        class="mt-1 block w-full py-2 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+        <option value="" disabled selected>Select Constituency</option>
+        <option value="other" {{ (old('constituency_id') == 'other') ? 'selected' : '' }}>Other</option>
+    </select>
+    @error('constituency_id')
+        <span class="text-red-500 text-xs">{{ $message }}</span>
+    @enderror
+</div>
+
+<!-- Input Field for "Other" Constituency -->
+<div class="flex-1" id="constituency_other_div" style="display: none;">
+    <label for="constituency_other" class="block text-sm font-medium text-gray-700">
+        Please Specify Constituency<span class="text-red-500">*</span>
+    </label>
+    <input 
+        type="text" 
+        name="constituency_other" 
+        id="constituency_other" 
+        value="{{ old('constituency_other') }}"
+        class="mt-1 block w-full py-2 px-4 border border-gray-300 rounded-md shadow-sm focus:outline-none sm:text-sm">
+    @error('constituency_other')
+        <span class="text-red-500 text-xs">{{ $message }}</span>
+    @enderror
+</div>
+
+
+<!-- Subcounty Field -->
+<div class="flex-1">
+    <label for="subcounty" class="block text-sm font-medium text-gray-700">
+        Subcounty<span class="text-red-500">*</span>
+    </label>
+    <select 
+        name="subcounty_id" 
+        id="subcounty" 
+        required 
+        class="mt-1 block w-full py-2 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+        <option value="" disabled selected>Select Subcounty</option>
+        <option value="other" {{ (old('subcounty_id') == 'other') ? 'selected' : '' }}>Other</option>
+    </select>
+    @error('subcounty_id')
+        <span class="text-red-500 text-xs">{{ $message }}</span>
+    @enderror
+</div>
+
+<!-- Input Field for "Other" Subcounty -->
+<div class="flex-1" id="subcounty_other_div" style="display: none;">
+    <label for="subcounty_other" class="block text-sm font-medium text-gray-700">
+        Please Specify Subcounty<span class="text-red-500">*</span>
+    </label>
+    <input 
+        type="text" 
+        name="subcounty_other" 
+        id="subcounty_other" 
+        value="{{ old('subcounty_other') }}"
+        class="mt-1 block w-full py-2 px-4 border border-gray-300 rounded-md shadow-sm focus:outline-none sm:text-sm">
+    @error('subcounty_other')
+        <span class="text-red-500 text-xs">{{ $message }}</span>
+    @enderror
+</div>
+
 
 
   </div>
 
+  <!-- Subcounty Field -->
+
+
      
 
-    <!-- Constituency Field -->
-    <div class="flex-1">
-            <label for="constituency" class="block text-sm font-medium text-gray-700">Constituency<span class="text-red-500">*</span></label>
-            <select 
-                name="constituency" 
-                id="constituency" 
-                required 
-                class="mt-1 block w-full py-2 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                <option value="" disabled>Select Constituency</option>
-                @if (!empty($inputData['homecounty']))
-                    @foreach (\App\Models\Constituency::where('homecounty_id', $inputData['homecounty'])->get() as $constituency)
-                        <option value="{{ $constituency->name }}" {{ (old('constituency', $inputData['constituency'] ?? '') == $constituency->name) ? 'selected' : '' }}>{{ $constituency->name }}</option>
-                    @endforeach
-                @endif
-
-
-            </select>
-
-            @error('constituency')
-                <span class="text-red-500 text-xs">{{ $message }}</span>
-            @enderror
-        </div>
+    
        
 
   <div class="flex space-x-4">
@@ -502,7 +617,7 @@
 <!-- Ministry Field -->
 <div class="flex space-x-4">
             <div class="flex-1">
-                <label for="ministry" class="block text-sm font-medium text-gray-700">Ministry/state/department/county/other public institutions</label>
+                <label for="ministry" class="block text-sm font-medium text-gray-700">Ministry/state department/county/office of the attorney general</label>
                 <input type="text"  name="ministry" id="ministry" maxlength="100" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" value="N/A">
             </div>
             <div class="flex-1">

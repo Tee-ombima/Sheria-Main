@@ -59,120 +59,231 @@
 
 </div>
 
-<!-- Area of Study and High School Level -->
+<!-- Area of Study -->
 <div class="flex space-x-4">
-    
     <div class="flex-1">
-    <label for="highschool" class="block text-sm font-medium text-gray-700">Area of Study:<span class="text-red-500">*</span></label>
-    <select 
-        name="highschool" 
-        id="highschool" 
-        required 
-        class="mt-1 block w-full py-2 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-        <option value=""disabled selected>Select Area of Study</option>
-        @foreach($highschools as $highschool)
-            <option value="{{ $highschool->name }}" {{ old('highschool') == $highschool->name ? 'selected' : '' }}>{{ $highschool->name }}</option>
-        @endforeach
-    </select>
+        <label for="highschool" class="block text-sm font-medium text-gray-700">
+            Area of Study:<span class="text-red-500">*</span>
+        </label>
+        <select 
+            name="highschool" 
+            id="highschool" 
+            required 
+            class="mt-1 block w-full py-2 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            <option value="" disabled selected>Select Area of Study</option>
+            @foreach($highschools as $highschool)
+                <option value="{{ $highschool->name }}" {{ old('highschool') == $highschool->name ? 'selected' : '' }}>
+                    {{ $highschool->name }}
+                </option>
+            @endforeach
+            <option value="other" {{ old('highschool') == 'other' ? 'selected' : '' }}>Other</option>
+        </select>
 
-    @error('highschool')
-        <span class="text-red-500 text-xs">{{ $message }}</span>
-    @enderror
-</div>
+        @error('highschool')
+            <span class="text-red-500 text-xs">{{ $message }}</span>
+        @enderror
+    </div>
 </div>
 
-<!-- Area of Specialisation -->
+<!-- Input Field for "Other" Area of Study -->
+<div class="flex space-x-4" id="highschool_other_div" style="display: none;">
+    <div class="flex-1">
+        <label for="highschool_other" class="block text-sm font-medium text-gray-700">
+            Please Specify Area of Study<span class="text-red-500">*</span>
+        </label>
+        <input 
+            type="text" 
+            name="highschool_other" 
+            id="highschool_other" 
+            value="{{ old('highschool_other') }}"
+            class="mt-1 block w-full py-2 px-4 border border-gray-300 rounded-md shadow-sm focus:outline-none sm:text-sm">
+        @error('highschool_other')
+            <span class="text-red-500 text-xs">{{ $message }}</span>
+        @enderror
+    </div>
+</div>
+
+
+<!-- Specialisation -->
 <div class="flex space-x-4">
-    <!-- Area of Specialisation Field -->
-<div class="flex-1">
-    <label for="specialisation" class="block text-sm font-medium text-gray-700">Specialisation:<span class="text-red-500">*</span></label>
-    <select 
-        name="specialisation" 
-        id="specialisation" 
-        required 
-        class="mt-1 block w-full py-2 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-        <option value="" disabled selected>Select Specialisation</option>
-        @foreach($specialisations as $specialisation)
-            <option value="{{ $specialisation->name }}" {{ old('specialisation') == $specialisation->name ? 'selected' : '' }}>{{ $specialisation->name }}</option>
-        @endforeach
-    </select>
+    <div class="flex-1">
+        <label for="specialisation" class="block text-sm font-medium text-gray-700">
+            Specialisation:<span class="text-red-500">*</span>
+        </label>
+        <select 
+            name="specialisation" 
+            id="specialisation" 
+            required 
+            class="mt-1 block w-full py-2 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            <option value="" disabled selected>Select Specialisation</option>
+            @foreach($specialisations as $specialisation)
+                <option value="{{ $specialisation->name }}" {{ old('specialisation') == $specialisation->name ? 'selected' : '' }}>
+                    {{ $specialisation->name }}
+                </option>
+            @endforeach
+            <option value="other" {{ old('specialisation') == 'other' ? 'selected' : '' }}>Other</option>
+        </select>
 
-    @error('specialisation')
-        <span class="text-red-500 text-xs">{{ $message }}</span>
-    @enderror
+        @error('specialisation')
+            <span class="text-red-500 text-xs">{{ $message }}</span>
+        @enderror
+    </div>
 </div>
 
+<!-- Input Field for "Other" Specialisation -->
+<div class="flex space-x-4" id="specialisation_other_div" style="display: none;">
+    <div class="flex-1">
+        <label for="specialisation_other" class="block text-sm font-medium text-gray-700">
+            Please Specify Specialisation<span class="text-red-500">*</span>
+        </label>
+        <input 
+            type="text" 
+            name="specialisation_other" 
+            id="specialisation_other" 
+            value="{{ old('specialisation_other') }}"
+            class="mt-1 block w-full py-2 px-4 border border-gray-300 rounded-md shadow-sm focus:outline-none sm:text-sm">
+        @error('specialisation_other')
+            <span class="text-red-500 text-xs">{{ $message }}</span>
+        @enderror
+    </div>
 </div>
+
 
 
 
 <!-- Course -->
 <div class="flex space-x-4">
-    <!-- Course Field -->
-<div class="flex-1">
-    <label for="course" class="block text-sm font-medium text-gray-700">Course:<span class="text-red-500">*</span></label>
-    <select 
-        name="course" 
-        id="course" 
-        required 
-        class="mt-1 block w-full py-2 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-        <option value="" disabled selected>Select Course</option>
-        @foreach($courses as $course)
-            <option value="{{ $course->name }}" {{ old('course') == $course->name ? 'selected' : '' }}>{{ $course->name }}</option>
-        @endforeach
-    </select>
+    <div class="flex-1">
+        <label for="course" class="block text-sm font-medium text-gray-700">
+            Course:<span class="text-red-500">*</span>
+        </label>
+        <select 
+            name="course" 
+            id="course" 
+            required 
+            class="mt-1 block w-full py-2 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            <option value="" disabled selected>Select Course</option>
+            @foreach($courses as $course)
+                <option value="{{ $course->name }}" {{ old('course') == $course->name ? 'selected' : '' }}>
+                    {{ $course->name }}
+                </option>
+            @endforeach
+            <option value="other" {{ old('course') == 'other' ? 'selected' : '' }}>Other</option>
+        </select>
 
-    @error('course')
-        <span class="text-red-500 text-xs">{{ $message }}</span>
-    @enderror
+        @error('course')
+            <span class="text-red-500 text-xs">{{ $message }}</span>
+        @enderror
+    </div>
 </div>
 
+<!-- Input Field for "Other" Course -->
+<div class="flex space-x-4" id="course_other_div" style="display: none;">
+    <div class="flex-1">
+        <label for="course_other" class="block text-sm font-medium text-gray-700">
+            Please Specify Course<span class="text-red-500">*</span>
+        </label>
+        <input 
+            type="text" 
+            name="course_other" 
+            id="course_other" 
+            value="{{ old('course_other') }}"
+            class="mt-1 block w-full py-2 px-4 border border-gray-300 rounded-md shadow-sm focus:outline-none sm:text-sm">
+        @error('course_other')
+            <span class="text-red-500 text-xs">{{ $message }}</span>
+        @enderror
+    </div>
 </div>
+
 <!-- Award -->
 <div class="flex space-x-4">
-    <!-- Award Field -->
-<div class="flex-1">
-    <label for="award" class="block text-sm font-medium text-gray-700">Award:<span class="text-red-500">*</span></label>
-    <select 
-        name="award" 
-        id="award" 
-        required 
-        class="mt-1 block w-full py-2 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-        <option value="" disabled selected>Select Award</option>
-        @foreach($awards as $award)
-            <option value="{{ $award->name }}" {{ old('award') == $award->name ? 'selected' : '' }}>{{ $award->name }}</option>
-        @endforeach
-    </select>
+    <div class="flex-1">
+        <label for="award" class="block text-sm font-medium text-gray-700">
+            Award:<span class="text-red-500">*</span>
+        </label>
+        <select 
+            name="award" 
+            id="award" 
+            required 
+            class="mt-1 block w-full py-2 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            <option value="" disabled selected>Select Award</option>
+            @foreach($awards as $award)
+                <option value="{{ $award->name }}" {{ old('award') == $award->name ? 'selected' : '' }}>
+                    {{ $award->name }}
+                </option>
+            @endforeach
+            <option value="other" {{ old('award') == 'other' ? 'selected' : '' }}>Other</option>
+        </select>
 
-    @error('award')
-        <span class="text-red-500 text-xs">{{ $message }}</span>
-    @enderror
+        @error('award')
+            <span class="text-red-500 text-xs">{{ $message }}</span>
+        @enderror
+    </div>
 </div>
 
+<!-- Input Field for "Other" Award -->
+<div class="flex space-x-4" id="award_other_div" style="display: none;">
+    <div class="flex-1">
+        <label for="award_other" class="block text-sm font-medium text-gray-700">
+            Please Specify Award<span class="text-red-500">*</span>
+        </label>
+        <input 
+            type="text" 
+            name="award_other" 
+            id="award_other" 
+            value="{{ old('award_other') }}"
+            class="mt-1 block w-full py-2 px-4 border border-gray-300 rounded-md shadow-sm focus:outline-none sm:text-sm">
+        @error('award_other')
+            <span class="text-red-500 text-xs">{{ $message }}</span>
+        @enderror
+    </div>
 </div>
+
 
 <!-- Grade -->
 <div class="flex space-x-4">
-    <!-- Grade Field -->
-<div class="flex-1">
-    <label for="grade" class="block text-sm font-medium text-gray-700">Grade:<span class="text-red-500">*</span></label>
-    <select 
-        name="grade" 
-        id="grade" 
-        required 
-        class="mt-1 block w-full py-2 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-        <option value="" disabled selected>Select Grade</option>
-        @foreach($grades as $grade)
-            <option value="{{ $grade->name }}" {{ old('grade') == $grade->name ? 'selected' : '' }}>{{ $grade->name }}</option>
-        @endforeach
-    </select>
+    <div class="flex-1">
+        <label for="grade" class="block text-sm font-medium text-gray-700">
+            Grade:<span class="text-red-500">*</span>
+        </label>
+        <select 
+            name="grade" 
+            id="grade" 
+            required 
+            class="mt-1 block w-full py-2 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            <option value="" disabled selected>Select Grade</option>
+            @foreach($grades as $grade)
+                <option value="{{ $grade->name }}" {{ old('grade') == $grade->name ? 'selected' : '' }}>
+                    {{ $grade->name }}
+                </option>
+            @endforeach
+            <option value="other" {{ old('grade') == 'other' ? 'selected' : '' }}>Other</option>
+        </select>
 
-    @error('grade')
-        <span class="text-red-500 text-xs">{{ $message }}</span>
-    @enderror
+        @error('grade')
+            <span class="text-red-500 text-xs">{{ $message }}</span>
+        @enderror
+    </div>
 </div>
 
+<!-- Input Field for "Other" Grade -->
+<div class="flex space-x-4" id="grade_other_div" style="display: none;">
+    <div class="flex-1">
+        <label for="grade_other" class="block text-sm font-medium text-gray-700">
+            Please Specify Grade<span class="text-red-500">*</span>
+        </label>
+        <input 
+            type="text" 
+            name="grade_other" 
+            id="grade_other" 
+            value="{{ old('grade_other') }}"
+            class="mt-1 block w-full py-2 px-4 border border-gray-300 rounded-md shadow-sm focus:outline-none sm:text-sm">
+        @error('grade_other')
+            <span class="text-red-500 text-xs">{{ $message }}</span>
+        @enderror
+    </div>
 </div>
+
 
 
 
@@ -273,6 +384,12 @@
                     <td>{{ $datum->end_date }}</td>
                     <td>{{ $datum->graduation_completion_date }}</td>
                     <td>
+
+<!-- Edit button -->
+            <a href="{{ route('edit.academic.info', $datum->id) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Edit
+            </a>
+
                         <form action="{{ route('delete.academic.info', $datum->id) }}" method="POST">
                             @csrf
                             @method('DELETE')
@@ -285,6 +402,11 @@
             @endforeach
         </tbody>
     </table>
+
+    <!-- Pagination Links -->
+        <div class="mt-4">
+            {{ $academicInfos->links() }}
+        </div>
 
 <form id="academic-info-form" action="{{ route('profile.save-academic-info') }}" method="POST">
         @csrf

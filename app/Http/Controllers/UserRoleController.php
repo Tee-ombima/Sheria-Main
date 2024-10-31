@@ -44,7 +44,7 @@ class UserRoleController extends Controller
     $user = User::findOrFail($id);
     $user->delete(); // Or use soft deletes if applicable
 
-    return redirect()->route('admin.role-management')->with('success', 'User deleted successfully.');
+    return redirect()->route('admin.role-management')->with('message', 'User deleted successfully.');
 }
 
     public function toggleRole(User $user)
@@ -53,6 +53,6 @@ class UserRoleController extends Controller
         $user->role = $user->role === 'admin' ? 'user' : 'admin';
         $user->save();
 
-        return redirect()->route('admin.role-management')->with('success', 'User role updated successfully.');
+        return redirect()->route('admin.role-management')->with('message', 'User role updated successfully.');
     }
 }

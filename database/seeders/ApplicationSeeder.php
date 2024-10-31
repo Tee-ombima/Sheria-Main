@@ -11,9 +11,9 @@ class ApplicationSeeder extends Seeder
 {
     public function run()
     {
-        // Ensure the specific users are included in the 10,000 users
+        // Ensure the specific users are included in the 3,000 users
         $specificUsers = [
-            ['email' => 'ombimatitus7@gmail.com'],
+            
             ['email' => 'ombimatitus51@gmail.com'],
         ];
 
@@ -27,7 +27,7 @@ class ApplicationSeeder extends Seeder
         }
 
         // Generate the remaining users to reach 10,000 in total
-        $totalUsersNeeded = 50 - count($specificUsers); // Subtract specific users from 10,000
+        $totalUsersNeeded = 10 - count($specificUsers); // Subtract specific users from 10,000
         User::factory()->count($totalUsersNeeded)->create();
 
         // Get all the users from the database, including the specific ones
@@ -48,9 +48,9 @@ class ApplicationSeeder extends Seeder
                 ]);
             }
 
-            // Ensure at least 2000 users apply to each job
+            // Ensure at least 1500 users apply to each job
             $currentApplicantCount = Application::where('job_id', $job->id)->count();
-            $remainingApplicants = 20 - $currentApplicantCount;
+            $remainingApplicants = 10 - $currentApplicantCount;
 
             // Select enough users to fill in the remaining slots
             if ($remainingApplicants > 0) {
