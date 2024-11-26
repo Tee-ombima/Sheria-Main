@@ -1,6 +1,11 @@
 <!-- resources/views/admin/pupillages/nonPending.blade.php -->
 <x-layout>
     <x-card class="p-10 max-w-6xl mx-auto mt-24 bg-white rounded-lg shadow-lg">
+
+    <a href="{{ url()->previous() }}" class="inline-flex items-center px-4 py-2 bg-gray-500 text-white font-semibold text-sm rounded-lg hover:bg-gray-700">
+            ← Back
+        </a>
+
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-3xl font-bold">Processed Pupillage Applications</h1>
             <div class="flex space-x-2">

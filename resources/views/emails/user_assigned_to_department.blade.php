@@ -6,7 +6,7 @@
 <body>
     <p>Dear {{ $department->name }},</p>
 
-    <p>A new user has been assigned to your department:</p>
+    <p>A new Attachee has been assigned to your department:</p>
 
     <p><strong>Name:</strong> {{ $user->name }}</p>
     <p><strong>Email:</strong> {{ $user->email }}</p>
@@ -16,6 +16,6 @@
 
     <p>Please take the necessary actions.</p>
 
-    <p>Best regards,<br>Your Application System</p>
+    <p>Best regards,<br>HR Team (Office of the Attorney General)</p>
 </body>
 </html>

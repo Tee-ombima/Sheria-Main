@@ -1,7 +1,7 @@
 <x-layout>
-  <a href="/" class="inline-block text-black ml-4 mb-4">
-    <i class="fa-solid fa-arrow-left"></i> Back
-  </a>
+  <a href="{{ url()->previous() }}" class="inline-flex items-center px-4 py-2 bg-gray-500 text-white font-semibold text-sm rounded-lg hover:bg-gray-700">
+            ← Back
+        </a>
   
   <div class="mx-4">
     <x-card class="p-10">
@@ -100,17 +100,7 @@
     @endif
   </div>
 
-  <!-- Include CKEditor Script -->
-  <script src="https://cdn.ckeditor.com/ckeditor5/34.0.0/classic/ckeditor.js"></script>
-  <script>
-    ClassicEditor
-      .create(document.querySelector('textarea[name="description"]'), {
-        toolbar: ['bold', 'italic', 'bulletedList', 'numberedList', 'blockQuote', 'undo', 'redo'],
-      })
-      .catch(error => {
-        console.error(error);
-      });
-  </script>
+  
 
   <script>
 @if($listing->isActive)

@@ -24,6 +24,9 @@ use App\Http\Controllers\AdminInternshipController;
 
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\PupillageController;
+use App\Http\Controllers\PostPupillageController;
+
+use App\Http\Controllers\AdminPostPupillageController;
 
 
 Auth::routes(['verify' => true]);
@@ -39,9 +42,13 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::put('/internships/{id}', [InternshipController::class, 'update'])->name('internships.update');
     Route::get('/pupillages/{id}/edit', [PupillageController::class, 'edit'])->name('pupillages.edit');
     Route::put('/pupillages/{id}', [PupillageController::class, 'update'])->name('pupillages.update');
+    Route::get('/post-pupillages/{id}/edit', [PostPupillageController::class, 'edit'])->name('postPupillages.edit');
+    Route::put('/post-pupillages/{id}', [PostPupillageController::class, 'update'])->name('postPupillages.update');
+
 
     Route::delete('/internships/{id}', [InternshipController::class, 'destroy'])->name('internships.destroy');
     Route::delete('/pupillages/{id}', [PupillageController::class, 'destroy'])->name('pupillages.destroy');
+    Route::delete('/post-pupillages/{id}', [PostPupillageController::class, 'destroy'])->name('postPupillages.destroy');
 
 });
 
@@ -171,7 +178,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/internships/create', [InternshipController::class, 'create'])->name('internships.create');
     Route::post('/internships', [InternshipController::class, 'store'])->name('internships.store');
     Route::get('/internships', [InternshipController::class, 'index'])->name('internships.index'); // This route is for listing all internships
-    Route::get('/internships/apply/{department}', [InternshipController::class, 'apply'])->name('internships.apply');
+    Route::post('/internships/upload-file', [InternshipController::class, 'uploadFile'])->name('internships.uploadFile');
 
 });
 
@@ -179,10 +186,23 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/pupillages/create', [PupillageController::class, 'create'])->name('pupillages.create');
     Route::post('/pupillages', [PupillageController::class, 'store'])->name('pupillages.store');
     Route::get('/pupillages', [PupillageController::class, 'index'])->name('pupillages.index');
+    Route::get('/getSubCounties/{county_id}', [PupillageController::class, 'getSubCounties'])->name('getSubCounties');
+
+});
+Route::middleware(['auth'])->group(function () {
+    Route::get('/post-pupillages/create', [PostPupillageController::class, 'create'])->name('postPupillages.create');
+    Route::post('/post-pupillages', [PostPupillageController::class, 'store'])->name('postPupillages.store');
+    Route::get('/post-pupillages', [AdminPostPupillageController::class, 'index'])->name('postPupillages.index');
+    Route::get('/getSubCounties/{county_id}', [PostPupillageController::class, 'getSubCounties'])->name('getSubCounties');
+
 });
 
 // Admin Routes
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    
+    Route::get('admin/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+
+
     Route::get('/admin/internships', [AdminInternshipController::class, 'index'])->name('internships.index');
     Route::get('/admin/internships/{department}', [AdminInternshipController::class, 'show'])->name('internships.show');
     Route::post('/admin/departments', [AdminInternshipController::class, 'storeDepartment'])->name('departments.store');
@@ -206,6 +226,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::delete('/admindepartments/{department}', [DepartmentController::class, 'destroy'])->name('admin.departments.destroy');
     Route::get('/admindepartments/archived', [DepartmentController::class, 'archived'])->name('departments.archived');
 
+    Route::get('internships/accepted', [AdminInternshipController::class, 'accepted'])->name('internships.accepted');
+    Route::get('internships/not_accepted', [AdminInternshipController::class, 'notAccepted'])->name('internships.not_accepted');
+    Route::get('internships/export', [AdminInternshipController::class, 'export'])->name('internships.export');
+    // ... other routes ...
+    Route::post('/internships/toggle-apply', [AdminInternshipController::class, 'toggleApply'])->name('internships.toggleApply');
 
 });
 
@@ -222,4 +247,37 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/pupillages/non-pending', [AdminPupillageController::class, 'nonPending'])->name('pupillages.nonPending');
 
     // Other admin routes...
+    Route::patch('/pupillages/{application}', [AdminPupillageController::class, 'update'])->name('admin.pupillages.update');
+    Route::get('pupillages/accepted', [AdminPupillageController::class, 'accepted'])->name('pupillages.accepted');
+    Route::get('pupillages/not_accepted', [AdminPupillageController::class, 'notAccepted'])->name('pupillages.not_accepted');
+    Route::get('pupillages/export', [AdminPupillageController::class, 'export'])->name('pupillages.export');
+    Route::post('/pupillages/toggle-apply', [AdminPupillageController::class, 'toggleApply'])->name('pupillages.toggleApply');
+
 });
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+
+    // Pupillage Applications
+    Route::get('/admin/post-pupillages', [AdminPostPupillageController::class, 'index'])->name('postPupillages.index');
+    Route::get('/admin/post-pupillages/{application}', [AdminPostPupillageController::class, 'show'])->name('postPupillages.show');
+    Route::post('/admin/post-pupillages/departments', [AdminPostPupillageController::class, 'storeDepartment'])->name('postPupillages.departments.store');
+    Route::delete('/admin/post-pupillages/{application}', [AdminPostPupillageController::class, 'destroy'])->name('postPupillages.destroy');
+    Route::post('/admin/post-pupillages/{application}/archive', [AdminPostPupillageController::class, 'archive'])->name('postPupillages.archive');
+    Route::get('/admin/post-pupillages/archived-applications', [AdminPostPupillageController::class, 'archivedApplications'])->name('postPupillages.archived.applications');
+    Route::patch('/admin/post-pupillages/{application}/unarchive', [AdminPostPupillageController::class, 'unarchive'])->name('postPupillages.unarchive');
+    Route::get('/post-pupillages/non-pending', [AdminPostPupillageController::class, 'nonPending'])->name('postPupillages.nonPending');
+
+    // Other admin routes...
+    Route::patch('/post-pupillages/{application}', [AdminPostPupillageController::class, 'update'])->name('admin.postPupillages.update');
+
+    Route::get('postPupillages/accepted', [AdminPostPupillageController::class, 'accepted'])->name('postPupillages.accepted');
+    Route::get('postPupillages/not_accepted', [AdminPostPupillageController::class, 'notAccepted'])->name('postPupillages.not_accepted');
+    Route::get('postPupillages/export', [AdminPostPupillageController::class, 'export'])->name('postPupillages.export');
+    Route::post('/postPupillages/toggle-apply', [AdminPostPupillageController::class, 'toggleApply'])->name('postPupillages.toggleApply');
+
+
+    Route::get('/post-pupillage/vacancy-number', [AdminPostPupillageController::class, 'editVacancyNumber'])->name('postPupillages.editVacancyNumber');
+    Route::post('/post-pupillage/vacancy-number', [AdminPostPupillageController::class, 'updateVacancyNumber'])->name('postPupillages.updateVacancyNumber');
+});
+
+
+

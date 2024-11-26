@@ -1,4 +1,5 @@
 <x-layout>
+
     <!-- Display User Statistics -->
     <div class="p-4 bg-gray-100 rounded-lg text-center mb-6">
         <h3 class="text-lg font-semibold">User Statistics</h3>

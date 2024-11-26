@@ -1,6 +1,10 @@
 <!-- resources/views/admin/pupillages/archived.blade.php -->
 <x-layout>
     <x-card class="p-10 max-w-6xl mx-auto mt-24 bg-white rounded-lg shadow-lg">
+    <!-- Download Excel Button -->
+                <a href="{{ route('admin.postPupillages.export') }}" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow">
+                    Download All Applications Excel
+                </a>
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-3xl font-bold">Archived Pupillage Applications</h1>
             <div class="flex space-x-2">

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 
 class Listing extends Model
@@ -16,6 +17,7 @@ class Listing extends Model
         'deadline',
         'vacancies',  // Add this field
         'file',
+        
     ];
     
     public function applications()
@@ -23,45 +25,34 @@ class Listing extends Model
         return $this->hasMany(Application::class, 'job_id');
     }
 
-    // ... existing code ...
+    // Automatically cast 'deadline' to a Carbon instance
+    protected $dates = ['deadline'];
 
     /**
-     * Determine if the listing is expired based on the deadline.
+     * Accessor to determine if a listing is active.
      *
-     * @return bool
-     */
-    public function getIsExpiredAttribute()
-    {
-        return $this->deadline <= now();
-    }
-
-    // Optionally, add an accessor for 'isActive'
-    /**
-     * Determine if the listing is active (not archived and not expired).
-     *
-     * @return bool
+     * A listing is active if it is not archived and the deadline has not passed.
      */
     public function getIsActiveAttribute()
     {
-        return !$this->archived && !$this->isExpired;
+        return !$this->archived && $this->deadline->isFuture();
     }
 
-    // Optionally, add a scope for active listings
     /**
-     * Scope a query to only include active listings.
+     * Scope to get only active listings.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @return \Illuminate\Database\Eloquent\Builder
+     * Use in queries to filter listings that are not archived and have not passed their deadline.
      */
     public function scopeActive($query)
     {
         return $query->where('archived', false)
-                     ->where('deadline', '>', now());
+                     ->where('deadline', '>', Carbon::now());
     }
 
     public function scopeFilter($query, array $filters) {
         if($filters['search'] ?? false) {
-            $query->where('title', 'like', '%' . request('search') . '%');
+            $query->where('title', 'like', '%' . request('search') . '%')
+                ->orWhere('description', 'like', '%' . request('search') . '%');
         }
     }
 }

@@ -4,7 +4,8 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\VerifiesEmails;
-
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\RedirectResponse;
 class VerificationController extends Controller
 {
     /*
@@ -19,7 +20,13 @@ class VerificationController extends Controller
     */
 
     use VerifiesEmails;
+    public function __invoke(EmailVerificationRequest $request): RedirectResponse
+    {
+        $request->fulfill();
 
+        // Redirect to login page with success message
+        return redirect()->route('login')->with('message', 'Your email has been successfully verified. Please log in.');
+    }
     /**
      * Where to redirect users after verification.
      *

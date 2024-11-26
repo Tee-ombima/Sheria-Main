@@ -1,5 +1,9 @@
 <x-layout>
     <x-card class="p-10 max-w-4xl mx-auto mt-24 bg-white rounded-lg shadow-lg">
+
+    <a href="{{ url()->previous() }}" class="inline-flex items-center px-4 py-2 bg-gray-500 text-white font-semibold text-sm rounded-lg hover:bg-gray-700">
+    ← Back
+</a>
         <div class="container mx-auto">
             <h1 class="text-2xl font-bold text-center mb-8 text-gray-700">Create a Department</h1>
 

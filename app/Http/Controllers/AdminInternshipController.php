@@ -1,13 +1,16 @@
 <?php
 // app/Http/Controllers/AdminInternshipController.php
 namespace App\Http\Controllers;
+use App\Models\ApplicationSetting;
+use Illuminate\Support\Facades\Auth;
 
 use App\Models\InternshipApplication;
 use App\Models\Department;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\UserAssignedToDepartmentMail;
-
+use App\Exports\InternshipApplicationsExport;
+use Maatwebsite\Excel\Facades\Excel;
 class AdminInternshipController extends Controller
 {
     
@@ -103,7 +106,7 @@ public function update(Request $request, InternshipApplication $application)
         }
     }
 
-    return redirect()->back()->with('message', 'Application updated successfully.');
+    return redirect()->route('admin.internships.index')->with('message', 'Application updated successfully.');
 }
 
 public function destroy(InternshipApplication $application)
@@ -131,4 +134,35 @@ public function storeDepartment(Request $request)
     return back()->with('message', 'Department added successfully!');
 }
 
+public function accepted()
+    {
+        $applications = InternshipApplication::where('status', 'Accepted')->paginate(10);
+
+        return view('admin.internships.accepted', compact('applications'));
+    }
+
+    public function notAccepted()
+    {
+        $applications = InternshipApplication::where('status', 'Not_Successful')->paginate(10);
+
+        return view('admin.internships.not_accepted', compact('applications'));
+    }
+
+    public function export()
+    {
+        return Excel::download(new InternshipApplicationsExport, 'accepted_internship_applications.xlsx');
+    }
+    public function toggleApply()
+    {
+        // Only allow admins
+        if (Auth::user()->role !== 'admin') {
+            abort(403, 'Unauthorized Action');
+        }
+
+        $setting = ApplicationSetting::first();
+        $setting->internship_applications_enabled = !$setting->internship_applications_enabled;
+        $setting->save();
+
+        return redirect()->back()->with('message', 'Attachement application status updated.');
+    }
 }

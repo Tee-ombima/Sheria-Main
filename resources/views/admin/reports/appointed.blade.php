@@ -1,4 +1,6 @@
 <x-layout>
+    <x-card class="p-10 max-w-6xl mx-auto mt-24 bg-white rounded-lg shadow-lg">
+
     <h1 class="text-3xl font-bold mb-6">Appointed</h1>
 <form method="GET" action="{{ url()->current() }}" class="mb-4">
     <label for="job_title" class="mr-2">Filter by Job Title:</label>
@@ -41,4 +43,6 @@
 
     <!-- Button to download PDF -->
     <a href="{{ route('export.pdf', ['type' => 'appointed', 'job_title' => $jobTitle]) }}" class="mt-4 inline-block bg-red-500 text-white px-4 py-2 rounded">Download PDF</a>
+    </x-card>
+
 </x-layout>

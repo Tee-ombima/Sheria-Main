@@ -206,4 +206,8 @@ public function showAppointed(Request $request)
         $pdf = PDF::loadView('admin.reports.pdf', compact('applications', 'type'));
         return $pdf->download("{$type}_applications.pdf");
     }
+    public function dashboard()
+    {
+        return view('admin.dashboard');
+    }
 }

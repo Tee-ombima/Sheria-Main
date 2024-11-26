@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Carbon\Carbon;
 
 class ListingFactory extends Factory
 {
@@ -22,30 +23,8 @@ class ListingFactory extends Factory
         $year = date('Y');
         $uniqueId = $this->faker->unique()->numberBetween(10000, 99999);
         $jobReferenceNumber = "$department/$year/$uniqueId";
-
-        // Generate a detailed job description with sections
-        $jobOverview = $this->faker->paragraphs(3, true);  // 3 paragraphs for job overview
-        $jobDuties = $this->faker->sentences(6); // 6 duties
-        $qualifications = $this->faker->sentences(5); // 5 qualifications
-        $salary = $this->faker->numberBetween(50000, 150000);  // Salary example
         $deadline = $this->faker->dateTimeBetween('-10 days', '+30 days');
-
-
-        // Create the formatted job description
-        $description = "
-            **Job Overview:**
-
-            $jobOverview
-
-            **Key Job Duties:**
-            - " . implode("\n            - ", $jobDuties) . "
-
-            **Qualifications:**
-            - " . implode("\n            - ", $qualifications) . "
-
-            **Salary:** \$" . number_format($salary) . " per annum
-        ";
-        $filePath = 'files/5-mb-example-file.pdf';
+        $filePath = 'files/1-mb-example-file.pdf';
 
 
         return [
@@ -54,6 +33,8 @@ class ListingFactory extends Factory
             'vacancies' => $this->faker->numberBetween(1, 10), // Random number of vacancies
             'deadline' => $deadline,
             'file' => $filePath,
+            
+
         ];
     }
 }

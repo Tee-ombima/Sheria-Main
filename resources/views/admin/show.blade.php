@@ -1,4 +1,6 @@
 <x-layout>
+    <x-card class="p-10 max-w-6xl mx-auto mt-24">
+
     <h1 class="text-3xl font-bold mb-6">{{ $listing->title }}</h1>
 
     <!-- Filter Form -->
@@ -200,4 +202,6 @@
             </div>
         </div>
     </div>
+        </x-card>
+
 </x-layout>

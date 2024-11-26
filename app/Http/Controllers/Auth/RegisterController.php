@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rules\Password;
 
 class RegisterController extends Controller
 {
@@ -52,7 +53,17 @@ class RegisterController extends Controller
         return Validator::make($data, [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'password' => [
+            'required',
+            'string',
+            'confirmed',
+            Password::min(8)
+                ->mixedCase()      // Requires at least one uppercase and one lowercase letter
+                ->letters()        // Requires at least one letter
+                ->numbers()        // Requires at least one number
+                ->symbols()        // Requires at least one symbol
+                ->uncompromised(), // Checks if the password has been compromised in data leaks
+        ],
         ]);
     }
 
@@ -80,10 +91,9 @@ class RegisterController extends Controller
      */
     protected function registered(Request $request, $user)
     {
-        // Send email verification notification
-        $user->sendEmailVerificationNotification();
+        
 
         // Redirect the user to the email verification notice page
-        return redirect()->route('verification.notice');
+        return redirect()->route('verification.notice')->with('message', 'Registration successful! Please check your email to verify your account.');
     }
 }

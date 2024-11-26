@@ -43,11 +43,17 @@ class ProfileController extends Controller
         $personalInfoSubmitted = PersonalInfo::where('user_id', $userId)->exists();
         $inputData = $request->session()->get('inputData', []);
     
-        // Retrieve salutations from the database
-        $salutations = Salutation::all();
-        $ethnicities = Ethnicity::all();
-        $homecounties = Homecounty::all();
-        $countryCodes = CountryCode::all();
+        // Retrieve and sort salutations from the database (ensure 'other' is last)
+    $salutations = Salutation::orderByRaw("name = 'other' DESC, name ASC")->get();
+    
+    // Retrieve and sort ethnicities from the database (ensure 'other' is last)
+    $ethnicities = Ethnicity::orderByRaw("name = 'other' DESC, name ASC")->get();
+    
+    // Retrieve and sort home counties from the database (ensure 'other' is last)
+    $homecounties = Homecounty::orderByRaw("name = 'other' DESC, name ASC")->get();
+    
+    // Retrieve and sort country codes from the database (ensure 'other' is last)
+    $countryCodes = CountryCode::orderByRaw("name = 'other' DESC, name ASC")->get();
         
     
         // Pass personalInfo and salutations to the view
@@ -67,11 +73,11 @@ public function savePersonalInfo(Request $request)
     // Validate the incoming request
     $validatedData = $request->validate([
         // Personal Information
-        'surname' => 'required|string|max:100',
-        'firstname' => 'required|string|max:100',
-        'lastname' => 'nullable|string|max:100',
+        'surname' => 'required|string|max:50',
+        'firstname' => 'required|string|max:50',
+        'lastname' => 'nullable|string|max:50',
         'dob' => 'required|date',
-        'idno' => 'required|string|max:8',
+        'idno' => 'required|integer',
         'kra_pin' => 'required|string|max:11',
         'nationality' => 'required|string|max:50',
 
@@ -80,8 +86,8 @@ public function savePersonalInfo(Request $request)
         'salutation_other' => 'nullable|string|max:50',
 
         // Ethnicity
-        'ethnicity' => 'required|string|max:255',
-        'ethnicity_other' => 'nullable|string|max:255',
+        'ethnicity' => 'required|string|max:50',
+        'ethnicity_other' => 'nullable|string|max:50',
 
         // Homecounty
         'homecounty_id' => [
@@ -93,7 +99,7 @@ public function savePersonalInfo(Request $request)
                 }
             },
         ],
-        'homecounty_other' => 'nullable|string|max:255',
+        'homecounty_other' => 'nullable|string|max:50',
 
         // Constituency
         'constituency_id' => [
@@ -105,7 +111,7 @@ public function savePersonalInfo(Request $request)
                 }
             },
         ],
-        'constituency_other' => 'nullable|string|max:255',
+        'constituency_other' => 'nullable|string|max:50',
 
         // Subcounty
         'subcounty_id' => [
@@ -117,17 +123,17 @@ public function savePersonalInfo(Request $request)
                 }
             },
         ],
-        'subcounty_other' => 'nullable|string|max:255',
+        'subcounty_other' => 'nullable|string|max:50',
 
         // Contact Information
         'postal_address' => 'required|string',
-        'code' => 'nullable|string',
+        'code' => 'nullable|numeric',
         'town_city' => 'required|string|max:50',
-        'telephone_num' => 'nullable|string',
-        'mobile_num' => 'required|string',
+        'telephone_num' => 'nullable|integer',
+        'mobile_num' => 'required|integer',
         'email_address' => 'required|email|max:100',
         'alt_contact_person' => 'required|string|max:100',
-        'alt_contact_telephone_num' => 'required|string',
+        'alt_contact_telephone_num' => 'required|integer',
         'disability_question' => 'nullable|string',
         'nature_of_disability' => 'nullable|string|max:100',
         'ncpd_registration_no' => 'nullable|string|max:100',
@@ -244,12 +250,13 @@ public function showAcademicInfo(Request $request)
     // Retrieve stored data from the database
     $academicInfos = AcademicInfo::where('user_id', Auth::id())->paginate(10); // Adjust the number per page as needed
 
-    $awards = Award::all();
-    $grades = Grade::all();
-    $courses = Course::all();
-    $specialisations = Specialisation::all();
+    $awards = Award::orderByRaw("name = 'other' DESC, name ASC")->get();
 
-    $highschools = Highschool::all();
+    $grades = Grade::orderByRaw("name = 'other' DESC, name ASC")->get();
+    $courses = Course::orderByRaw("name = 'other' DESC, name ASC")->get();
+    $specialisations = Specialisation::orderByRaw("name = 'other' DESC, name ASC")->get();
+
+    $highschools = Highschool::orderByRaw("name = 'other' DESC, name ASC")->get();
     
 
     return view('users.profile.academic-info', [
@@ -267,25 +274,25 @@ public function addRow(Request $request)
 {
     // Define validation rules
     $rules = [
-        'institution_name' => 'required|string|max:100',
-        'student_admission_no' => 'nullable|string|max:100',
+        'institution_name' => 'required|string|max:50',
+        'student_admission_no' => 'nullable|string|max:50',
 
-        'highschool' => 'required|string',
-        'highschool_other' => 'nullable|string|max:100',
+        'highschool' => 'required|string|max:50',
+        'highschool_other' => 'nullable|string|max:50',
 
-        'specialisation' => 'required|string',
-        'specialisation_other' => 'nullable|string|max:100',
+        'specialisation' => 'required|string|max:50',
+        'specialisation_other' => 'nullable|string|max:50',
 
-        'course' => 'required|string',
-        'course_other' => 'nullable|string|max:100',
+        'course' => 'required|string|max:50',
+        'course_other' => 'nullable|string|max:50',
 
-        'award' => 'required|string',
-        'award_other' => 'nullable|string|max:100',
+        'award' => 'required|string|max:50',
+        'award_other' => 'nullable|string|max:50',
 
-        'grade' => 'required|string|max:100',
-        'grade_other' => 'nullable|string|max:100',
+        'grade' => 'required|string|max:50',
+        'grade_other' => 'nullable|string|max:50',
 
-        'certificate_no' => 'required|string|max:100',
+        'certificate_no' => 'required|string|max:50',
         'start_date' => 'nullable|date',
         'end_date' => 'nullable|date',
         'graduation_completion_date' => 'nullable|date',
@@ -369,11 +376,11 @@ public function editAcademicInfo($id)
     $academicInfo = AcademicInfo::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
 
     // Get options for select fields
-    $awards = Award::all();
-    $grades = Grade::all();
-    $courses = Course::all();
-    $specialisations = Specialisation::all();
-    $highschools = Highschool::all();
+    $awards = Award::orderByRaw("name = 'other' DESC, name ASC")->get();
+    $grades = Grade::orderByRaw("name = 'other' DESC, name ASC")->get();
+    $courses = Course::orderByRaw("name = 'other' DESC, name ASC")->get();
+    $specialisations = Specialisation::orderByRaw("name = 'other' DESC, name ASC")->get();
+    $highschools = Highschool::orderByRaw("name = 'other' DESC, name ASC")->get();
 
     return view('users.profile.edit-academic-info', [
         'academicInfo' => $academicInfo,
@@ -389,14 +396,14 @@ public function updateAcademicInfo(Request $request, $id)
 {
     // Define validation rules
     $rules = [
-        'institution_name' => 'required|string|max:100',
-        'student_admission_no' => 'nullable|string|max:100',
-        'highschool' => 'required|string',
-        'specialisation' => 'required|string',
-        'award' => 'required|string',
-        'course' => 'required|string',
-        'grade' => 'required|string|max:100',
-        'certificate_no' => 'required|string|max:100',
+        'institution_name' => 'required|string|max:50',
+        'student_admission_no' => 'nullable|string|max:50',
+        'highschool' => 'required|string|max:50',
+        'specialisation' => 'required|string|max:50',
+        'award' => 'required|string|max:50',
+        'course' => 'required|string|max:50',
+        'grade' => 'required|string|max:50',
+        'certificate_no' => 'required|string|max:50',
         'start_date' => 'nullable|date',
         'end_date' => 'nullable|date',
         'graduation_completion_date' => 'nullable|date',
@@ -428,25 +435,25 @@ public function saveAcademicInfo(Request $request)
 
     // Define validation rules
     $rules = [
-        'institution_name' => 'required|string|max:100',
-        'student_admission_no' => 'nullable|string|max:100',
+        'institution_name' => 'required|string|max:50',
+        'student_admission_no' => 'nullable|string|max:50',
 
-        'highschool' => 'required|string',
-        'highschool_other' => 'nullable|string|max:100',
+        'highschool' => 'required|string|max:50',
+        'highschool_other' => 'nullable|string|max:50',
 
-        'specialisation' => 'required|string',
-        'specialisation_other' => 'nullable|string|max:100',
+        'specialisation' => 'required|string|max:50',
+        'specialisation_other' => 'nullable|string|max:50',
 
-        'course' => 'required|string',
-        'course_other' => 'nullable|string|max:100',
+        'course' => 'required|string|max:50',
+        'course_other' => 'nullable|string|max:50',
 
-        'award' => 'required|string',
-        'award_other' => 'nullable|string|max:100',
+        'award' => 'required|string|max:50',
+        'award_other' => 'nullable|string|max:50',
 
-        'grade' => 'required|string|max:100',
+        'grade' => 'required|string|max:50',
         'grade_other' => 'nullable|string|max:100',
 
-        'certificate_no' => 'required|string|max:100',
+        'certificate_no' => 'required|string|max:50',
         'start_date' => 'nullable|date',
         'end_date' => 'nullable|date',
         'graduation_completion_date' => 'nullable|date',
@@ -543,10 +550,10 @@ public function showProfInfo(Request $request)
     // Retrieve stored data from the database
     $profInfos = ProfInfo::where('user_id', $userId)->paginate(10); // Get all records, not paginated
 
-    $prof_awards = Prof_award::all();
-    $prof_grades = Prof_grade::all();
-    $prof_area_of_study_high_school_levels = Prof_area_of_study_high_school_level::all();
-    $prof_area_of_specialisations = Prof_area_of_specialisation::all();
+    $prof_awards = Prof_award::orderByRaw("name = 'other' DESC, name ASC")->get();
+    $prof_grades = Prof_grade::orderByRaw("name = 'other' DESC, name ASC")->get();
+    $prof_area_of_study_high_school_levels = Prof_area_of_study_high_school_level::orderByRaw("name = 'other' DESC, name ASC")->get();
+    $prof_area_of_specialisations = Prof_area_of_specialisation::orderByRaw("name = 'other' DESC, name ASC")->get();
     
 
     return view('users.profile.prof-info', [
@@ -563,24 +570,24 @@ public function addProfRow(Request $request)
 {
     // Define validation rules
     $rules = [
-        'prof_institution_name' => 'required|string|max:100',
-        'prof_student_admission_no' => 'nullable|string|max:100',
+        'prof_institution_name' => 'required|string|max:50',
+        'prof_student_admission_no' => 'nullable|string|max:50',
 
-        'prof_area_of_study_high_school_level' => 'required|string',
-        'prof_area_of_study_high_school_level_other' => 'nullable|string|max:100',
+        'prof_area_of_study_high_school_level' => 'required|string|max:50',
+        'prof_area_of_study_high_school_level_other' => 'nullable|string|max:50',
 
-        'prof_area_of_specialisation' => 'required|string',
-        'prof_area_of_specialisation_other' => 'nullable|string|max:100',
+        'prof_area_of_specialisation' => 'required|string|max:50',
+        'prof_area_of_specialisation_other' => 'nullable|string|max:50',
 
-        'prof_award' => 'required|string',
-        'prof_award_other' => 'nullable|string|max:100',
+        'prof_award' => 'required|string|max:50',
+        'prof_award_other' => 'nullable|string|max:50',
 
-        'prof_course' => 'nullable|string|max:100',
+        'prof_course' => 'nullable|string|max:50',
 
-        'prof_grade' => 'required|string|max:100',
-        'prof_grade_other' => 'nullable|string|max:100',
+        'prof_grade' => 'required|string|max:50',
+        'prof_grade_other' => 'nullable|string|max:50',
 
-        'prof_certificate_no' => 'nullable|string|max:100',
+        'prof_certificate_no' => 'nullable|string|max:50',
         'prof_start_date' => 'required|date',
         'prof_end_date' => 'required|date',
     ];
@@ -655,10 +662,10 @@ public function editProfInfo($id)
     $profInfo = ProfInfo::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
 
     // Get options for select fields
-    $prof_awards = Prof_award::all();
-    $prof_grades = Prof_grade::all();
-    $prof_area_of_study_high_school_levels = Prof_area_of_study_high_school_level::all();
-    $prof_area_of_specialisations = Prof_area_of_specialisation::all();
+    $prof_awards = Prof_award::orderByRaw("name = 'other' DESC, name ASC")->get();
+    $prof_grades = Prof_grade::orderByRaw("name = 'other' DESC, name ASC")->get();
+    $prof_area_of_study_high_school_levels = Prof_area_of_study_high_school_level::orderByRaw("name = 'other' DESC, name ASC")->get();
+    $prof_area_of_specialisations = Prof_area_of_specialisation::orderByRaw("name = 'other' DESC, name ASC")->get();
 
     return view('users.profile.edit-prof-info', [
         'profInfo' => $profInfo,
@@ -673,24 +680,24 @@ public function updateProfInfo(Request $request, $id)
 {
     // Define validation rules
     $rules = [
-        'prof_institution_name' => 'required|string|max:100',
-        'prof_student_admission_no' => 'nullable|string|max:100',
+        'prof_institution_name' => 'required|string|max:50',
+        'prof_student_admission_no' => 'nullable|string|max:50',
 
-        'prof_area_of_study_high_school_level' => 'required|string',
-        'prof_area_of_study_high_school_level_other' => 'nullable|string|max:100',
+        'prof_area_of_study_high_school_level' => 'required|string|max:50',
+        'prof_area_of_study_high_school_level_other' => 'nullable|string|max:50',
 
-        'prof_area_of_specialisation' => 'required|string',
-        'prof_area_of_specialisation_other' => 'nullable|string|max:100',
+        'prof_area_of_specialisation' => 'required|string|max:50',
+        'prof_area_of_specialisation_other' => 'nullable|string|max:50',
 
-        'prof_award' => 'required|string',
-        'prof_award_other' => 'nullable|string|max:100',
+        'prof_award' => 'required|string|max:50',
+        'prof_award_other' => 'nullable|string|max:50',
 
-        'prof_course' => 'nullable|string|max:100',
+        'prof_course' => 'nullable|string|max:50',
 
-        'prof_grade' => 'required|string|max:100',
-        'prof_grade_other' => 'nullable|string|max:100',
+        'prof_grade' => 'required|string|max:50',
+        'prof_grade_other' => 'nullable|string|max:50',
 
-        'prof_certificate_no' => 'nullable|string|max:100',
+        'prof_certificate_no' => 'nullable|string|max:50',
         'prof_start_date' => 'required|date',
         'prof_end_date' => 'required|date',
     ];
@@ -751,24 +758,24 @@ public function saveProfInfo(Request $request)
 
     // Define validation rules
     $rules = [
-        'prof_institution_name' => 'required|string|max:100',
-        'prof_student_admission_no' => 'nullable|string|max:100',
+        'prof_institution_name' => 'required|string|max:50',
+        'prof_student_admission_no' => 'nullable|string|max:50',
 
-        'prof_area_of_study_high_school_level' => 'required|string',
-        'prof_area_of_study_high_school_level_other' => 'nullable|string|max:100',
+        'prof_area_of_study_high_school_level' => 'required|string|max:50',
+        'prof_area_of_study_high_school_level_other' => 'nullable|string|max:50',
 
-        'prof_area_of_specialisation' => 'required|string',
-        'prof_area_of_specialisation_other' => 'nullable|string|max:100',
+        'prof_area_of_specialisation' => 'required|string|max:50',
+        'prof_area_of_specialisation_other' => 'nullable|string|max:50',
 
-        'prof_award' => 'required|string',
-        'prof_award_other' => 'nullable|string|max:100',
+        'prof_award' => 'required|string|max:50',
+        'prof_award_other' => 'nullable|string|max:50',
 
-        'prof_course' => 'nullable|string|max:100',
+        'prof_course' => 'nullable|string|max:50',
 
-        'prof_grade' => 'required|string|max:100',
+        'prof_grade' => 'required|string|max:50',
         'prof_grade_other' => 'nullable|string|max:100',
 
-        'prof_certificate_no' => 'nullable|string|max:100',
+        'prof_certificate_no' => 'nullable|string|max:50',
         'prof_start_date' => 'required|date',
         'prof_end_date' => 'required|date',
     ];
@@ -894,9 +901,9 @@ public function saveRelevantCourses(Request $request)
 
     // Define validation rules
     $rules = [
-        'rel_institution_name.*' => 'required|string|max:100',
-        'rel_course.*' => 'required|string|max:100',
-        'rel_certificate_no.*' => 'nullable|string|max:100',
+        'rel_institution_name.*' => 'required|string|max:50',
+        'rel_course.*' => 'required|string|max:50',
+        'rel_certificate_no.*' => 'nullable|string|max:50',
         'rel_issue_date.*' => 'required|date',
     ];
 
@@ -962,9 +969,9 @@ public function updateRelevantCourse(Request $request, $id)
 {
     // Define validation rules
     $rules = [
-        'rel_institution_name' => 'required|string|max:100',
-        'rel_course' => 'required|string|max:100',
-        'rel_certificate_no' => 'nullable|string|max:100',
+        'rel_institution_name' => 'required|string|max:50',
+        'rel_course' => 'required|string|max:50',
+        'rel_certificate_no' => 'nullable|string|max:50',
         'rel_issue_date' => 'required|date',
     ];
 
@@ -1009,7 +1016,7 @@ public function updateRelevantCourse(Request $request, $id)
 //             'lastname' => 'nullable|string|max:100',
 //             'salutation' => 'required|string',
 //             'dob' => 'required|date',
-//             'idno' => 'required|string|max:8',
+//             'idno' => 'required|string',
 //             'kra_pin' => 'required|string|max:11',
 //             'gender' => 'required|in:male,female',
 //             'nationality' => 'required|string|max:50',

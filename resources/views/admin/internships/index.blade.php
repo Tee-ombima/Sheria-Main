@@ -1,9 +1,17 @@
 <!-- resources/views/admin/internships/index.blade.php -->
 <x-layout>
     <x-card class="p-10 max-w-6xl mx-auto mt-24 bg-white rounded-lg shadow-lg">
+    <a href="{{ url()->previous() }}" class="inline-flex items-center px-4 py-2 bg-gray-500 text-white font-semibold text-sm rounded-lg hover:bg-gray-700">
+    ← Back
+</a>
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-3xl font-bold">Attachee Applications</h1>
             <div class="flex space-x-2">
+                <!-- Back to Dashboard Button -->
+                <a href="{{ route('admin.dashboard') }}" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg shadow">
+                    Back to Dashboard
+                </a>
+
                 <!-- Manage Departments Button -->
                 @if(isset($department))
                     <a href="{{ route('admin.departments.show', $department->id) }}" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg shadow">
@@ -15,14 +23,14 @@
                     </a>
                 @endif
 
-                <!-- View Pupillage Applications Button -->
-                <a href="{{ route('admin.pupillages.index') }}" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow">
-                    View Pupillage Applications
+                <!-- View Accepted Applications Button -->
+                <a href="{{ route('admin.internships.accepted') }}" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg shadow">
+                    View Accepted Applications
                 </a>
 
-                <!-- View Processed Applications Button -->
-                <a href="{{ route('admin.internships.nonPending') }}" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-lg shadow">
-                    View Processed Attachee Applications
+                <!-- View Not Accepted Applications Button -->
+                <a href="{{ route('admin.internships.not_accepted') }}" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg shadow">
+                    View Not Accepted Applications
                 </a>
             </div>
         </div>
@@ -49,7 +57,7 @@
                         <tr>
                             <th class="px-6 py-3 text-left">Email</th>
                             <th class="px-6 py-3 text-left">Status</th>
-                            <th class="px-6 py-3 text-left">Assigned Department</th> <!-- New Column -->
+                            <th class="px-6 py-3 text-left">Assigned Department</th>
                         </tr>
                     </thead>
                     <tbody>

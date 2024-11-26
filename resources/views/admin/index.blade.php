@@ -1,5 +1,7 @@
  <x-layout>
-    <h1 class="text-center font-bold">Admin Dashboard</h1>
+     <x-card class="p-10 max-w-6xl mx-auto mt-24 bg-white rounded-lg shadow-lg">
+
+    <h1 class="text-center font-bold">Manage Job Applications</h1>
     
     
 
@@ -18,5 +20,6 @@
     </div>
 <!-- AJAX for Load More -->
   
-    
+        </x-card>
+
 </x-layout> 

@@ -45,6 +45,16 @@ class DatabaseSeeder extends Seeder
         ApplicationSeeder::class,
         DepartmentSeeder::class,
         FooterTableSeeder::class,
+        CountypSeeder::class,
+        SubCountypsSeeder::class,
+        CountyppSeeder::class,
+        SubCountyppsSeeder::class,
+        KSCEGradeSeeder::class,
+        InstitutionSeeder::class,
+        InstitutionGradeSeeder::class,
+        
+        
+
         
         ]);
 

@@ -3,11 +3,14 @@
 // app/Http/Controllers/AdminPupillageController.php
 
 namespace App\Http\Controllers;
+use App\Models\ApplicationSetting;
+use Illuminate\Support\Facades\Auth;
 
 use App\Models\Pupillage;
 use App\Models\Department;
 use Illuminate\Http\Request;
-
+use App\Exports\PupillageExport;
+use Maatwebsite\Excel\Facades\Excel;
 class AdminPupillageController extends Controller
 {
     /**
@@ -15,46 +18,27 @@ class AdminPupillageController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Pupillage::with('user', 'department')
+        $query = Pupillage::with('user')
             ->where('status', 'Pending');
 
-        // Apply Assignment Filter
-        $assignmentFilter = $request->input('assignment_filter');
-
-        if ($assignmentFilter == 'assigned') {
-            $query->whereNotNull('department_id');
-        } elseif ($assignmentFilter == 'not_assigned') {
-            $query->whereNull('department_id');
-        }
+        
 
         $applications = $query->paginate(10);
 
         return view('admin.pupillages.index', compact('applications'));
     }
 
-    /**
-     * Show the form for creating a new department (if applicable).
-     */
-    public function storeDepartment(Request $request)
-    {
-        $request->validate(['name' => 'required|string|max:255']);
-        Department::create([
-            'name' => $request->name,
-            'email' => $request->email,
-        ]);
-
-        return back()->with('message', 'Department added successfully!');
-    }
+    
+    
 
     /**
      * Display the specified application.
      */
     public function show($id)
     {
-        $application = Pupillage::with('user')->findOrFail($id);
-        $departments = Department::all();
+        $pupillage = Pupillage::with('user')->findOrFail($id);
 
-        return view('admin.pupillages.show', compact('application', 'departments'));
+        return view('admin.pupillages.show', compact('pupillage'));
     }
 
     /**
@@ -64,17 +48,15 @@ class AdminPupillageController extends Controller
     {
         $request->validate([
             'status' => 'required|in:Pending,Accepted,Not_Successful,Removed',
-            'department_id' => 'nullable|exists:departments,id',
         ]);
 
         $application->update([
             'status' => $request->status,
-            'department_id' => $request->department_id,
         ]);
 
         // Send email logic (if needed)
 
-        return redirect()->back()->with('message', 'Application updated successfully.');
+        return redirect()->route('admin.pupillages.index')->with('message', 'Application updated successfully.');
     }
 
     /**
@@ -128,4 +110,38 @@ class AdminPupillageController extends Controller
 
         return view('admin.pupillages.nonPending', compact('applications'));
     }
+
+    // In PupillageController
+public function accepted()
+{
+    $applications = Pupillage::where('status', 'Accepted')->paginate(15);
+    return view('admin.pupillages.accepted', compact('applications'));
+}
+
+    public function notAccepted()
+    {
+        $applications = Pupillage::where('status', 'Not_Successful')->paginate(10);
+
+        return view('admin.pupillages.not_accepted', compact('applications'));
+    }
+
+    public function export()
+    {
+        return Excel::download(new PupillageExport, 'pupillage.xlsx');
+    }
+
+    public function toggleApply()
+    {
+        // Only allow admins
+        if (Auth::user()->role !== 'admin') {
+            abort(403, 'Unauthorized Action');
+        }
+
+        $setting = ApplicationSetting::first();
+        $setting->pupillage_applications_enabled = !$setting->pupillage_applications_enabled;
+        $setting->save();
+
+        return redirect()->back()->with('message', 'Pupillage application status updated.');
+    }
+
 }

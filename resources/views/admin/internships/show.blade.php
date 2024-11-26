@@ -1,5 +1,8 @@
 <x-layout>
     <x-card class="p-10 max-w-full mx-auto mt-24 bg-white rounded-lg shadow-lg">
+    <a href="{{ url()->previous() }}" class="inline-flex items-center px-4 py-2 bg-gray-500 text-white font-semibold text-sm rounded-lg hover:bg-gray-700">
+    ← Back
+</a>
 
         <h1 class="text-3xl font-bold mb-6">Application Details</h1>
 
@@ -98,4 +101,14 @@
     </div>
 
     </x-card>
+
+
+    <script>
+      document.querySelector("form").addEventListener("submit", function() {
+          // Show the loader
+          document.getElementById("loader").style.display = "flex";
+      });
+  </script>
+
+
 </x-layout>

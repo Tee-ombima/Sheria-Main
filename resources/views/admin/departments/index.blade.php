@@ -2,6 +2,9 @@
 
 <x-layout>
     <x-card class="p-10 max-w-6xl mx-auto mt-24">
+    <a href="{{ url()->previous() }}" class="inline-flex items-center px-4 py-2 bg-gray-500 text-white font-semibold text-sm rounded-lg hover:bg-gray-700">
+    ← Back
+</a>
         <h1 class="text-3xl font-bold mb-6">Departments</h1>
 
         <!-- Success message -->

@@ -1,5 +1,8 @@
 <x-layout>
   <x-card class="p-10">
+  <a href="{{ url()->previous() }}" class="inline-flex items-center px-4 py-2 bg-gray-500 text-white font-semibold text-sm rounded-lg hover:bg-gray-700">
+            ← Back
+        </a>
     <header>
       <h1 class="text-3xl text-center font-bold my-6 uppercase">
         MANAGE Job Listings

@@ -1,4 +1,3 @@
-<x-layout>
     <h1 class="text-3xl font-bold mb-6">{{ ucfirst($type) }} Applications</h1>
 
     <table class="table-auto w-full text-left border-collapse">
@@ -27,4 +26,4 @@
             @endforeach
         </tbody>
     </table>
-</x-layout>
+

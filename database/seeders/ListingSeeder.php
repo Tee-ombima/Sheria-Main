@@ -10,6 +10,16 @@ class ListingSeeder extends Seeder
 {
     public function run()
     {
+        Listing::factory()->count(5)->create([
+            
+            'deadline' => now()->subDays(rand(1, 10)), // Past deadlines
+        ]);
+
+        // Create 5 active listings
+        Listing::factory()->count(5)->create([
+            
+            'deadline' => now()->addDays(rand(1, 30)), // Future deadlines
+        ]);
         Listing::factory()
             ->count(10) // Create 10 listings
             ->create()

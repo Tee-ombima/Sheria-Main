@@ -29,9 +29,8 @@ class ApplicationController extends Controller
     $listing = Listing::findOrFail($id);
     $userId = Auth::id();
 
-    // Check if the listing is active
     if (!$listing->isActive) {
-        return redirect()->back()->with('error', 'Cannot apply to an archived or expired listing.');
+        return redirect()->back()->with('error', 'Cannot apply to an inactive listing.');
     }
 
     // Check if all required sections are completed

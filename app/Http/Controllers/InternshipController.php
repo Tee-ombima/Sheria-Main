@@ -7,6 +7,10 @@ use App\Models\InternshipApplication;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage; // For file storage operations
+use App\Models\Pupillage;
+use App\Models\PostPupillage;
+use Illuminate\Support\Facades\Validator;
+use App\Models\ApplicationSetting;
 
 class InternshipController extends Controller
 {
@@ -15,58 +19,114 @@ class InternshipController extends Controller
      */
     public function create()
 {
+    $existingApplication = InternshipApplication::where('user_id', Auth::id())->first();
+
+    if ($existingApplication) {
+        return redirect()->route('internships.index')->with('message', 'You have already applied for an internship.');
+    }
+    if (!$this->internshipApplicationsEnabled()) {
+        return redirect()->back()->with('message', 'No Attachment available at this time.');
+    }
+
+
     return view('internships.create');
 }
 
-public function store(Request $request)
-{
-    // Validate the request
-    $request->validate([
-        'full_name' => 'required|string|max:255',
-        'phone' => 'required|string|max:20',
-        'institution' => 'required|string|max:255',
-        'email' => 'required|email|max:255',
-        'id_file' => 'required|file|mimes:pdf|max:2048',
-        'university_letter' => 'required|file|mimes:pdf|max:2048',
-        'kra_pin' => 'required|file|mimes:pdf|max:2048',
-        'insurance' => 'required|file|mimes:pdf|max:2048',
-        'good_conduct' => 'required|file|mimes:pdf|max:2048', // Add this line
-        'cv' => 'required|file|mimes:pdf|max:2048', // Add this line
-    ]);
+public function uploadFile(Request $request)
+    {
+        $fieldName = $request->file('id_file') ? 'id_file' :
+                     ($request->file('university_letter') ? 'university_letter' :
+                     ($request->file('kra_pin') ? 'kra_pin' :
+                     ($request->file('insurance') ? 'insurance' :
+                     ($request->file('good_conduct') ? 'good_conduct' :
+                     ($request->file('cv') ? 'cv' : null)))));
 
-    // Handle file uploads
-    $idFilePath = $request->file('id_file')->store('internship_files', 'public');
-    $universityLetterPath = $request->file('university_letter')->store('internship_files', 'public');
-    $kraPinPath = $request->file('kra_pin')->store('internship_files', 'public');
-    $insurancePath = $request->file('insurance')->store('internship_files', 'public');
-    $goodConductPath = $request->hasFile('good_conduct') ? $request->file('good_conduct')->store('internship_files', 'public') : null;
-    $cvPath = $request->hasFile('cv') ? $request->file('cv')->store('internship_files', 'public') : null;
+        if (!$fieldName) {
+            return response()->json(['success' => false, 'message' => 'No file uploaded.'], 400);
+        }
 
-    // Create the Internship application
-    InternshipApplication::create([
-        'user_id' => Auth::id(),
-        'full_name' => $request->full_name,
-        'phone' => $request->phone,
-        'institution' => $request->institution,
-        'email' => $request->email,
-        'id_file' => $idFilePath,
-        'university_letter' => $universityLetterPath,
-        'kra_pin' => $kraPinPath,
-        'insurance' => $insurancePath,
-        'good_conduct' => $goodConductPath,
-        'cv' => $cvPath,
-        'status' => 'Pending',
-    ]);
-    return redirect()->route('internships.index')->with('message', 'Internship application submitted successfully.');
-}
+        // Validate the file
+        $validator = Validator::make($request->all(), [
+            $fieldName => 'required|file|mimes:pdf|max:2048', 
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'message' => $validator->errors()->first($fieldName)], 400);
+        }
+
+        // Handle file upload
+        $filePath = $request->file($fieldName)->store('internship_files', 'public');
+
+        // Store the file path in the session
+        $uploadedFiles = session()->get('uploaded_files', []);
+        $uploadedFiles[$fieldName] = $filePath;
+        session()->put('uploaded_files', $uploadedFiles);
+
+        return response()->json(['success' => true]);
+    }
+
+    public function store(Request $request)
+    {
+        $existingApplication = InternshipApplication::where('user_id', Auth::id())->first();
+
+        if ($existingApplication) {
+            return redirect()->route('internships.index')->with('message', 'You have already applied for an internship.');
+        }
+        if (!$this->internshipApplicationsEnabled()) {
+            return redirect()->back()->with('message', 'No Attachment available at this time.');
+        }
+
+        // Validate the remaining form data
+        $request->validate([
+            'full_name' => 'required|string|max:50',
+            'phone' => 'required|integer',
+            'institution' => 'required|string|max:50',
+            'email' => 'required|email|max:50',
+        ]);
+
+        // Retrieve uploaded files from the session
+        $uploadedFiles = session()->get('uploaded_files', []);
+
+        // Check if all files have been uploaded
+        $requiredFiles = ['id_file', 'university_letter', 'kra_pin', 'insurance', 'good_conduct', 'cv'];
+        foreach ($requiredFiles as $file) {
+            if (!isset($uploadedFiles[$file])) {
+                return back()->withErrors([$file => 'Please upload the ' . ucwords(str_replace('_', ' ', $file)) . '.']);
+            }
+        }
+
+        // Create the Internship application
+        InternshipApplication::create([
+            'user_id' => Auth::id(),
+            'full_name' => $request->full_name,
+            'phone' => $request->phone,
+            'institution' => $request->institution,
+            'email' => $request->email,
+            'id_file' => $uploadedFiles['id_file'],
+            'university_letter' => $uploadedFiles['university_letter'],
+            'kra_pin' => $uploadedFiles['kra_pin'],
+            'insurance' => $uploadedFiles['insurance'],
+            'good_conduct' => $uploadedFiles['good_conduct'],
+            'cv' => $uploadedFiles['cv'],
+            'status' => 'Pending',
+        ]);
+
+        // Clear the uploaded files from the session
+        session()->forget('uploaded_files');
+
+        return redirect()->route('internships.index')->with('message', 'Internship application submitted successfully.');
+    }
+
 
 public function index()
 {
     // Retrieve internships applied by the authenticated user
     $internships = InternshipApplication::where('user_id', Auth::id())->paginate(10);
+    $pupillages = Pupillage::where('user_id', Auth::id())->paginate(10);
+    $postpupillages = PostPupillage::where('user_id', Auth::id())->paginate(10);
 
 
-    return view('internships.index', compact('internships')); // Pass both internships and departments
+    return view('internships.index', compact('internships', 'pupillages','postpupillages'));
 }
 
 
@@ -89,16 +149,15 @@ public function edit($id)
         // Validate the request
         $request->validate([
             'full_name' => 'required|string|max:255',
-            'phone' => 'required|string|max:20',
-            'institution' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            // File fields are optional on update
-            'id_file' => 'nullable|file|mimes:pdf|max:2048',
-            'university_letter' => 'nullable|file|mimes:pdf|max:2048',
-            'kra_pin' => 'nullable|file|mimes:pdf|max:2048',
-            'insurance' => 'nullable|file|mimes:pdf|max:2048',
-            'good_conduct' => 'nullable|file|mimes:pdf|max:2048',
-            'cv' => 'nullable|file|mimes:pdf|max:2048',
+        'phone' => 'required|string|max:20',
+        'institution' => 'required|string|max:255',
+        'email' => 'required|email|max:255',
+        'id_file' => 'required|file|mimes:pdf|max:2048', // 5 MB
+        'university_letter' => 'required|file|mimes:pdf|max:2048', // 5 MB
+        'kra_pin' => 'required|file|mimes:pdf|max:2048', // 5 MB
+        'insurance' => 'required|file|mimes:pdf|max:2048', // 5 MB
+        'good_conduct' => 'required|file|mimes:pdf|max:2048', // 5 MB
+        'cv' => 'required|file|mimes:pdf|max:2048', // 5 MB
         ]);
 
         // Update the internship application
@@ -158,7 +217,44 @@ public function edit($id)
         return redirect()->route('internships.index')->with('message', 'Internship application updated successfully.');
     }
 
-
+    public function destroy($id)
+    {
+        // Find the internship application by ID and ensure it belongs to the authenticated user
+        $internship = InternshipApplication::where('id', $id)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
+    
+        // Delete associated files if they exist
+        if ($internship->id_file) {
+            Storage::disk('public')->delete($internship->id_file);
+        }
+        if ($internship->university_letter) {
+            Storage::disk('public')->delete($internship->university_letter);
+        }
+        if ($internship->kra_pin) {
+            Storage::disk('public')->delete($internship->kra_pin);
+        }
+        if ($internship->insurance) {
+            Storage::disk('public')->delete($internship->insurance);
+        }
+        if ($internship->good_conduct) {
+            Storage::disk('public')->delete($internship->good_conduct);
+        }
+        if ($internship->cv) {
+            Storage::disk('public')->delete($internship->cv);
+        }
+    
+        // Delete the internship application
+        $internship->delete();
+    
+        // Redirect to the internship index page with a success message
+        return redirect()->route('internships.index')->with('message', 'Internship application deleted successfully.');
+    }
+    private function internshipApplicationsEnabled()
+{
+    $applicationSetting = ApplicationSetting::first();
+    return $applicationSetting && $applicationSetting->internship_applications_enabled;
+}
 
 
 }

@@ -40,7 +40,7 @@ class InternshipApplicationFactory extends Factory
     private function generateDummyFilePath(string $fileType): string
 {
     $fileName = Str::uuid() . "_{$fileType}.pdf";
-    $filePath = 'files/5-mb-example-file.pdf';
+    $filePath = 'files/1-mb-example-file.pdf';
 
     // Create an empty PDF file for testing purposes
     Storage::disk('public')->put($filePath, '');

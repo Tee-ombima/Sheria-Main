@@ -4,130 +4,330 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Pupillage;
-use App\Models\Department;
+use App\Models\SubCountyp;
+use App\Models\Countyp;
+use App\Models\KSCEGrade;
+use App\Models\Institution;
+use App\Models\InstitutionGrade;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Models\ApplicationSetting;
 
 class PupillageController extends Controller
 {
     public function create()
     {
-        return view('pupillages.create');
+        $existingApplication = Pupillage::where('user_id', Auth::id())->first();
+
+        if ($existingApplication) {
+            return redirect()->route('internships.index')->with('message', 'You have already applied for pupillage.');
+        }
+        if (!$this->pupillageApplicationsEnabled()) {
+            return redirect()->back()->with('message', 'No Pupillage program available at this time.');
+        }
+
+        $countyps = Countyp::orderByRaw("name = 'other' DESC, name ASC")->get();
+        $ksceGrades = KSCEGrade::all();
+        $institutions = Institution::orderByRaw("name = 'other' DESC, name ASC")->get();
+        $institutionGrades = InstitutionGrade::all();
+
+        return view('pupillages.create', compact('countyps', 'ksceGrades', 'institutions', 'institutionGrades'));
     }
+
 
     // Store the Pupillage application
     public function store(Request $request)
     {
+        $existingApplication = Pupillage::where('user_id', Auth::id())->first();
+
+        if ($existingApplication) {
+            return redirect()->route('internships.index')->with('message', 'You have already applied for pupillage.');
+        }
+        if (!$this->pupillageApplicationsEnabled()) {
+            return redirect()->back()->with('message', 'No Pupillage program available at this time.');
+        }
+
         // Validate the request
         $request->validate([
-            'full_name' => 'required|string|max:255',
-            'phone' => 'required|string|max:20',
-            'institution' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'id_file' => 'required|file|mimes:pdf|max:2048',
-            'university_letter' => 'required|file|mimes:pdf|max:2048',
-            'kra_pin' => 'required|file|mimes:pdf|max:2048',
-            'insurance' => 'required|file|mimes:pdf|max:2048',
-            'good_conduct' => 'required|file|mimes:pdf|max:2048',
-            'cv' => 'required|file|mimes:pdf|max:2048',
+            // Personal Details
+            'full_name' => 'required|string|max:50',
+            'date_of_birth' => 'required|date',
+            'identity_card_number' => 'required|integer',
+            'gender' => 'required|in:Male,Female',
+            'nationality' => 'required|string|max:50',
+            'ethnicity' => 'required|string|max:50',
+            'home_county' => 'required|string|max:50',
+            'other_home_county' => 'required_if:home_county,Other|max:50',
+
+            'sub_county' => 'required|string|max:50',
+            'other_sub_county' => 'required_if:sub_county,Other|max:50',
+
+            'disability_status' => 'required|boolean',
+            'nature_of_disability' => 'nullable|string|max:50',
+
+            // Contact Details
+            'postal_address' => 'required|string|max:50',
+            'postal_code' => 'required|string',
+            'town' => 'required|string|max:255',
+            'physical_address' => 'required|string|max:50',
+            'mobile_number' => 'required|string',
+            'alternate_mobile_number' => 'nullable|string',
+            'email_address' => 'required|email|max:50',
+
+            // Academic Qualification
+            'ksce_grade' => 'required|string|max:50',
+            'other_ksce_grade' => 'required_if:ksce_grade,Other|max:50',
+
+            'institution_name' => 'required|string|max:50',
+            'other_institution_name' => 'required_if:institution_name,Other|max:50',
+
+            'institution_grade' => 'required|string|max:50',
+            'other_institution_grade' => 'required_if:institution_grade,Other|max:50',
+
+            'are_you_employed' => 'required|in:Yes,No',
+            'employer_institution_name' => 'nullable|required_if:are_you_employed,Yes|string|max:255',
+            'gross_salary' => 'nullable|required_if:are_you_employed,Yes|integer|min:0',
+            'declaration' => 'accepted',
+
         ]);
+        $homeCounty = $request->home_county == 'Other' ? $request->other_home_county : Countyp::find($request->home_county)->name;
 
-        // Handle file uploads
-        $idFilePath = $request->file('id_file')->store('pupillage_files', 'public');
-        $universityLetterPath = $request->file('university_letter')->store('pupillage_files', 'public');
-        $kraPinPath = $request->file('kra_pin')->store('pupillage_files', 'public');
-        $insurancePath = $request->file('insurance')->store('pupillage_files', 'public');
-        $goodConductPath = $request->file('good_conduct')->store('pupillage_files', 'public');
-        $cvPath = $request->file('cv')->store('pupillage_files', 'public');
+        // Determine the sub county value
+        $subCounty = $request->sub_county == 'Other' ? $request->other_sub_county : SubCountyp::find($request->sub_county)->name;
+        // Determine the KSCE grade value
+        $ksceGrade = $request->ksce_grade == 'Other' ? $request->other_ksce_grade : KSCEGrade::find($request->ksce_grade)->grade;
 
+        // Determine the institution name
+        $institutionName = $request->institution_name == 'Other' ? $request->other_institution_name : Institution::find($request->institution_name)->name;
+
+        // Determine the institution grade
+        $institutionGrade = $request->institution_grade == 'Other' ? $request->other_institution_grade : InstitutionGrade::find($request->institution_grade)->grade;
+        if ($request->ksce_grade == 'Other') {
+            $ksceGradeId = null;
+            $otherKsceGrade = $request->other_ksce_grade;
+        } else {
+            $ksceGradeId = $request->ksce_grade;
+            $otherKsceGrade = null;
+        }
+        // Determine the Institution Name value
+        if ($request->institution_name == 'Other') {
+            $institutionNameId = null;
+            $otherInstitutionName = $request->other_institution_name;
+        } else {
+            $institutionNameId = $request->institution_name;
+            $otherInstitutionName = null;
+        }
+
+        // Determine the Institution Grade value
+        if ($request->institution_grade == 'Other') {
+            $institutionGradeId = null;
+            $otherInstitutionGrade = $request->other_institution_grade;
+        } else {
+            $institutionGradeId = $request->institution_grade;
+            $otherInstitutionGrade = null;
+        }
         // Create the Pupillage application
         Pupillage::create([
             'user_id' => Auth::id(),
+
+            // Personal Details
             'full_name' => $request->full_name,
-            'phone' => $request->phone,
-            'institution' => $request->institution,
-            'email' => $request->email,
-            'id_file' => $idFilePath,
-            'university_letter' => $universityLetterPath,
-            'kra_pin' => $kraPinPath,
-            'insurance' => $insurancePath,
-            'good_conduct' => $goodConductPath,
-            'cv' => $cvPath,
+            'date_of_birth' => $request->date_of_birth,
+            'identity_card_number' => $request->identity_card_number,
+            'gender' => $request->gender,
+            'nationality' => $request->nationality,
+            'ethnicity' => $request->ethnicity,
+            'home_county' => $homeCounty,
+            'sub_county' => $subCounty,
+
+            'disability_status' => $request->disability_status,
+            'nature_of_disability' => $request->nature_of_disability,
+
+            // Contact Details
+            'postal_address' => $request->postal_address,
+            'postal_code' => $request->postal_code,
+            'town' => $request->town,
+            'physical_address' => $request->physical_address,
+            'mobile_number' => $request->mobile_number,
+            'alternate_mobile_number' => $request->alternate_mobile_number,
+            'email_address' => $request->email_address,
+            // Academic Qualification
+            'ksce_grade' => $ksceGrade,
+            'institution_name' => $institutionName,
+            'institution_grade' => $institutionGrade,
+
+            'other_ksce_grade' => $otherKsceGrade,
+            'other_institution_name' => $otherInstitutionName,
+            'other_institution_grade' => $otherInstitutionGrade,
+
+            'are_you_employed' => $request->are_you_employed,
+            'employer_institution_name' => $request->employer_institution_name,
+            'gross_salary' => $request->gross_salary,
+            'declaration' => $request->declaration,
+
             'status' => 'Pending',
         ]);
 
-        return redirect()->route('pupillages.index')->with('message', 'Pupillage application submitted successfully.');
+        return redirect()->route('internships.index')->with('message', 'Pupillage application submitted successfully.');
     }
 
-    // Display the user's Pupillage applications
-    public function index()
-    {
-        $pupillages = Pupillage::where('user_id', Auth::id())->paginate(10);
 
-        return view('pupillages.index', compact('pupillages'));
-    }
 
     public function edit($id)
-{
-    $pupillage = Pupillage::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
+    {
+        // Existing code...
+        $pupillage = Pupillage::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
+        $countyps = Countyp::orderByRaw("name = 'other' DESC, name ASC")->get();
 
-    return view('pupillages.edit', compact('pupillage'));
-}
+        // Fetch options from the database
+        $ksceGrades = KSCEGrade::orderByRaw("name = 'other' DESC, name ASC")->get();
+        $institutions = Institution::orderByRaw("name = 'other' DESC, name ASC")->get();
+        $institutionGrades = InstitutionGrade::orderByRaw("name = 'other' DESC, name ASC")->get();
 
-public function update(Request $request, $id)
-{
-    $pupillage = Pupillage::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
+        return view('pupillages.edit', compact('pupillage', 'countyps', 'ksceGrades', 'institutions', 'institutionGrades'));
+    }
 
-    // Validate the request
-    $request->validate([
-        'full_name' => 'required|string|max:255',
-        'phone' => 'required|string|max:20',
-        'institution' => 'required|string|max:255',
-        'email' => 'required|email|max:255',
-        // File fields are optional on update
-        'id_file' => 'nullable|file|mimes:pdf|max:2048',
-        'university_letter' => 'nullable|file|mimes:pdf|max:2048',
-        'kra_pin' => 'nullable|file|mimes:pdf|max:2048',
-        'insurance' => 'nullable|file|mimes:pdf|max:2048',
-        'good_conduct' => 'nullable|file|mimes:pdf|max:2048',
-        'cv' => 'nullable|file|mimes:pdf|max:2048',
-    ]);
 
-    // Update the pupillage application
-    $pupillage->update([
-        'full_name' => $request->full_name,
-        'phone' => $request->phone,
-        'institution' => $request->institution,
-        'email' => $request->email,
-    ]);
 
-    // Handle file uploads
-    if ($request->hasFile('id_file')) {
-        if ($pupillage->id_file) {
-            Storage::disk('public')->delete($pupillage->id_file);
+    public function update(Request $request, $id)
+    {
+        $pupillages = Pupillage::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
+
+        // Validate the request
+        $request->validate([
+            // Personal Details
+            'full_name' => 'required|string|max:50',
+            'date_of_birth' => 'required|date',
+            'identity_card_number' => 'required|integer',
+            'gender' => 'required|in:Male,Female',
+            'nationality' => 'required|string|max:50',
+            'ethnicity' => 'required|string|max:50',
+            'home_county' => 'required|string|max:50',
+            'other_home_county' => 'required_if:home_county,Other|max:50',
+
+            'sub_county' => 'required|string|max:50',
+            'other_sub_county' => 'required_if:sub_county,Other|max:50',
+
+            'disability_status' => 'required|boolean',
+            'nature_of_disability' => 'nullable|string|max:50',
+
+            // Contact Details
+            'postal_address' => 'required|string|max:50',
+            'postal_code' => 'required|string',
+            'town' => 'required|string|max:255',
+            'physical_address' => 'required|string|max:50',
+            'mobile_number' => 'required|string',
+            'alternate_mobile_number' => 'nullable|string',
+            'email_address' => 'required|email|max:50',
+
+            // Academic Qualification
+            'ksce_grade' => 'required|string|max:50',
+            'other_ksce_grade' => 'required_if:ksce_grade,Other|max:50',
+
+            'institution_name' => 'required|string|max:50',
+            'other_institution_name' => 'required_if:institution_name,Other|max:50',
+
+            'institution_grade' => 'required|string|max:50',
+            'other_institution_grade' => 'required_if:institution_grade,Other|max:50',
+
+            'are_you_employed' => 'required|in:Yes,No',
+            'employer_institution_name' => 'nullable|required_if:are_you_employed,Yes|string|max:255',
+            'gross_salary' => 'nullable|required_if:are_you_employed,Yes|integer|min:0',
+            'declaration' => 'accepted',
+        ]);
+        $homeCounty = $request->home_county == 'Other' ? $request->other_home_county : Countyp::find($request->home_county)->name;
+
+        // Determine the sub county value
+        $subCounty = $request->sub_county == 'Other' ? $request->other_sub_county : SubCountyp::find($request->sub_county)->name;
+        
+        if ($request->ksce_grade == 'Other') {
+            $ksceGradeId = null;
+            $otherKsceGrade = $request->other_ksce_grade;
+        } else {
+            $ksceGradeId = $request->ksce_grade;
+            $otherKsceGrade = null;
         }
-        $pupillage->id_file = $request->file('id_file')->store('pupillage_files', 'public');
+
+        // Determine the Institution Name value
+        if ($request->institution_name == 'Other') {
+            $institutionNameId = null;
+            $otherInstitutionName = $request->other_institution_name;
+        } else {
+            $institutionNameId = $request->institution_name;
+            $otherInstitutionName = null;
+        }
+
+        // Determine the Institution Grade value
+        if ($request->institution_grade == 'Other') {
+            $institutionGradeId = null;
+            $otherInstitutionGrade = $request->other_institution_grade;
+        } else {
+            $institutionGradeId = $request->institution_grade;
+            $otherInstitutionGrade = null;
+        }
+        // Update the Pupillage application
+        $pupillages->update([
+            // Personal Details
+            'full_name' => $request->full_name,
+            'date_of_birth' => $request->date_of_birth,
+            'identity_card_number' => $request->identity_card_number,
+            'gender' => $request->gender,
+            'nationality' => $request->nationality,
+            'ethnicity' => $request->ethnicity,
+            'home_county' => $homeCounty,
+            'sub_county' => $subCounty,
+            'disability_status' => $request->disability_status,
+            'nature_of_disability' => $request->nature_of_disability,
+
+            // Contact Details
+            'postal_address' => $request->postal_address,
+            'postal_code' => $request->postal_code,
+            'town' => $request->town,
+            'physical_address' => $request->physical_address,
+            'mobile_number' => $request->mobile_number,
+            'alternate_mobile_number' => $request->alternate_mobile_number,
+            'email_address' => $request->email_address,
+
+            // Academic Qualification
+            'ksce_grade' => $ksceGradeId,
+            'other_ksce_grade' => $otherKsceGrade,
+
+            'institution_name' => $institutionNameId,
+            'other_institution_name' => $otherInstitutionName,
+
+            'institution_grade' => $institutionGradeId,
+            'other_institution_grade' => $otherInstitutionGrade,
+            'are_you_employed' => $request->are_you_employed,
+            'employer_institution_name' => $request->employer_institution_name,
+            'gross_salary' => $request->gross_salary,
+            'declaration' => $request->declaration,
+        ]);
+
+        return redirect()->route('internships.index')->with('message', 'Pupillage application updated successfully.');
     }
-    // Repeat for other files...
 
-    $pupillage->save();
+    public function destroy($id)
+    {
+        $pupillages = Pupillage::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
 
-    return redirect()->route('pupillages.index')->with('message', 'Pupillage application updated successfully.');
-}
-public function destroy($id)
+        $pupillages->delete();
+
+        return redirect()->route('internships.index')->with('message', 'Pupillage application deleted successfully.');
+    }
+    public function getSubCounties($county_id)
+    {
+        if ($county_id == 'Other') {
+            return response()->json([]);
+        }
+
+        $subCountyps = SubCountyp::where('county_id', $county_id)->pluck('name', 'id');
+
+        return response()->json($subCountyps);
+    }
+    private function pupillageApplicationsEnabled()
 {
-    $pupillage = Pupillage::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
-
-    // Delete associated files
-    if ($pupillage->id_file) {
-        Storage::disk('public')->delete($pupillage->id_file);
-    }
-    // Repeat for other files...
-
-    $pupillage->delete();
-
-    return redirect()->route('pupillages.index')->with('message', 'Puppilage application deleted successfully.');
+    $applicationSetting = ApplicationSetting::first();
+    return $applicationSetting && $applicationSetting->pupillage_applications_enabled;
 }
-
 
 }

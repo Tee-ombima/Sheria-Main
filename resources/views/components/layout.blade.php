@@ -179,28 +179,29 @@
 
 
       @endif
-      <!-- View Advertised Jobs Link -->
+      
+
+      @if(auth()->user()->role === 'user')
+      <li class="relative group">
+        <a href="{{ route('internships.index') }}" class="hover:text-laravel text-white" style="color: #ffffff;">
+            <i class="fa-solid fa-briefcase" style="color: #ffffff;"></i> Opportunities
+        </a>
+        
+    </li>
+    <!-- View Advertised Jobs Link -->
 <li class="ml-6">
     <a class="flex items-center hover:text-laravel" href="{{ route('index') }}">
         <!-- SVG Icon for briefcase -->
         <svg class="h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" style="color: #ffffff;">
             <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v2H2v4a2 2 0 002 2v6a2 2 0 002 2h8a2 2 0 002-2v-6a2 2 0 002-2V6h-2V4a2 2 0 00-2-2H6zm8 4V4H6v2h8zM4 10v6h12v-6H4z" clip-rule="evenodd" />
         </svg>
-        <span style="color: #ffffff;">View Advertised Jobs</span>
+        <span style="color: #ffffff;">Advertised Jobs</span>
     </a>
 </li>
 
-      @if(auth()->user()->role === 'user')
-      <li class="relative group">
-        <a href="{{ route('internships.index') }}" class="hover:text-laravel text-white" style="color: #ffffff;">
-            <i class="fa-solid fa-briefcase" style="color: #ffffff;"></i> Attachee/Pupillage Programs
-        </a>
-        
-    </li>
-
 
       <li>
-        <a href="/my-applications" class="hover:text-laravel" style="color: #ffffff;"><i class="fa-solid fa-clipboard" style="color: #ffffff;"></i> View my applications</a>
+        <a href="/my-applications" class="hover:text-laravel" style="color: #ffffff;"><i class="fa-solid fa-clipboard" style="color: #ffffff;"></i> View your job applications</a>
       </li>
 
       @endif
@@ -211,45 +212,150 @@
             <i class="fa-solid fa-users-cog" style="color: #ffffff;"></i> Manage Users
         </a>
     </li>
-    <li>
-    <a href="{{ route('admin.internships.index') }}" class="hover:text-laravel" style="color: #ffffff;">
-        <i class="fa-solid fa-briefcase" style="color: #ffffff;"></i> Attachees/Pupillage Programs
-    </a>
-</li>
+    
+<li>
+        <a href="{{ route('admin.index') }}" class="hover:text-laravel" style="color: #ffffff;"><i class="fa-solid fa-clipboard-list" style="color: #ffffff;"></i> Manage Job Applications</a>
+      </li>
 
 @endif
 
-      
       @if(auth()->user()->role === 'admin')
-      <!-- Admin-specific dropdown -->
-      <li class="relative">
-        <button onclick="toggleAdminReportsDropdown('admin-dropdown')" class="hover:text-laravel flex items-center" id="admin-menu-button" aria-expanded="true" aria-haspopup="true">
-          <i class="fa-solid fa-chart-line" style="color: #ffffff;"></i>
-          <span class="ml-2" style="color: #ffffff;">Admin Reports</span>
-          <!-- Heroicon name: solid/chevron-down -->
-          <svg class="ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" style="color: #ffffff;">
-              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-          </svg>
+<!-- Trainings & Programs Dropdown -->
+<li class="relative">
+    <button onclick="toggleProgramsDropdown('programs-dropdown')" class="hover:text-laravel flex items-center" id="programs-menu-button" aria-expanded="true" aria-haspopup="true">
+        <i class="fa-solid fa-graduation-cap" style="color: #ffffff;"></i>
+        <span class="ml-2" style="color: #ffffff;">Trainings & Programs</span>
+        <!-- Heroicon name: solid/chevron-down -->
+        <svg class="ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="currentColor" style="color: #ffffff;" viewBox="0 0 20 20" aria-hidden="true">
+            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414L10 13.414l-4.707-4.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+        </svg>
+    </button>
+
+    <ul class="absolute hidden mt-2 w-48 shadow-lg rounded-md py-2 z-10" id="programs-dropdown" style="background-color: #3a4f29;">
+        <!-- Attachees Submenu -->
+        <li class="relative">
+            <button onclick="toggleSubDropdown('attachees-dropdown')" class="block w-full text-left px-4 py-2 hover:bg-green-800" style="color: #ffffff;">
+                Attachees
+                <svg class="inline-block ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="currentColor" style="color: #ffffff;" viewBox="0 0 20 20" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M6 8l4 4 4-4H6z" clip-rule="evenodd" />
+                </svg>
+            </button>
+            <ul class="absolute hidden left-full top-0 mt-0 w-48 shadow-lg rounded-md py-2 z-10" id="attachees-dropdown" style="background-color: #3a4f29;">
+                <li>
+                    <a class="block px-4 py-2 hover:bg-green-800" href="{{ route('admin.departments.index') }}" style="color: #ffffff;">
+                        Create Attachee's Department
+                    </a>
+                </li>
+                <li>
+            <form action="{{ route('admin.internships.toggleApply') }}" method="POST">
+                @csrf
+                <button type="submit" class="block w-full text-left px-4 py-2 hover:bg-green-800" style="color: #ffffff;">
+                    @if($internshipApplicationsEnabled)
+                        Disable Attachee's Applications
+                    @else
+                        Enable Attachee's Applications
+                    @endif
+                </button>
+            </form>
+        </li>
+                <li>
+                    <a class="block px-4 py-2 hover:bg-green-800" href="{{ route('admin.internships.index') }}" style="color: #ffffff;">
+                        Manage Attachment Applications
+                    </a>
+                </li>
+            </ul>
+        </li>
+
+        <!-- Pupillage Submenu -->
+        <li class="relative">
+            <button onclick="toggleSubDropdown('pupillage-dropdown')" class="block w-full text-left px-4 py-2 hover:bg-green-800" style="color: #ffffff;">
+                Pupillage
+                <svg class="inline-block ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="currentColor" style="color: #ffffff;" viewBox="0 0 20 20" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M6 8l4 4 4-4H6z" clip-rule="evenodd" />
+                </svg>
+            </button>
+            <ul class="absolute hidden left-full top-0 mt-0 w-48 shadow-lg rounded-md py-2 z-10" id="pupillage-dropdown" style="background-color: #3a4f29;">
+                <li>
+                    <a class="block px-4 py-2 hover:bg-green-800" href="{{ route('admin.pupillages.index') }}" style="color: #ffffff;">
+                        Manage Pupillages
+                    </a>
+                </li>
+                <li>
+                    <form action="{{ route('admin.pupillages.toggleApply') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="block w-full text-left px-4 py-2 hover:bg-green-800" style="color: #ffffff;">
+                            @if($pupillageApplicationsEnabled)
+                                Disable Pupillage Applications
+                            @else
+                                Enable Pupillage Applications
+                            @endif
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </li>
+
+        <!-- Post Pupillage Submenu -->
+<li class="relative">
+    <button onclick="toggleSubDropdown('post-pupillage-dropdown')" class="block w-full text-left px-4 py-2 hover:bg-green-800" style="color: #ffffff;">
+        Post Pupillage
+        <svg class="inline-block ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="currentColor" style="color: #ffffff;" viewBox="0 0 20 20" aria-hidden="true">
+            <path fill-rule="evenodd" d="M6 8l4 4 4-4H6z" clip-rule="evenodd" />
+        </svg>
+    </button>
+    <ul class="absolute hidden left-full top-0 mt-0 w-48 shadow-lg rounded-md py-2 z-10" id="post-pupillage-dropdown" style="background-color: #3a4f29;">
+        <li>
+            <a class="block px-4 py-2 hover:bg-green-800" href="{{ route('admin.postPupillages.index') }}" style="color: #ffffff;">
+                Manage Post Pupillage
+            </a>
+        </li>
+        <li>
+            <form action="{{ route('admin.postPupillages.toggleApply') }}" method="POST">
+                @csrf
+                <button type="submit" class="block w-full text-left px-4 py-2 hover:bg-green-800" style="color: #ffffff;">
+                    @if($postPupillageApplicationsEnabled)
+                        Disable Post Pupillage Applications
+                    @else
+                        Enable Post Pupillage Applications
+                    @endif
+                </button>
+            </form>
+        </li>
+        <li>
+            <a class="block px-4 py-2 hover:bg-green-800" href="{{ route('admin.postPupillages.editVacancyNumber') }}" style="color: #ffffff;">
+                Edit Vacancy Number
+            </a>
+        </li>
+    </ul>
+</li>
+
+    </ul>
+</li>
+    <!-- Make Updates Dropdown -->
+    <li class="relative">
+        <button onclick="toggleAdminReportsDropdown('updates-dropdown')" class="hover:text-laravel flex items-center" id="updates-menu-button" aria-expanded="true" aria-haspopup="true">
+            <i class="fa-solid fa-chart-line" style="color: #ffffff;"></i>
+            <span class="ml-2" style="color: #ffffff;">Admin Reports</span>
+            <!-- Heroicon name: solid/chevron-down -->
+            <svg class="ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="currentColor" style="color: #ffffff;" viewBox="0 0 20 20" aria-hidden="true">
+                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414L10 13.414l-4.707-4.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
         </button>
 
-        <ul class="absolute hidden mt-2 w-48 bg-white shadow-lg rounded-md py-2 z-10" id="admin-dropdown" style="background-color: #3a4f29;">
-          <li>
-            <a class="block px-4 py-2 hover:bg-green-800" href="{{ route('admin.reports.selected') }}" style="color: #ffffff;">
-              Selected for Interview
-            </a>
-          </li>
-          <li>
-            <a class="block px-4 py-2 hover:bg-green-800" href="{{ route('admin.reports.appointed') }}" style="color: #ffffff;">
-              Appointed
-            </a>
-          </li>
+        <ul class="absolute hidden mt-2 w-48 shadow-lg rounded-md py-2 z-10" id="updates-dropdown" style="background-color: #3a4f29;">
+            <li>
+                <a class="block px-4 py-2 hover:bg-green-800" href="{{ route('admin.reports.selected') }}" style="color: #ffffff;">
+                    Selected for Interview
+                </a>
+            </li>
+            <li>
+                <a class="block px-4 py-2 hover:bg-green-800" href="{{ route('admin.reports.appointed') }}" style="color: #ffffff;">
+                    Appointed
+                </a>
+            </li>
         </ul>
-      </li>
-
-      <li>
-        <a href="{{ route('admin.index') }}" class="hover:text-laravel" style="color: #ffffff;"><i class="fa-solid fa-chart-line" style="color: #ffffff;"></i> Admin Dashboard</a>
-      </li>
-      @endif
+    </li>
+@endif
 
       <li>
         <form class="inline" method="POST" action="/logout">
@@ -356,37 +462,7 @@
     </script>
     
 
-  <script>
-        // Load form data from LocalStorage on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('personal-info');
-            const formData = JSON.parse(localStorage.getItem('formData')) || {};
-
-            for (const key in formData) {
-                if (formData.hasOwnProperty(key) && form[key]) {
-                    form[key].value = formData[key];
-                }
-            }
-        });
-
-        // Save form data to LocalStorage on form submit
-        document.getElementById('personal-info').addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            const formData = {};
-            const form = event.target;
-
-            for (let i = 0; i < form.elements.length; i++) {
-                const element = form.elements[i];
-                if (element.name) {
-                    formData[element.name] = element.value;
-                }
-            }
-
-            localStorage.setItem('formData', JSON.stringify(formData));
-        });
-    </script>
-
+  
 <script>
 $(document).ready(function(){
 
@@ -614,91 +690,38 @@ $(document).ready(function(){
   });
 </script>
 
-<script>
-// Function to save form data to localStorage
-function saveFormData() {
-    const formData = {
-        surname: document.getElementById('surname').value,
-        firstname: document.getElementById('firstname').value,
-        lastname: document.getElementById('lastname').value,
-        salutation: document.getElementById('salutation').value,
-        dob: document.getElementById('dob').value,
-        idno: document.getElementById('idno').value,
-        kra_pin: document.getElementById('kra_pin').value,
-        gender: document.getElementById('gender').value,
-        nationality: document.getElementById('nationality').value,
-        ethnicity: document.getElementById('ethnicity').value,
-        homecounty: document.getElementById('homecounty').value,
-        subcounty: document.getElementById('subcounty').value,
-        constituency: document.getElementById('constituency').value,
-        postal_address: document.getElementById('postal_address').value,
-        code: document.getElementById('code').value,
-        town_city: document.getElementById('town_city').value,
-        telephone_num: document.getElementById('telephone_num').value,
-        mobile_num: document.getElementById('mobile_num').value,
-        email_address: document.getElementById('email_address').value,
-        alt_contact_person: document.getElementById('alt_contact_person').value,
-        alt_contact_telephone_num: document.getElementById('alt_contact_telephone_num').value,
-        disability_question: document.getElementById('disability_question').value,
-        nature_of_disability: document.getElementById('nature_of_disability').value,
-        ncpd_registration_no: document.getElementById('ncpd_registration_no').value
-    };
+  <script>
+        // Load form data from LocalStorage on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('personal-info');
+            const formData = JSON.parse(localStorage.getItem('formData')) || {};
 
-    localStorage.setItem('personalInfoFormData', JSON.stringify(formData));
-}
+            for (const key in formData) {
+                if (formData.hasOwnProperty(key) && form[key]) {
+                    form[key].value = formData[key];
+                }
+            }
+        });
 
-// Function to load form data from localStorage
-function loadFormData() {
-    const savedFormData = localStorage.getItem('personalInfoFormData');
-    if (savedFormData) {
-        const formData = JSON.parse(savedFormData);
-        document.getElementById('surname').value = formData.surname || '';
-        document.getElementById('firstname').value = formData.firstname || '';
-        document.getElementById('lastname').value = formData.lastname || '';
-        document.getElementById('salutation').value = formData.salutation || '';
-        document.getElementById('dob').value = formData.dob || '';
-        document.getElementById('idno').value = formData.idno || '';
-        document.getElementById('kra_pin').value = formData.kra_pin || '';
-        document.getElementById('gender').value = formData.gender || '';
-        document.getElementById('nationality').value = formData.nationality || '';
-        document.getElementById('ethnicity').value = formData.ethnicity || '';
-        document.getElementById('homecounty').value = formData.homecounty || '';
-        document.getElementById('subcounty').value = formData.subcounty || '';
-        document.getElementById('constituency').value = formData.constituency || '';
-        document.getElementById('postal_address').value = formData.postal_address || '';
-        document.getElementById('code').value = formData.code || '';
-        document.getElementById('town_city').value = formData.town_city || '';
-        document.getElementById('telephone_num').value = formData.telephone_num || '';
-        document.getElementById('mobile_num').value = formData.mobile_num || '';
-        document.getElementById('email_address').value = formData.email_address || '';
-        document.getElementById('alt_contact_person').value = formData.alt_contact_person || '';
-        document.getElementById('alt_contact_telephone_num').value = formData.alt_contact_telephone_num || '';
-        document.getElementById('disability_question').value = formData.disability_question || '';
-        document.getElementById('nature_of_disability').value = formData.nature_of_disability || '';
-        document.getElementById('ncpd_registration_no').value = formData.ncpd_registration_no || '';
-    }
-}
+        // Save form data to LocalStorage on form submit
+        document.getElementById('personal-info').addEventListener('submit', function(event) {
+            event.preventDefault();
 
-// Function to clear the saved form data after submission
-function clearFormData() {
-    localStorage.removeItem('personalInfoFormData');
-}
+            const formData = {};
+            const form = event.target;
 
-// Listen for input events to save data
-document.querySelectorAll('input, select').forEach(input => {
-    input.addEventListener('input', saveFormData);
-});
+            for (let i = 0; i < form.elements.length; i++) {
+                const element = form.elements[i];
+                if (element.name) {
+                    formData[element.name] = element.value;
+                }
+            }
 
-// Load form data when the page loads
-window.onload = function() {
-    loadFormData();
-};
+            localStorage.setItem('formData', JSON.stringify(formData));
+        });
+    </script>
 
-// Clear form data on form submission
-document.getElementById('personal-info').addEventListener('submit', function() {
-    clearFormData();
-});
-</script>
+
 
 
 
@@ -901,14 +924,206 @@ document.getElementById('personal-info').addEventListener('submit', function() {
         });
     });
 </script>
-
+<!-- JavaScript Functions -->
 <script>
-    function toggleAdminReportsDropdown(menuId = 'dropdownMenu') {
+    function toggleProgramsDropdown(menuId) {
         const dropdownMenu = document.getElementById(menuId);
         dropdownMenu.classList.toggle('hidden');
     }
+
+    function toggleAdminReportsDropdown(menuId) {
+        const dropdownMenu = document.getElementById(menuId);
+        dropdownMenu.classList.toggle('hidden');
+    }
+
+    // Close the dropdowns if the user clicks outside of them
+    document.addEventListener('click', function(event) {
+        const programsDropdown = document.getElementById('programs-dropdown');
+        const updatesDropdown = document.getElementById('updates-dropdown');
+
+        const programsMenuButton = document.getElementById('programs-menu-button');
+        const updatesMenuButton = document.getElementById('updates-menu-button');
+
+        // Check if the click is inside the Programs dropdown or its button
+        const isClickInsidePrograms = programsDropdown.contains(event.target) || programsMenuButton.contains(event.target);
+        // Check if the click is inside the Updates dropdown or its button
+        const isClickInsideUpdates = updatesDropdown.contains(event.target) || updatesMenuButton.contains(event.target);
+
+        // If the click is outside Programs dropdown, hide it
+        if (!isClickInsidePrograms) {
+            programsDropdown.classList.add('hidden');
+        }
+
+        // If the click is outside Updates dropdown, hide it
+        if (!isClickInsideUpdates) {
+            updatesDropdown.classList.add('hidden');
+        }
+    });
 </script>
 
+<script>
+function toggleSubDropdown(id) {
+    var dropdown = document.getElementById(id);
+    dropdown.classList.toggle('hidden');
+}
+</script>
+
+
+<script>
+$(document).ready(function() {
+    // Function to fetch sub-counties based on selected county
+    $('#home_county').change(function() {
+        var countyID = $(this).val();
+
+        if (countyID == 'Other') {
+            $('#other_home_county').show();
+            $('#sub_county').html('<option value="Other">Other</option>');
+            $('#other_sub_county').show();
+        } else {
+            $('#other_home_county').hide();
+            $('#other_sub_county').hide();
+            if (countyID) {
+                $.ajax({
+                    url: '/getSubCounties/' + countyID,
+                    type: "GET",
+                    dataType: "json",
+                    success: function(data) {
+                        $('#sub_county').empty();
+                        $('#sub_county').append('<option value="">Select Sub County</option>');
+                        $.each(data, function(key, value) {
+                            $('#sub_county').append('<option value="'+ key +'">'+ value +'</option>');
+                        });
+                        $('#sub_county').append('<option value="Other">Other</option>');
+                    }
+                });
+            } else {
+                $('#sub_county').empty();
+                $('#sub_county').append('<option value="">Select Sub County</option>');
+            }
+        }
+    });
+
+    // Show or hide 'Other Sub County' input
+    $('#sub_county').change(function() {
+        var subCounty = $(this).val();
+        if (subCounty == 'Other') {
+            $('#other_sub_county').show();
+        } else {
+            $('#other_sub_county').hide();
+        }
+    });
+
+    // Trigger change event on page load if there's a selected value
+    var selectedCounty = '{{ old('home_county') }}';
+    if (selectedCounty) {
+        $('#home_county').val(selectedCounty).trigger('change');
+    }
+});
+</script>
+
+<script>
+$(document).ready(function() {
+    // Function to fetch sub-countypps based on selected countypp
+    $('#home_countypp').change(function() {
+        var countyppID = $(this).val();
+
+        if (countyppID == 'Other') {
+            $('#other_home_countypp').show();
+            $('#sub_countypp').html('<option value="Other">Other</option>');
+            $('#other_sub_countypp').show();
+        } else {
+            $('#other_home_countypp').hide();
+            $('#other_sub_countypp').hide();
+            if (countyppID) {
+                $.ajax({
+                    url: '/getSubCountypps/' + countyppID,
+                    type: "GET",
+                    dataType: "json",
+                    success: function(data) {
+                        $('#sub_countypp').empty();
+                        $('#sub_countypp').append('<option value="">Select Sub County</option>');
+                        $.each(data, function(key, value) {
+                            $('#sub_countypp').append('<option value="'+ key +'">'+ value +'</option>');
+                        });
+                        $('#sub_countypp').append('<option value="Other">Other</option>');
+                    }
+                });
+            } else {
+                $('#sub_countypp').empty();
+                $('#sub_countypp').append('<option value="">Select Sub County</option>');
+            }
+        }
+    });
+
+    // Show or hide 'Other Sub Countypp' input
+    $('#sub_countypp').change(function() {
+        var subCountypp = $(this).val();
+        if (subCountypp == 'Other') {
+            $('#other_sub_countypp').show();
+        } else {
+            $('#other_sub_countypp').hide();
+        }
+    });
+
+    // Trigger change event on page load if there's a selected value
+    var selectedCountypp = '{{ old('home_countypp') }}';
+    if (selectedCountypp) {
+        $('#home_countypp').val(selectedCountypp).trigger('change');
+    }
+});
+</script>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        function toggleOtherField(selectElement, otherFieldId) {
+            const otherField = document.getElementById(otherFieldId);
+            if (selectElement.value === 'Other') {
+                otherField.style.display = 'block';
+            } else {
+                otherField.style.display = 'none';
+            }
+        }
+
+        const ksceGradeSelect = document.getElementById('ksce_grade');
+        ksceGradeSelect.addEventListener('change', function () {
+            toggleOtherField(this, 'other_ksce_grade');
+        });
+        toggleOtherField(ksceGradeSelect, 'other_ksce_grade'); // Initialize on page load
+
+        const institutionNameSelect = document.getElementById('institution_name');
+        institutionNameSelect.addEventListener('change', function () {
+            toggleOtherField(this, 'other_institution_name');
+        });
+        toggleOtherField(institutionNameSelect, 'other_institution_name');
+
+        const institutionGradeSelect = document.getElementById('institution_grade');
+        institutionGradeSelect.addEventListener('change', function () {
+            toggleOtherField(this, 'other_institution_grade');
+        });
+        toggleOtherField(institutionGradeSelect, 'other_institution_grade');
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var areYouEmployed = document.getElementById('are_you_employed');
+        var employmentDetails = document.getElementById('employment_details');
+
+        function toggleEmploymentDetails() {
+            if (areYouEmployed.value == 'Yes') {
+                employmentDetails.style.display = 'block';
+            } else {
+                employmentDetails.style.display = 'none';
+            }
+        }
+
+        areYouEmployed.addEventListener('change', toggleEmploymentDetails);
+
+        // Call the function on page load to set the correct state
+        toggleEmploymentDetails();
+    });
+</script>
 
 
 
