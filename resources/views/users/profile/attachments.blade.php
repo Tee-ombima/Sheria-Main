@@ -35,7 +35,7 @@
             <div class="flex-1">
                 <label for="file" class="block text-sm font-medium text-gray-700">Upload File:</label>
                 <input type="file" name="file" id="file" accept="application/pdf" required class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                <small class="text-gray-500">PDF only, max size 5MB</small>
+                <small class="text-gray-500">PDF only, max size 2MB</small>
             </div>
         </div>
 
@@ -99,7 +99,7 @@
                     <div class="flex-1">
                         <label for="edit_file" class="block text-sm font-medium text-gray-700">Upload New File:</label>
                         <input type="file" name="edit_file" id="edit_file" accept="application/pdf" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                        <small class="text-gray-500">PDF only, max size 5MB</small>
+                        <small class="text-gray-500">PDF only, max size 2MB</small>
                     </div>
                 </div>
                 <div class="flex justify-end space-x-4 mt-4">

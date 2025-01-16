@@ -43,7 +43,7 @@ public function uploadAttachment(Request $request)
     $validator = Validator::make($request->all(), [
         'document_name' => 'required_without:custom_document_name',
         'custom_document_name' => 'nullable|string|required_if:document_name,other',
-        'file' => 'required|mimes:pdf|max:2048', // PDF only, max 5MB
+        'file' => 'required|mimes:pdf|max:2048', // PDF only, max 2MB
     ]);
 
     if ($validator->fails()) {
@@ -76,7 +76,7 @@ public function editAttachment(Request $request)
     $validator = Validator::make($request->all(), [
         'attachment_id' => 'required|exists:attachments,id',
         'edit_document_name' => 'required|string|max:255',
-        'edit_file' => 'nullable|mimes:pdf|max:2048', // PDF only, max size 5MB
+        'edit_file' => 'nullable|mimes:pdf|max:2048', // PDF only, max size 2MB
     ]);
 
     if ($validator->fails()) {

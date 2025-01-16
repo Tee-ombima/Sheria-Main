@@ -1126,6 +1126,47 @@ $(document).ready(function() {
 </script>
 
 
+<script>
+    // Function to show or hide the "Other" options for constituency and subcounty
+    function toggleOtherOptions() {
+        const homecounty = document.getElementById('homecounty').value;
+        const otherOptionConstituency = document.querySelector('#constituency option[value="other"]');
+        const otherOptionSubcounty = document.querySelector('#subcounty option[value="other"]');
+        
+        // Show/hide the "Other" option based on home county selection
+        if (homecounty && homecounty !== "other") {
+            otherOptionConstituency.style.display = 'block';
+            otherOptionSubcounty.style.display = 'block';
+        } else {
+            otherOptionConstituency.style.display = 'none';
+            otherOptionSubcounty.style.display = 'none';
+        }
+    }
+
+    // Event listener for homecounty selection change
+    document.getElementById('homecounty').addEventListener('change', toggleOtherOptions);
+
+    // Initial call to handle default state (in case of re-render or validation errors)
+    toggleOtherOptions();
+</script>
+
+
+<script>
+    function confirmRoleChange(event, userId, currentRole) {
+        event.preventDefault(); // Prevent the form submission
+
+        const newRole = currentRole === 'admin' ? 'user' : 'admin';
+        const confirmed = confirm(`Are you sure you want to change the role to ${newRole}?`);
+
+        if (confirmed) {
+            // Submit the form for the respective user
+            document.getElementById(`toggle-role-form-${userId}`).submit();
+        } else {
+            // Revert the checkbox state if the action is canceled
+            event.target.checked = !event.target.checked;
+        }
+    }
+</script>
 
 </body>
 

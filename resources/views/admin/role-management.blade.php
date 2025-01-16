@@ -61,23 +61,26 @@
                         <td class="px-4 py-2">{{ $user->email }}</td>
                         <td class="px-4 py-2">{{ ucfirst($user->role) }}</td>
                         <td class="px-4 py-2 flex space-x-2">
-                            <form method="POST" action="{{ route('admin.role-management.toggleRole', $user->id) }}">
-                                @csrf
-                                <label class="inline-flex items-center">
-                                    <input type="checkbox" class="form-checkbox h-5 w-5 text-green-500"
-                                           {{ $user->role === 'admin' ? 'checked' : '' }}
-                                           onchange="this.form.submit()">
-                                    <span class="ml-2">{{ $user->role === 'admin' ? 'Admin' : 'User' }}</span>
-                                </label>
-                            </form>
-                            <form method="POST" action="{{ route('admin.users.destroy', $user->id) }}" onsubmit="return confirm('Are you sure you want to delete this user?');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-300 ease-in-out">
-                                    Delete
-                                </button>
-                            </form>
-                        </td>
+    <form id="toggle-role-form-{{ $user->id }}" method="POST" action="{{ route('admin.role-management.toggleRole', $user->id) }}">
+        @csrf
+        <label class="inline-flex items-center">
+            <input 
+                type="checkbox" 
+                class="form-checkbox h-5 w-5 text-green-500" 
+                {{ $user->role === 'admin' ? 'checked' : '' }}
+                onchange="confirmRoleChange(event, {{ $user->id }}, '{{ $user->role }}')">
+            <span class="ml-2">{{ $user->role === 'admin' ? 'Admin' : 'User' }}</span>
+        </label>
+    </form>
+    <form method="POST" action="{{ route('admin.users.destroy', $user->id) }}" onsubmit="return confirm('Are you sure you want to delete this user?');">
+        @csrf
+        @method('DELETE')
+        <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-300 ease-in-out">
+            Delete
+        </button>
+    </form>
+</td>
+
                     </tr>
                 @empty
                     <tr>

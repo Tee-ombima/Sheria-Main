@@ -290,7 +290,7 @@
 <!-- Certificate No. -->
 <div class="flex space-x-4">
     <div class="flex-1">
-        <label for="certificate_no" class="block text-sm font-medium text-gray-700">Certificate No.:</label>
+        <label for="certificate_no" class="block text-sm font-medium text-gray-700">Certificate No:<span class="text-red-500">*</span></label>
         <input type="text" value="{{ old('certificate_no') }}" name="certificate_no" id="certificate_no" maxlength="100" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" >
     </div>
 </div>

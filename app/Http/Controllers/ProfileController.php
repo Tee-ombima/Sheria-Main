@@ -41,7 +41,7 @@ class ProfileController extends Controller
         
         $userId = $request->user()->id; // Assuming the user ID is available via authenticated user
         $personalInfoSubmitted = PersonalInfo::where('user_id', $userId)->exists();
-        $inputData = $request->session()->get('inputData', []);
+        $inputData = $request->session()->get('inputData', default: []);
     
         // Retrieve and sort salutations from the database (ensure 'other' is last)
     $salutations = Salutation::orderByRaw("name = 'other' DESC, name ASC")->get();
@@ -51,7 +51,6 @@ class ProfileController extends Controller
     
     // Retrieve and sort home counties from the database (ensure 'other' is last)
     $homecounties = Homecounty::orderByRaw("name = 'other' DESC, name ASC")->get();
-    
     // Retrieve and sort country codes from the database (ensure 'other' is last)
     $countryCodes = CountryCode::orderByRaw("name = 'other' DESC, name ASC")->get();
         
@@ -63,6 +62,7 @@ class ProfileController extends Controller
             'salutations' => $salutations,
             'ethnicities' => $ethnicities,
             'homecounties' => $homecounties,
+            
             'countryCodes' => $countryCodes,
             
         ]);
@@ -77,7 +77,7 @@ public function savePersonalInfo(Request $request)
         'firstname' => 'required|string|max:50',
         'lastname' => 'nullable|string|max:50',
         'dob' => 'required|date',
-        'idno' => 'required|integer',
+        'idno' => 'required|digits:8',
         'kra_pin' => 'required|string|max:11',
         'nationality' => 'required|string|max:50',
 
@@ -92,48 +92,47 @@ public function savePersonalInfo(Request $request)
         // Homecounty
         'homecounty_id' => [
             'required',
-            'string',
             function ($attribute, $value, $fail) {
-                if ($value !== 'other' && $value !== 'Other' && !Homecounty::where('id', $value)->exists()) {
+                if ($value !== 'other' && !Homecounty::where('id', $value)->exists()) {
                     $fail('The selected home county is invalid.');
                 }
             },
         ],
-        'homecounty_other' => 'nullable|string|max:50',
-
-        // Constituency
+        'homecounty_other' => 'required_if:homecounty_id,other|string|max:50',
         'constituency_id' => [
             'required',
-            'string',
             function ($attribute, $value, $fail) {
-                if ($value !== 'other' && $value !== 'Other' && !Constituency::where('id', $value)->exists()) {
+                if ($value !== 'other' && !Constituency::where('id', $value)->exists()) {
                     $fail('The selected constituency is invalid.');
                 }
             },
         ],
-        'constituency_other' => 'nullable|string|max:50',
-
-        // Subcounty
+        'constituency_other' => 'required_if:constituency_id,other|string|max:50',
         'subcounty_id' => [
             'required',
-            'string',
             function ($attribute, $value, $fail) {
-                if ($value !== 'other' && $value !== 'Other' && !Subcounty::where('id', $value)->exists()) {
+                if ($value !== 'other' && !Subcounty::where('id', $value)->exists()) {
                     $fail('The selected subcounty is invalid.');
                 }
             },
         ],
-        'subcounty_other' => 'nullable|string|max:50',
+        'subcounty_other' => 'required_if:subcounty_id,other|string|max:50',
 
         // Contact Information
         'postal_address' => 'required|string',
         'code' => 'nullable|numeric',
         'town_city' => 'required|string|max:50',
-        'telephone_num' => 'nullable|integer',
+        'telephone_num' => 'required|integer',
+        'telephone_country_code' => 'required|string|max:50',
+
         'mobile_num' => 'required|integer',
+        'mobile_country_code' => 'required|string|max:50',
+
         'email_address' => 'required|email|max:100',
         'alt_contact_person' => 'required|string|max:100',
         'alt_contact_telephone_num' => 'required|integer',
+        'alt_contact_country_code' => 'required|string|max:50',
+
         'disability_question' => 'nullable|string',
         'nature_of_disability' => 'nullable|string|max:100',
         'ncpd_registration_no' => 'nullable|string|max:100',

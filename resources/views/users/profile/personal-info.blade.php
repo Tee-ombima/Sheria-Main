@@ -142,15 +142,15 @@
 
 
     <!-- ID Number Field -->
-    <div class="flex-1">
+<div class="flex-1">
     <label for="idno" class="block text-sm font-medium text-gray-700">ID Number<span class="text-red-500">*</span></label>
     <input 
-        type="number" 
+        type="text"  
         name="idno" 
         id="idno" 
         class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
         maxlength="8"  {{-- setting the maximum number of digits to 8 --}}
-        value="{{ old('idno', $inputData['idno'] ?? '') }}"
+        value="{{ old('idno', $inputData['idno'] ?? '') }}"  {{-- Retain old input value or existing data --}}
     >
     
     <!-- Display error message if any -->
@@ -160,8 +160,9 @@
 </div>
 
 
+
     <div class="flex-1">
-    <label for="kra_pin" class="block text-sm font-medium text-gray-700">Own Application Letter<span class="text-red-500">*</span></label>
+    <label for="kra_pin" class="block text-sm font-medium text-gray-700">Kra Pin<span class="text-red-500">*</span></label>
     <input 
         type="text" 
         name="kra_pin" 
@@ -304,13 +305,13 @@
         Constituency<span class="text-red-500">*</span>
     </label>
     <select 
-        name="constituency_id" 
-        id="constituency" 
-        required 
-        class="mt-1 block w-full py-2 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-        <option value="" disabled selected>Select Constituency</option>
-        <option value="other" {{ (old('constituency_id') == 'other') ? 'selected' : '' }}>Other</option>
-    </select>
+    name="constituency_id" 
+    id="constituency" 
+    required 
+    class="mt-1 block w-full py-2 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+    <option value="" disabled selected>Select Constituency</option>
+    <option value="other" {{ (old('constituency_id', $inputData['constituency_id'] ?? '') == 'other') ? 'selected' : '' }}>Other</option>
+</select>
     @error('constituency_id')
         <span class="text-red-500 text-xs">{{ $message }}</span>
     @enderror
@@ -339,13 +340,13 @@
         Subcounty<span class="text-red-500">*</span>
     </label>
     <select 
-        name="subcounty_id" 
-        id="subcounty" 
-        required 
-        class="mt-1 block w-full py-2 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-        <option value="" disabled selected>Select Subcounty</option>
-        <option value="other" {{ (old('subcounty_id') == 'other') ? 'selected' : '' }}>Other</option>
-    </select>
+    name="subcounty_id" 
+    id="subcounty" 
+    required 
+    class="mt-1 block w-full py-2 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+    <option value="" disabled selected>Select Subcounty</option>
+    <option value="other" {{ (old('subcounty_id', $inputData['subcounty_id'] ?? '') == 'other') ? 'selected' : '' }}>Other</option>
+</select>
     @error('subcounty_id')
         <span class="text-red-500 text-xs">{{ $message }}</span>
     @enderror
@@ -537,8 +538,9 @@
         <select name="alt_contact_country_code" id="alt_contact_country_code" class="mt-1 block py-2 px-3 border border-gray-300 bg-white rounded-l-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
             @foreach($countryCodes as $code)
                 <option value="{{ $code->code }}" {{ old('alt_contact_country_code', $inputData['alt_contact_country_code'] ?? '') == $code->code ? 'selected' : '' }}>
-                    {{ $code->code }} ({{ $code->name }})
-                </option>
+    {{ $code->code }} ({{ $code->name }})
+</option>
+
             @endforeach
         </select>
 
