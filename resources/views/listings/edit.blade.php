@@ -1,77 +1,112 @@
 <x-layout>
-  <x-card class="p-10 max-w-lg mx-auto mt-24">
-  <a href="{{ url()->previous() }}" class="inline-flex items-center px-4 py-2 bg-gray-500 text-white font-semibold text-sm rounded-lg hover:bg-gray-700">
-            ← Back
-        </a>
-    <header class="text-center">
-      <h2 class="text-2xl font-bold uppercase mb-1">Edit Gig</h2>
-      <p class="mb-4">Edit: {{$listing->title}}</p>
+  <!-- Main card with creamy background -->
+  <x-card class="p-8 max-w-3xl mx-auto mt-12 bg-[#FFF5E6] rounded-lg shadow-lg">
+    <!-- Back Button -->
+    <a href="{{ url()->previous() }}" class="inline-flex items-center px-4 py-2 bg-[#D68C3C] text-white rounded-md hover:bg-[#bf7a2e] transition-colors shadow-sm">
+      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+      </svg>
+      Back
+    </a>
+
+    <!-- Header Section -->
+    <header class="text-center mt-6">
+      <h2 class="text-3xl font-bold text-gray-900">Edit Gig</h2>
+      <p class="mt-2 text-gray-600">Edit: {{ $listing->title }}</p>
     </header>
 
-    <form method="POST" action="/listings/{{$listing->id}}" enctype="multipart/form-data">
+    <!-- Form -->
+    <form method="POST" action="/listings/{{ $listing->id }}" enctype="multipart/form-data" class="mt-8 space-y-6">
       @csrf
       @method('PUT')
 
-      <div class="mb-6">
-        <label for="title" class="inline-block text-lg mb-2">Job Title</label>
-        <input type="text" class="border border-gray-200 rounded p-2 w-full" name="title"
-          placeholder="Example: Senior Laravel Developer" value="{{$listing->title}}" />
-
+      <!-- Job Title Field -->
+      <div>
+        <label for="title" class="block text-sm font-medium text-gray-700">Job Title <span class="text-red-500">*</span></label>
+        <input type="text" id="title" name="title"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-white focus:border-[#D68C3C] focus:ring-[#D68C3C]"
+          placeholder="Example: Senior Laravel Developer" 
+          value="{{ $listing->title }}" 
+          required>
         @error('title')
-        <p class="text-red-500 text-xs mt-1">{{$message}}</p>
+        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
         @enderror
       </div>
 
-      <div class="mb-6">
-        <label for="job_reference_number" class="inline-block text-lg mb-2">Job Reference Number</label>
-        <input type="text" class="border border-gray-200 rounded p-2 w-full" name="job_reference_number"
-          placeholder="Example: 2024/CVer/17/14" value="{{$listing->job_reference_number}}" />
-
+      <!-- Job Reference Number -->
+      <div>
+        <label for="job_reference_number" class="block text-sm font-medium text-gray-700">Job Reference Number <span class="text-red-500">*</span></label>
+        <input type="text" id="job_reference_number" name="job_reference_number"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-white focus:border-[#D68C3C] focus:ring-[#D68C3C]"
+          placeholder="Example: 2024/CVer/17/14" 
+          value="{{ $listing->job_reference_number }}" 
+          required>
         @error('job_reference_number')
-        <p class="text-red-500 text-xs mt-1">{{$message}}</p>
+        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
         @enderror
       </div>
 
-      <div class="mb-6">
-    <label for="vacancies" class="inline-block text-lg mb-2">Number of Vacancies</label>
-    <input type="number" class="border border-gray-200 rounded p-2 w-full" name="vacancies"
-      placeholder="Enter number of vacancies" value="{{old('vacancies')}}" />
-
-    @error('vacancies')
-    <p class="text-red-500 text-xs mt-1">{{$message}}</p>
-    @enderror
-</div>
-
-<div class="mb-6">
-    <label for="deadline" class="inline-block text-lg mb-2">Application Deadline</label>
-    <input type="datetime-local" class="border border-gray-200 rounded p-2 w-full" name="deadline" required
-    value="{{ old('deadline', isset($listing) ? date('Y-m-d\TH:i', strtotime($listing->deadline)) : '') }}" />
-
-    @error('deadline')
+      <!-- Number of Vacancies -->
+      <div>
+        <label for="vacancies" class="block text-sm font-medium text-gray-700">Number of Vacancies <span class="text-red-500">*</span></label>
+        <input type="number" id="vacancies" name="vacancies"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-white focus:border-[#D68C3C] focus:ring-[#D68C3C]"
+          placeholder="Enter number of vacancies" 
+          value="{{ old('vacancies', $listing->vacancies) }}" 
+          required>
+        @error('vacancies')
         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-    @enderror
-</div>
+        @enderror
+      </div>
 
-
-
-      
-
-      <div class="mb-6">
-    <label for="file" class="inline-block text-lg mb-2">Upload Job Description (PDF)</label>
-    <input type="file" class="border border-gray-200 rounded p-2 w-full" name="file" accept=".pdf" />
-
-    @error('file')
+      <!-- Application Deadline -->
+     <!-- Application Deadline -->
+      <div>
+        <label for="deadline" class="block text-sm font-medium text-gray-700">Application Deadline <span class="text-red-500">*</span></label>
+        <input type="datetime-local" id="deadline" name="deadline"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-white focus:border-[#D68C3C] focus:ring-[#D68C3C]"
+          value="{{ old('deadline', isset($listing) ? date('Y-m-d\TH:i', strtotime($listing->deadline)) : '') }}" 
+          required>
+        @error('deadline')
         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-    @enderror
-</div>
+        @enderror
+      </div>
+      <!-- File Upload -->
+      <div>
+        <label for="file" class="block text-sm font-medium text-gray-700">Upload Job Description (PDF)</label>
+        <input type="file" id="file" name="file" accept=".pdf"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-white focus:border-[#D68C3C] focus:ring-[#D68C3C] file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#D68C3C]/10 file:text-[#D68C3C] hover:file:bg-[#D68C3C]/20">
+        @error('file')
+        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+        @enderror
+      </div>
 
-
-      <div class="mb-6">
-        <button class="bg-laravel text-white rounded py-2 px-4 hover:bg-black">Update Gig</button>
-        <a href="/" class="text-black ml-4">Back</a>
+      <!-- Submit Section -->
+      <div class="flex justify-end space-x-4 pt-8">
+        <button type="submit" class="px-6 py-2 bg-[#D68C3C] text-white rounded-md hover:bg-[#bf7a2e] transition-colors flex items-center">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+          </svg>
+          Update Gig
+        </button>
+        <a href="/" class="px-6 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-700 transition-colors">
+          Cancel
+        </a>
       </div>
     </form>
   </x-card>
 
-
+  <!-- Loader Script -->
+  <script>
+    document.querySelector("form").addEventListener("submit", function() {
+      const submitBtn = this.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `
+        <svg class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+        </svg>
+        Updating...`;
+    });
+  </script>
 </x-layout>

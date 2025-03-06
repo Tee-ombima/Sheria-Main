@@ -247,7 +247,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/pupillages/non-pending', [AdminPupillageController::class, 'nonPending'])->name('pupillages.nonPending');
 
     // Other admin routes...
-    Route::patch('/pupillages/{application}', [AdminPupillageController::class, 'update'])->name('admin.pupillages.update');
+    // Corrected to PUT
+Route::put('/pupillages/{application}', [AdminPupillageController::class, 'update'])
+->name('admin.pupillages.update');
     Route::get('pupillages/accepted', [AdminPupillageController::class, 'accepted'])->name('pupillages.accepted');
     Route::get('pupillages/not_accepted', [AdminPupillageController::class, 'notAccepted'])->name('pupillages.not_accepted');
     Route::get('pupillages/export', [AdminPupillageController::class, 'export'])->name('pupillages.export');
@@ -278,6 +280,5 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/post-pupillage/vacancy-number', [AdminPostPupillageController::class, 'editVacancyNumber'])->name('postPupillages.editVacancyNumber');
     Route::post('/post-pupillage/vacancy-number', [AdminPostPupillageController::class, 'updateVacancyNumber'])->name('postPupillages.updateVacancyNumber');
 });
-
 
 

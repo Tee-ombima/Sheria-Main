@@ -19,8 +19,8 @@ class DepartmentController extends Controller
     {
         // Validate input
         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255', // Add email validation
+            'name' => 'required|string|max:255|unique:departments,name',
+        'email' => 'required|email|max:255|unique:departments,email',
 
         ]);
 

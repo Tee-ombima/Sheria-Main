@@ -18,7 +18,7 @@ class InternshipApplication extends Model
         'email',
         'id_file',
         'university_letter',
-        'kra_pin',
+        'application_letter',
         'insurance',
         'good_conduct',
         'cv',

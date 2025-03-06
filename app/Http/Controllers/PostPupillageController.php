@@ -73,7 +73,7 @@ class PostPupillageController extends Controller
             'postal_code' => 'required|string',
             'town' => 'required|string|max:50',
             'email_address' => 'required|email|max:50',
-            'mobile_number' => 'required|integer|max:20',
+            'mobile_number' => 'required|string',
             'home_county' => 'required|string|max:50',
             'other_home_county' => 'required_if:home_county,Other|max:50',
 
@@ -83,7 +83,7 @@ class PostPupillageController extends Controller
             'disability_status' => 'required|boolean',
             'nature_of_disability' => 'nullable|string|max:50',
             'deployment_region' => 'required|string|max:50',
-            'declaration' => 'accepted',
+            'declaration' => 'required|accepted',
         ]);
         $homeCounty = $request->home_county == 'Other' ? $request->other_home_county : Countypp::find($request->home_county)->name;
 
@@ -114,7 +114,7 @@ class PostPupillageController extends Controller
             'disability_status' => $request->disability_status,
             'nature_of_disability' => $request->nature_of_disability,
             'deployment_region' => $request->deployment_region,
-            'declaration' => $request->declaration,
+            'declaration' => $request->has(key: 'declaration'), // Convert checkbox to boolean
         ]);
 
         return redirect()->route('internships.index')->with('message', 'Post Pupillage application submitted successfully.');
@@ -160,7 +160,7 @@ class PostPupillageController extends Controller
             'postal_code' => 'required|string',
             'town' => 'required|string|max:50',
             'email_address' => 'required|email|max:50',
-            'mobile_number' => 'required|integer|max:20',
+            'mobile_number' => 'required|string',
             'home_county' => 'required|string|max:50',
             'other_home_county' => 'required_if:home_county,Other|max:50',
 
@@ -170,7 +170,7 @@ class PostPupillageController extends Controller
             'disability_status' => 'required|boolean',
             'nature_of_disability' => 'nullable|string|max:50',
             'deployment_region' => 'required|string|max:50',
-            'declaration' => 'accepted',
+            'declaration' => 'required|accepted',
         ]);
         $homeCounty = $request->home_county == 'Other' ? $request->other_home_county : Countypp::find($request->home_county)->name;
 
@@ -198,7 +198,7 @@ class PostPupillageController extends Controller
             'disability_status' => $request->disability_status,
             'nature_of_disability' => $request->nature_of_disability,
             'deployment_region' => $request->deployment_region,
-            'declaration' => $request->declaration,
+            'declaration' => $request->has(key: 'declaration'), // Convert checkbox to boolean
         ]);
 
         return redirect()->route('internships.index')->with('message', 'Post Pupillage application updated successfully.');

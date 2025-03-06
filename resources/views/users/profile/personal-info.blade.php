@@ -1,281 +1,179 @@
 <x-layout>
-
-  <x-card class="p-10 mx-auto mt-24">
-
-
-<body class="mb-48">
-
-<div class="text-center my-4">
-    <h1 class="text-3xl font-bold">Personal Info
-    <span class="{{ $personalInfoSubmitted ? 'submitted' : 'not-submitted' }}">
-            {{ $personalInfoSubmitted ? 'Submitted' : 'Not Submitted' }}
+  <x-card class="p-8 mx-auto mt-12 max-w-7xl">
+    <!-- Status Header -->
+    <div class="text-center mb-8">
+      <h1 class="text-3xl font-bold text-gray-900 mb-2">
+        Personal Information
+        <span class="ml-2 px-4 py-1 rounded-full {{ $personalInfoSubmitted ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+          {{ $personalInfoSubmitted ? '✓ Submitted' : '✗ Not Submitted' }}
         </span>
-    </h1>
-</div>
-@if ($errors->any())
-                <div class="alert alert-danger text-red-500">
-                    <ul>
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-    <form id="personal-info" action="{{ route('profile.save-personal-info') }}" method="POST" >
+      </h1>
+      <p class="text-gray-600 mt-2">All fields marked with <span class="text-red-500">*</span> are required</p>
+    </div>
+
+    <!-- Error Messages -->
+    @if ($errors->any())
+    <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+          </svg>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-red-800">Please correct the following errors:</h3>
+          <ul class="mt-2 text-sm text-red-700 list-disc pl-5 space-y-1">
+            @foreach ($errors->all() as $error)
+            <li>{{ $error }}</li>
+            @endforeach
+          </ul>
+        </div>
+      </div>
+    </div>
+    @endif
+
+    <form id="personal-info" action="{{ route('profile.save-personal-info') }}" method="POST" class="space-y-6">
       @csrf
-      <!-- Row 1: SurName, FirstName, OtherName, Salutation/Title -->
-          <!-- Row 1: SurName, FirstName, OtherName, Salutation/Title -->
-<div class="flex space-x-4">
-    <!-- Surname Field -->
-<div class="flex-1">
-    <label for="surname" class="block text-sm font-medium text-gray-700">
-        Surname <span class="text-red-500">*</span></label>
-    <input 
-        type="text" 
-        name="surname" 
-        id="surname" 
-        maxlength="100" 
-        required 
-        class="mt-1 block w-full py-2 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" 
-        value="{{ old('surname', $inputData['surname'] ?? '') }}">
-</div>
+      
+      <!-- Name Section -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <!-- Surname -->
+        <div>
+          <label for="surname" class="block text-sm font-medium text-gray-700">Surname <span class="text-red-500">*</span></label>
+          <input type="text" name="surname" id="surname" maxlength="100" required
+                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]"
+                 value="{{ old('surname', $inputData['surname'] ?? '') }}">
+        </div>
 
+        <!-- First Name -->
+        <div>
+          <label for="firstname" class="block text-sm font-medium text-gray-700">First Name <span class="text-red-500">*</span></label>
+          <input type="text" name="firstname" id="firstname" maxlength="100" required
+                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]"
+                 value="{{ old('firstname', $inputData['firstname'] ?? '') }}">
+        </div>
 
+        <!-- Other Names -->
+        <div>
+          <label for="lastname" class="block text-sm font-medium text-gray-700">Other Names</label>
+          <input type="text" name="lastname" id="lastname" maxlength="100"
+                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]"
+                 value="{{ old('lastname', $inputData['lastname'] ?? '') }}">
+        </div>
 
-    <!-- FirstName Field -->
-    <div class="flex-1">
-    <label for="firstname" class="block text-sm font-medium text-gray-700">Firstname<span class="text-red-500">*</span></label>
-    <input 
-        type="text" 
-        name="firstname" 
-        id="firstname" 
-        maxlength="100" 
-        required
-        class="mt-1 block w-full py-2 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" 
-        value="{{ old('firstname', $inputData['firstname'] ?? '') }}">
-
-    @error('firstname')
-        <span class="text-red-500 text-xs">{{ $message }}</span>
-    @enderror
-
-</div>
-
-    <!-- LastName Field -->
-    <div class="flex-1">
-    <label for="lastname" class="block text-sm font-medium text-gray-700">Othernames</label>
-    <input 
-        type="text" 
-        name="lastname" 
-        id="lastname" 
-        maxlength="100" 
-        class="mt-1 block w-full py-2 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" 
-        value="{{ old('lastname', $inputData['lastname'] ?? '') }}">
-
-
-
-</div>
-
-<!-- Salutation/Title Field -->
-<div class="flex-1">
-    <label for="salutation" class="block text-sm font-medium text-gray-700">
-        Salutation/Title<span class="text-red-500">*</span>
-    </label>
-    <select 
-        name="salutation" 
-        id="salutation" 
-        required 
-        class="mt-1 block w-full py-2 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-        <option value="" disabled selected>Select Salutation</option>
-        @foreach($salutations as $salutationOption)
-            <option value="{{ $salutationOption->name }}" {{ (old('salutation', $inputData['salutation'] ?? '') == $salutationOption->name) ? 'selected' : '' }}>
-                {{ $salutationOption->name }}
+        <!-- Salutation -->
+        <div>
+          <label for="salutation" class="block text-sm font-medium text-gray-700">Salutation <span class="text-red-500">*</span></label>
+          <select name="salutation" id="salutation" required
+                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]"
+                  data-other-target="#salutation_other_div">
+            <option value="">Select Salutation</option>
+            @foreach($salutations as $salutationOption)
+            <option value="{{ $salutationOption->name }}" {{ old('salutation', $inputData['salutation'] ?? '') == $salutationOption->name ? 'selected' : '' }}>
+              {{ $salutationOption->name }}
             </option>
-        @endforeach
-        <option value="other" {{ (old('salutation', $inputData['salutation'] ?? '') == 'other') ? 'selected' : '' }}>Other</option>
-    </select>
+            @endforeach
+            <option value="other" {{ old('salutation') === 'other' ? 'selected' : '' }}>Other</option>
+          </select>
+        </div>
 
-    @error('salutation')
-        <span class="text-red-500 text-xs">{{ $message }}</span>
-    @enderror
-</div>
+        <!-- Salutation Other -->
+        <div id="salutation_other_div" class="{{ old('salutation') === 'other' ? '' : 'hidden' }} col-span-full">
+          <label for="salutation_other" class="block text-sm font-medium text-gray-700">Specify Salutation <span class="text-red-500">*</span></label>
+          <input type="text" name="salutation_other" id="salutation_other"
+                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]"
+                 value="{{ old('salutation_other', $inputData['salutation_other'] ?? '') }}">
+        </div>
+      </div>
 
-<!-- Input Field for "Other" Salutation -->
-<div class="flex-1" id="salutation_other_div" style="display: none;">
-    <label for="salutation_other" class="block text-sm font-medium text-gray-700">
-        Please Specify Salutation<span class="text-red-500">*</span>
-    </label>
-    <input 
-        type="text" 
-        name="salutation_other" 
-        id="salutation_other" 
-        value="{{ old('salutation_other', $inputData['salutation_other'] ?? '') }}"
-        class="mt-1 block w-full py-2 px-4 border border-gray-300 rounded-md shadow-sm focus:outline-none sm:text-sm">
-    @error('salutation_other')
-        <span class="text-red-500 text-xs">{{ $message }}</span>
-    @enderror
-</div>
+      <!-- Personal Details Section -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <!-- Date of Birth -->
+        <div>
+          <label for="dob" class="block text-sm font-medium text-gray-700">Date of Birth <span class="text-red-500">*</span></label>
+          <input type="date" name="dob" id="dob" required
+                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]"
+                 value="{{ old('dob', $inputData['dob'] ?? '') }}">
+        </div>
 
+        <!-- ID Number -->
+        <div>
+          <label for="idno" class="block text-sm font-medium text-gray-700">ID Number <span class="text-red-500">*</span></label>
+          <input type="text" name="idno" id="idno" maxlength="8" required
+                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]"
+                 value="{{ old('idno', $inputData['idno'] ?? '') }}">
+        </div>
 
-</div>
+        <!-- KRA PIN -->
+        <div>
+          <label for="kra_pin" class="block text-sm font-medium text-gray-700">KRA PIN <span class="text-red-500">*</span></label>
+          <input type="text" name="kra_pin" id="kra_pin" maxlength="11" required
+                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]"
+                 value="{{ old('kra_pin', $inputData['kra_pin'] ?? '') }}">
+        </div>
 
+        <!-- Gender -->
+        <div>
+          <label for="gender" class="block text-sm font-medium text-gray-700">Gender <span class="text-red-500">*</span></label>
+          <select name="gender" id="gender" required
+                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]">
+            <option value="male" {{ old('gender', $inputData['gender'] ?? '') == 'male' ? 'selected' : '' }}>Male</option>
+            <option value="female" {{ old('gender', $inputData['gender'] ?? '') == 'female' ? 'selected' : '' }}>Female</option>
+          </select>
+        </div>
+      </div>
 
+      <!-- Nationality & Ethnicity Section -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Nationality -->
+        <div>
+          <label for="nationality" class="block text-sm font-medium text-gray-700">Nationality <span class="text-red-500">*</span></label>
+          <input type="text" name="nationality" id="nationality" maxlength="50" required
+                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]"
+                 value="{{ old('nationality', $inputData['nationality'] ?? '') }}">
+        </div>
 
-
-      <!-- Row 2: Date of Birth, IDNo, Krapin, Gender -->
-      <div class="flex space-x-4">
-    <div class="flex-1">
-    <label for="dob" class="block text-sm font-medium text-gray-700">Date of Birth<span class="text-red-500">*</span></label>
-
-    
-    <input 
-        type="date" 
-        name="dob" 
-        id="dob" 
-        class="mt-1 block w-full py-2 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" 
-        value="{{ old('dob', $inputData['dob'] ?? '') }}">
-    
-    <!-- Display error message if any -->
-    @error('dob')
-        <span class="text-red-500 text-xs">{{ $message }}</span>
-    @enderror
-</div>
-
-
-    <!-- ID Number Field -->
-<div class="flex-1">
-    <label for="idno" class="block text-sm font-medium text-gray-700">ID Number<span class="text-red-500">*</span></label>
-    <input 
-        type="text"  
-        name="idno" 
-        id="idno" 
-        class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-        maxlength="8"  {{-- setting the maximum number of digits to 8 --}}
-        value="{{ old('idno', $inputData['idno'] ?? '') }}"  {{-- Retain old input value or existing data --}}
-    >
-    
-    <!-- Display error message if any -->
-    @error('idno')
-        <span class="text-red-500 text-xs">{{ $message }}</span>
-    @enderror
-</div>
-
-
-
-    <div class="flex-1">
-    <label for="kra_pin" class="block text-sm font-medium text-gray-700">Kra Pin<span class="text-red-500">*</span></label>
-    <input 
-        type="text" 
-        name="kra_pin" 
-        id="kra_pin" 
-        maxlength="11"  {{-- setting the maximum length to 11 characters --}}
-        class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-        value="{{ old('kra_pin', $inputData['kra_pin'] ?? '') }}"
-    >
-    
-    
-    <!-- Display error message if any -->
-    @error('kra_pin')
-        <span class="text-red-500 text-xs">{{ $message }}</span>
-    @enderror
-</div>
-
-
- <!-- Gender Field -->
-    <div class="flex-1">
-    <label for="gender" class="block text-sm font-medium text-gray-700">Gender<span class="text-red-500">*</span></label>
-    <select name="gender" id="gender" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-        <option value="male" {{ old('gender', $inputData['gender'] ?? '') == 'male' ? 'selected' : '' }}>Male</option>
-        <option value="female" {{ old('gender', $inputData['gender'] ?? '') == 'female' ? 'selected' : '' }}>Female</option>
-    </select>
-    
-    <!-- Display error message if any -->
-    @error('gender')
-        <span class="text-red-500 text-xs">{{ $message }}</span>
-    @enderror
-</div>
-
-
-
-  </div>
-
-   <div class="flex space-x-4">
-    <div class="flex-1">
-    <label for="nationality" class="block text-sm font-medium text-gray-700">Nationality<span class="text-red-500">*</span></label>
-    <input 
-        type="text" 
-        name="nationality" 
-        id="nationality" 
-        maxlength="50"  {{-- setting the maximum length to 100 characters --}}
-        class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-        value="{{ old('nationality', $inputData['nationality'] ?? '') }}"
-    >
-    
-    <!-- Display error message if any -->
-    @error('nationality')
-        <span class="text-red-500 text-xs">{{ $message }}</span>
-    @enderror
-</div>
-
-
-<!-- Ethnicity Field -->
-<div class="flex-1">
-    <label for="ethnicity" class="block text-sm font-medium text-gray-700">
-        Ethnicity<span class="text-red-500">*</span>
-    </label>
-    <select 
-        name="ethnicity" 
-        id="ethnicity" 
-        required 
-        class="mt-1 block w-full py-2 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-        <option value="" disabled selected>Select Ethnicity</option>
-        @foreach($ethnicities as $ethnicity)
-            <option value="{{ $ethnicity->name }}" {{ (old('ethnicity', $inputData['ethnicity'] ?? '') == $ethnicity->name) ? 'selected' : '' }}>
-                {{ $ethnicity->name }}
+        <!-- Ethnicity -->
+        <div>
+          <label for="ethnicity" class="block text-sm font-medium text-gray-700">Ethnicity <span class="text-red-500">*</span></label>
+          <select name="ethnicity" id="ethnicity" required
+                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]"
+                  data-other-target="#ethnicity_other_div">
+            <option value="">Select Ethnicity</option>
+            @foreach($ethnicities as $ethnicity)
+            <option value="{{ $ethnicity->name }}" {{ old('ethnicity', $inputData['ethnicity'] ?? '') == $ethnicity->name ? 'selected' : '' }}>
+              {{ $ethnicity->name }}
             </option>
-        @endforeach
-        <option value="other" {{ (old('ethnicity', $inputData['ethnicity'] ?? '') == 'other') ? 'selected' : '' }}>Other</option>
-    </select>
+            @endforeach
+            <option value="other" {{ old('ethnicity') === 'other' ? 'selected' : '' }}>Other</option>
+          </select>
+        </div>
 
-    @error('ethnicity')
-        <span class="text-red-500 text-xs">{{ $message }}</span>
-    @enderror
-</div>
+        <!-- Ethnicity Other -->
+        <div id="ethnicity_other_div" class="{{ old('ethnicity') === 'other' ? '' : 'hidden' }}">
+          <label for="ethnicity_other" class="block text-sm font-medium text-gray-700">Specify Ethnicity <span class="text-red-500">*</span></label>
+          <input type="text" name="ethnicity_other" id="ethnicity_other"
+                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]"
+                 value="{{ old('ethnicity_other', $inputData['ethnicity_other'] ?? '') }}">
+        </div>
+      </div>
 
-<!-- Input Field for "Other" Ethnicity -->
-<div class="flex-1" id="ethnicity_other_div" style="display: none;">
-    <label for="ethnicity_other" class="block text-sm font-medium text-gray-700">
-        Please Specify Ethnicity<span class="text-red-500">*</span>
-    </label>
-    <input 
-        type="text" 
-        name="ethnicity_other" 
-        id="ethnicity_other" 
-        value="{{ old('ethnicity_other', $inputData['ethnicity_other'] ?? '') }}"
-        class="mt-1 block w-full py-2 px-4 border border-gray-300 rounded-md shadow-sm focus:outline-none sm:text-sm">
-    @error('ethnicity_other')
-        <span class="text-red-500 text-xs">{{ $message }}</span>
-    @enderror
-</div>
-
-
-
-<!-- Home County Field -->
+      <!-- Location Information -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Home County Field -->
 <div class="flex-1">
     <label for="homecounty" class="block text-sm font-medium text-gray-700">
         Home County<span class="text-red-500">*</span>
     </label>
-    <select 
-        name="homecounty_id" 
-        id="homecounty" 
-        required 
-        class="mt-1 block w-full py-2 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+    <select name="homecounty_id" id="homecounty" required 
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]">
         <option value="" disabled selected>Select Home County</option>
         @foreach($homecounties as $homecounty)
-            <option value="{{ $homecounty->id }}" {{ (old('homecounty_id') == $homecounty->id) ? 'selected' : '' }}>
+            <option value="{{ $homecounty->id }}" {{ old('homecounty_id', $inputData['homecounty_id'] ?? '') == $homecounty->id ? 'selected' : '' }}>
                 {{ $homecounty->name }}
             </option>
         @endforeach
-        <option value="other" {{ (old('homecounty_id') == 'other') ? 'selected' : '' }}>Other</option>
+        <option value="other" {{ old('homecounty_id', $inputData['homecounty_id'] ?? '') == 'other' ? 'selected' : '' }}>Other</option>
     </select>
     @error('homecounty_id')
         <span class="text-red-500 text-xs">{{ $message }}</span>
@@ -283,438 +181,299 @@
 </div>
 
 <!-- Input Field for "Other" Home County -->
-<div class="flex-1" id="homecounty_other_div" style="display: none;">
+<div class="flex-1" id="homecounty_other_div" style="display: {{ old('homecounty_id', $inputData['homecounty_id'] ?? '') == 'other' ? 'block' : 'none' }};">
     <label for="homecounty_other" class="block text-sm font-medium text-gray-700">
         Please Specify Home County<span class="text-red-500">*</span>
     </label>
-    <input 
-        type="text" 
-        name="homecounty_other" 
-        id="homecounty_other" 
-        value="{{ old('homecounty_other') }}"
-        class="mt-1 block w-full py-2 px-4 border border-gray-300 rounded-md shadow-sm focus:outline-none sm:text-sm">
+    <input type="text" name="homecounty_other" id="homecounty_other" 
+           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]"
+           value="{{ old('homecounty_other', $inputData['homecounty_other'] ?? '') }}">
     @error('homecounty_other')
         <span class="text-red-500 text-xs">{{ $message }}</span>
     @enderror
 </div>
-
 
 <!-- Constituency Field -->
 <div class="flex-1">
     <label for="constituency" class="block text-sm font-medium text-gray-700">
         Constituency<span class="text-red-500">*</span>
     </label>
-    <select 
-    name="constituency_id" 
-    id="constituency" 
-    required 
-    class="mt-1 block w-full py-2 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-    <option value="" disabled selected>Select Constituency</option>
-    <option value="other" {{ (old('constituency_id', $inputData['constituency_id'] ?? '') == 'other') ? 'selected' : '' }}>Other</option>
-</select>
+    <select name="constituency_id" id="constituency" required 
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]">
+        <option value="" disabled selected>Select Constituency</option>
+        <option value="other" {{ old('constituency_id', $inputData['constituency_id'] ?? '') == 'other' ? 'selected' : '' }}>Other</option>
+    </select>
     @error('constituency_id')
         <span class="text-red-500 text-xs">{{ $message }}</span>
     @enderror
 </div>
 
 <!-- Input Field for "Other" Constituency -->
-<div class="flex-1" id="constituency_other_div" style="display: none;">
+<div class="flex-1" id="constituency_other_div" style="display: {{ old('constituency_id', $inputData['constituency_id'] ?? '') == 'other' ? 'block' : 'none' }};">
     <label for="constituency_other" class="block text-sm font-medium text-gray-700">
         Please Specify Constituency<span class="text-red-500">*</span>
     </label>
-    <input 
-        type="text" 
-        name="constituency_other" 
-        id="constituency_other" 
-        value="{{ old('constituency_other') }}"
-        class="mt-1 block w-full py-2 px-4 border border-gray-300 rounded-md shadow-sm focus:outline-none sm:text-sm">
+    <input type="text" name="constituency_other" id="constituency_other" 
+           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]"
+           value="{{ old('constituency_other', $inputData['constituency_other'] ?? '') }}">
     @error('constituency_other')
         <span class="text-red-500 text-xs">{{ $message }}</span>
     @enderror
 </div>
-
 
 <!-- Subcounty Field -->
 <div class="flex-1">
     <label for="subcounty" class="block text-sm font-medium text-gray-700">
         Subcounty<span class="text-red-500">*</span>
     </label>
-    <select 
-    name="subcounty_id" 
-    id="subcounty" 
-    required 
-    class="mt-1 block w-full py-2 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-    <option value="" disabled selected>Select Subcounty</option>
-    <option value="other" {{ (old('subcounty_id', $inputData['subcounty_id'] ?? '') == 'other') ? 'selected' : '' }}>Other</option>
-</select>
+    <select name="subcounty_id" id="subcounty" required 
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]">
+        <option value="" disabled selected>Select Subcounty</option>
+        <option value="other" {{ old('subcounty_id', $inputData['subcounty_id'] ?? '') == 'other' ? 'selected' : '' }}>Other</option>
+    </select>
     @error('subcounty_id')
         <span class="text-red-500 text-xs">{{ $message }}</span>
     @enderror
 </div>
 
 <!-- Input Field for "Other" Subcounty -->
-<div class="flex-1" id="subcounty_other_div" style="display: none;">
+<div class="flex-1" id="subcounty_other_div" style="display: {{ old('subcounty_id', $inputData['subcounty_id'] ?? '') == 'other' ? 'block' : 'none' }};">
     <label for="subcounty_other" class="block text-sm font-medium text-gray-700">
         Please Specify Subcounty<span class="text-red-500">*</span>
     </label>
-    <input 
-        type="text" 
-        name="subcounty_other" 
-        id="subcounty_other" 
-        value="{{ old('subcounty_other') }}"
-        class="mt-1 block w-full py-2 px-4 border border-gray-300 rounded-md shadow-sm focus:outline-none sm:text-sm">
+    <input type="text" name="subcounty_other" id="subcounty_other" 
+           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]"
+           value="{{ old('subcounty_other', $inputData['subcounty_other'] ?? '') }}">
     @error('subcounty_other')
         <span class="text-red-500 text-xs">{{ $message }}</span>
     @enderror
 </div>
+      </div>
 
-
-
-  </div>
-
-  <!-- Subcounty Field -->
-
-
-     
-
-    
-       
-
-  <div class="flex space-x-4">
-   <div class="flex-1">
-                <label for="postal_address" class="block text-sm font-medium text-gray-700">Postal Address<span class="text-red-500">*</span></label>
-                <input 
-                    type="text" 
-                    name="postal_address" 
-                    id="postal_address" 
-                    maxlength="50" 
-                    required 
-                    value="{{ old('postal_address', $inputData['postal_address'] ?? '') }}"
-                    class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                    <div class="invalid-feedback" style="display: none;">invalid.</div>
-                @error('postal_address')
-                    <span class="text-red-500 text-xs">{{ $message }}</span>
-                @enderror
-            </div>
-
-            <!-- Code Field -->
-            <div class="flex-1">
-                <label for="code" class="block text-sm font-medium text-gray-700">Code</label>
-                <input 
-                    type="text" 
-                    name="code" 
-                    id="code" 
-                    maxlength="50" 
-                    required 
-                    pattern="\d*" 
-                    value="{{ old('code', $inputData['code'] ?? '') }}"
-                    class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                    <div class="invalid-feedback" style="display: none;">invalid.</div>
-                @error('code')
-                    <span class="text-red-500 text-xs">{{ $message }}</span>
-                @enderror
-            </div>
-
-            <!-- Town/City Field -->
-            <div class="flex-1">
-                <label for="town_city" class="block text-sm font-medium text-gray-700">Town/City<span class="text-red-500">*</span></label>
-                <input 
-                    type="text" 
-                    name="town_city" 
-                    id="town_city" 
-                    maxlength="50" 
-                    required 
-                    value="{{ old('town_city', $inputData['town_city'] ?? '') }}"
-                    class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                    <div class="invalid-feedback" style="display: none;">invalid.</div>
-                @error('town_city')
-                    <span class="text-red-500 text-xs">{{ $message }}</span>
-                @enderror
-            </div>
-       </div>
-
-         <div class="flex space-x-4">
-    <!-- Telephone Number Field -->
-    <div class="flex-1">
-        <label for="telephone_num" class="block text-sm font-medium text-gray-700">Telephone Number</label>
-        <div class="flex">
-            <!-- Country Code Select -->
-            <select name="telephone_country_code" id="telephone_country_code" class="mt-1 block py-2 px-3 border border-gray-300 bg-white rounded-l-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                @foreach($countryCodes as $code)
-                    <option value="{{ $code->code }}" {{ old('telephone_country_code', $inputData['telephone_country_code'] ?? '') == $code->code ? 'selected' : '' }}>
-                        {{ $code->code }} ({{ $code->name }})
-                    </option>
-                @endforeach
-            </select>
-
-            <!-- Telephone Number Input -->
-            <input 
-                type="tel" 
-                name="telephone_num" 
-                id="telephone_num" 
-                placeholder="XXXXXXXXX" 
-                pattern="[0-9]{9}" 
-                maxlength="9" 
-                required 
-                value="{{ old('telephone_num', $inputData['telephone_num'] ?? '') }}"
-                class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-r-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+      <!-- Contact Information -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Postal Address -->
+        <div>
+          <label for="postal_address" class="block text-sm font-medium text-gray-700">Postal Address <span class="text-red-500">*</span></label>
+          <input type="text" name="postal_address" id="postal_address" maxlength="50" required
+                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]"
+                 value="{{ old('postal_address', $inputData['postal_address'] ?? '') }}">
         </div>
-        @error('telephone_num')
-            <span class="text-red-500 text-xs">{{ $message }}</span>
-        @enderror
-    </div>
 
-    <!-- Mobile Number Field -->
-    <div class="flex-1">
-        <label for="mobile_num" class="block text-sm font-medium text-gray-700">Mobile Number</label>
-        <div class="flex">
-            <!-- Country Code Select -->
-            <select name="mobile_country_code" id="mobile_country_code" class="mt-1 block py-2 px-3 border border-gray-300 bg-white rounded-l-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                @foreach($countryCodes as $code)
-                    <option value="{{ $code->code }}" {{ old('mobile_country_code', $inputData['mobile_country_code'] ?? '') == $code->code ? 'selected' : '' }}>
-                        {{ $code->code }} ({{ $code->name }})
-                    </option>
-                @endforeach
-            </select>
-
-            <!-- Mobile Number Input -->
-            <input 
-                type="tel" 
-                name="mobile_num" 
-                id="mobile_num" 
-                placeholder="XXXXXXXXX" 
-                pattern="[0-9]{9}" 
-                maxlength="9" 
-                required 
-                value="{{ old('mobile_num', $inputData['mobile_num'] ?? '') }}"
-                class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-r-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+        <!-- Postal Code -->
+        <div>
+          <label for="code" class="block text-sm font-medium text-gray-700">Postal Code <span class="text-red-500">*</span></label>
+          <input type="text" name="code" id="code" maxlength="50" required pattern="\d*"
+                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]"
+                 value="{{ old('code', $inputData['code'] ?? '') }}">
         </div>
-        @error('mobile_num')
-            <span class="text-red-500 text-xs">{{ $message }}</span>
-        @enderror
-    </div>
-</div>
 
-            <!-- Email Address Field -->
-            <div class="flex-1">
-                <label for="email_address" class="block text-sm font-medium text-gray-700">Email Address<span class="text-red-500">*</span></label>
-                <input 
-                    type="email" 
-                    name="email_address" 
-                    id="email_address" 
-                    maxlength="100" 
-                    required 
-                    value="{{ old('email_address', $inputData['email_address'] ?? '') }}"
-                    class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                    <div class="invalid-feedback" style="display: none;">invalid.</div>
-                @error('email_address')
-                    <span class="text-red-500 text-xs">{{ $message }}</span>
-                @enderror
-            </div>
-       
+        <!-- Town/City -->
+        <div>
+          <label for="town_city" class="block text-sm font-medium text-gray-700">Town/City <span class="text-red-500">*</span></label>
+          <input type="text" name="town_city" id="town_city" maxlength="50" required
+                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]"
+                 value="{{ old('town_city', $inputData['town_city'] ?? '') }}">
+        </div>
+      </div>
 
-         <div class="flex space-x-4">
-          <!-- Alternative Contact Person Field -->
-            <div class="flex-1">
-                <label for="alt_contact_person" class="block text-sm font-medium text-gray-700">Alternative Contact Person<span class="text-red-500">*</span></label>
-                <input 
-                    type="text" 
-                    name="alt_contact_person" 
-                    id="alt_contact_person" 
-                    maxlength="100" 
-                    required 
-                    value="{{ old('alt_contact_person', $inputData['alt_contact_person'] ?? '') }}"
-                    class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                    <div class="invalid-feedback" style="display: none;">invalid.</div>
-                @error('alt_contact_person')
-                    <span class="text-red-500 text-xs">{{ $message }}</span>
-                @enderror
-            </div>
+      <!-- Phone Numbers -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Telephone -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Telephone Number</label>
+          <div class="flex gap-2">
+            <select name="telephone_country_code" class="w-1/3 rounded-md border-gray-300 shadow-sm">
+              @foreach($countryCodes as $code)
+              <option value="{{ $code->code }}" {{ old('telephone_country_code', $inputData['telephone_country_code'] ?? '') == $code->code ? 'selected' : '' }}>
+                {{ $code->code }}
+              </option>
+              @endforeach
+            </select>
+            <input type="tel" name="telephone_num" placeholder="XXXXXXXXX" pattern="[0-9]{9}" maxlength="9"
+                   class="flex-1 rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]"
+                   value="{{ old('telephone_num', $inputData['telephone_num'] ?? '') }}">
+          </div>
+        </div>
 
-            <div class="flex-1">
-    <label for="alt_contact_telephone_num" class="block text-sm font-medium text-gray-700">Alternative Contact Person's Telephone Number<span class="text-red-500">*</span></label>
-    <div class="flex">
-        <!-- Country Code Select -->
-        <select name="alt_contact_country_code" id="alt_contact_country_code" class="mt-1 block py-2 px-3 border border-gray-300 bg-white rounded-l-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-            @foreach($countryCodes as $code)
-                <option value="{{ $code->code }}" {{ old('alt_contact_country_code', $inputData['alt_contact_country_code'] ?? '') == $code->code ? 'selected' : '' }}>
-    {{ $code->code }} ({{ $code->name }})
-</option>
+        <!-- Mobile -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Mobile Number</label>
+          <div class="flex gap-2">
+            <select name="mobile_country_code" class="w-1/3 rounded-md border-gray-300 shadow-sm">
+              @foreach($countryCodes as $code)
+              <option value="{{ $code->code }}" {{ old('mobile_country_code', $inputData['mobile_country_code'] ?? '') == $code->code ? 'selected' : '' }}>
+                {{ $code->code }}
+              </option>
+              @endforeach
+            </select>
+            <input type="tel" name="mobile_num" placeholder="XXXXXXXXX" pattern="[0-9]{9}" maxlength="9"
+                   class="flex-1 rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]"
+                   value="{{ old('mobile_num', $inputData['mobile_num'] ?? '') }}">
+          </div>
+        </div>
+      </div>
 
-            @endforeach
-        </select>
+      <!-- Email -->
+      <div class="grid grid-cols-1 gap-6">
+        <div>
+          <label for="email_address" class="block text-sm font-medium text-gray-700">Email Address <span class="text-red-500">*</span></label>
+          <input type="email" name="email_address" id="email_address" maxlength="100" required
+                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]"
+                 value="{{ old('email_address', $inputData['email_address'] ?? '') }}">
+        </div>
+      </div>
 
-        <!-- Alternative Contact Person's Telephone Number Input -->
-        <input 
-            type="tel" 
-            name="alt_contact_telephone_num" 
-            id="alt_contact_telephone_num" 
-            placeholder="XXXXXXXXX" 
-            pattern="[0-9]{9}" 
-            maxlength="9" 
-            required 
-            value="{{ old('alt_contact_telephone_num', $inputData['alt_contact_telephone_num'] ?? '') }}"
-            class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-r-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-    </div>
-    <small class="text-gray-500">Format: XXXXXXXXX</small>
-    @error('alt_contact_telephone_num')
-        <span class="text-red-500 text-xs">{{ $message }}</span>
-    @enderror
-</div>
+      <!-- Alternative Contact -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label for="alt_contact_person" class="block text-sm font-medium text-gray-700">Alternative Contact Person <span class="text-red-500">*</span></label>
+          <input type="text" name="alt_contact_person" id="alt_contact_person" maxlength="100" required
+                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]"
+                 value="{{ old('alt_contact_person', $inputData['alt_contact_person'] ?? '') }}">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Contact's Number <span class="text-red-500">*</span></label>
+          <div class="flex gap-2">
+            <select name="alt_contact_country_code" class="w-1/3 rounded-md border-gray-300 shadow-sm">
+              @foreach($countryCodes as $code)
+              <option value="{{ $code->code }}" {{ old('alt_contact_country_code', $inputData['alt_contact_country_code'] ?? '') == $code->code ? 'selected' : '' }}>
+                {{ $code->code }}
+              </option>
+              @endforeach
+            </select>
+            <input type="tel" name="alt_contact_telephone_num" placeholder="XXXXXXXXX" pattern="[0-9]{9}" maxlength="9" required
+                   class="flex-1 rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]"
+                   value="{{ old('alt_contact_telephone_num', $inputData['alt_contact_telephone_num'] ?? '') }}">
+          </div>
+        </div>
+      </div>
 
-       </div>
-
-<div class="flex space-x-4">
-    <!-- Are you living with a disability? Field -->
-    <div class="flex-1">
-        <label for="disability_question" class="block text-sm font-medium text-gray-700">Are you living with a disability?<span class="text-red-500">*</span></label>
-        <select 
-            name="disability_question" 
-            id="disability_question" 
-            class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+      <!-- Disability Section -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label for="disability_question" class="block text-sm font-medium text-gray-700">Living with Disability? <span class="text-red-500">*</span></label>
+          <select name="disability_question" id="disability_question" required
+                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]">
             <option value="">Select...</option>
             <option value="yes" {{ old('disability_question', $inputData['disability_question'] ?? '') == 'yes' ? 'selected' : '' }}>Yes</option>
             <option value="no" {{ old('disability_question', $inputData['disability_question'] ?? '') == 'no' ? 'selected' : '' }}>No</option>
-        </select>
-        <div class="invalid-feedback" style="display: none;">invalid.</div>
-
-        @error('disability_question')
-            <span class="text-red-500 text-xs">{{ $message }}</span>
-        @enderror
-    </div>
-</div>
-
-
-            <!-- Nature of Disability Field -->
-            <div class="flex-1 hidden" id="nature_of_disability_container">
-                <label for="nature_of_disability" class="block text-sm font-medium text-gray-700">Nature of Disability</label>
-                <input 
-                    type="text" 
-                    name="nature_of_disability" 
-                    id="nature_of_disability" 
-                    value="{{ old('nature_of_disability', $inputData['nature_of_disability'] ?? '') }}"
-                    maxlength="100" 
-                    class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                    <div class="invalid-feedback" style="display: none;">invalid.</div>
-            </div>
-
-            <!-- Registration No and Date for National Council for People with Disabilities Field -->
-            <div class="flex-1 hidden" id="ncpd_registration_no_container">
-                <label for="ncpd_registration_no" class="block text-sm font-medium text-gray-700">Registration No and Date for National Council for People with Disabilities</label>
-                <input 
-                    type="text" 
-                    name="ncpd_registration_no" 
-                    id="ncpd_registration_no" 
-                    maxlength="100" 
-                    value="{{ old('ncpd_registration_no', $inputData['ncpd_registration_no'] ?? '') }}"
-                    class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                    <div class="invalid-feedback" style="display: none;">invalid.</div>
-            </div>
-            
-      
-<div class="text-center my-4">
-    <h2 class="text-3xl font-bold">A Section For Applicants in the Service ONLY</h2>
-</div>
-
-<!-- Ministry Field -->
-<div class="flex space-x-4">
-            <div class="flex-1">
-                <label for="ministry" class="block text-sm font-medium text-gray-700">Ministry/state department/county/office of the attorney general</label>
-                <input type="text"  name="ministry" id="ministry" maxlength="100" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" value="N/A">
-            </div>
-            <div class="flex-1">
-                <label for="station" class="block text-sm font-medium text-gray-700">Station</label>
-                <input type="text"  name="station" id="station" maxlength="100" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" value="N/A">
-            </div>
+          </select>
+        </div>
+        
+        <!-- Disability Details -->
+        <div id="nature_of_disability_container" class="{{ old('disability_question') == 'yes' ? '' : 'hidden' }}">
+          <label for="nature_of_disability" class="block text-sm font-medium text-gray-700">Nature of Disability</label>
+          <input type="text" name="nature_of_disability" id="nature_of_disability" maxlength="100"
+                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]"
+                 value="{{ old('nature_of_disability', $inputData['nature_of_disability'] ?? '') }}">
         </div>
 
-        <div class="flex space-x-4">
-            <div class="flex-1">
-                <label for="personal_employment_number" class="block text-sm font-medium text-gray-700">Personal/Employment Number</label>
-                <input type="text"  name="personal_employment_number" id="personal_employment_number" maxlength="100" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" value="N/A">
-            </div>
-            <div class="flex-1">
-                <label for="present_substantive_post" class="block text-sm font-medium text-gray-700">Present Substantive Post</label>
-                <input type="text"  name="present_substantive_post" id="present_substantive_post" maxlength="100" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" value="N/A">
-            </div>
+        <div id="ncpd_registration_no_container" class="{{ old('disability_question') == 'yes' ? '' : 'hidden' }}">
+          <label for="ncpd_registration_no" class="block text-sm font-medium text-gray-700">NCPD Registration</label>
+          <input type="text" name="ncpd_registration_no" id="ncpd_registration_no" maxlength="100"
+                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]"
+                 value="{{ old('ncpd_registration_no', $inputData['ncpd_registration_no'] ?? '') }}">
         </div>
+      </div>
 
-        <div class="flex space-x-4">
-            <div class="flex-1">
-                <label for="job_grp_scale_grade" class="block text-sm font-medium text-gray-700">Job Group/Scale/Grade</label>
-                <input type="text"  name="job_grp_scale_grade" id="job_grp_scale_grade" maxlength="100" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" value="N/A">
-            </div>
-            <div class="flex-1">
-                <label for="date_of_current_appointment" class="block text-sm font-medium text-gray-700">Date of Current Appointment</label>
-                <input type="date" name="date_of_current_appointment" id="date_of_current_appointment" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-            </div>
+      <!-- Service Section -->
+      <div class="space-y-6">
+        <h3 class="text-xl font-semibold text-gray-900">For Government Employees</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label for="ministry" class="block text-sm font-medium text-gray-700">Ministry/Department</label>
+            <input type="text" name="ministry" id="ministry" maxlength="100"
+                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]"
+                   value="{{ old('ministry', $inputData['ministry'] ?? 'N/A') }}">
+          </div>
+          <div>
+            <label for="station" class="block text-sm font-medium text-gray-700">Station</label>
+            <input type="text" name="station" id="station" maxlength="100"
+                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]"
+                   value="{{ old('station', $inputData['station'] ?? 'N/A') }}">
+          </div>
+          <div>
+            <label for="personal_employment_number" class="block text-sm font-medium text-gray-700">Employment Number</label>
+            <input type="text" name="personal_employment_number" id="personal_employment_number" maxlength="100"
+                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]"
+                   value="{{ old('personal_employment_number', $inputData['personal_employment_number'] ?? 'N/A') }}">
+          </div>
+          <div>
+            <label for="present_substantive_post" class="block text-sm font-medium text-gray-700">Current Post</label>
+            <input type="text" name="present_substantive_post" id="present_substantive_post" maxlength="100"
+                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]"
+                   value="{{ old('present_substantive_post', $inputData['present_substantive_post'] ?? 'N/A') }}">
+          </div>
+          <div>
+            <label for="job_grp_scale_grade" class="block text-sm font-medium text-gray-700">Job Group</label>
+            <input type="text" name="job_grp_scale_grade" id="job_grp_scale_grade" maxlength="100"
+                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]"
+                   value="{{ old('job_grp_scale_grade', $inputData['job_grp_scale_grade'] ?? 'N/A') }}">
+          </div>
+          <div>
+            <label for="date_of_current_appointment" class="block text-sm font-medium text-gray-700">Appointment Date</label>
+            <input type="date" name="date_of_current_appointment" id="date_of_current_appointment"
+                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]"
+                   value="{{ old('date_of_current_appointment', $inputData['date_of_current_appointment'] ?? '') }}">
+          </div>
         </div>
+      </div>
 
-        <div class="flex space-x-4">
-            <div class="flex-1">
-                <label for="upgraded_post" class="block text-sm font-medium text-gray-700">Upgraded Post</label>
-                <input type="text"  name="upgraded_post" id="upgraded_post" maxlength="100" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" value="N/A">
-            </div>
-            <div class="flex-1">
-                <label for="effective_date_previous_appointment" class="block text-sm font-medium text-gray-700">Effective Date of Previous Appointment</label>
-                <input type="date" name="effective_date_previous_appointment" id="effective_date_previous_appointment" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-            </div>
-        </div>
-
-        <div class="flex space-x-4">
-            <div class="flex-1">
-                <label for="on_secondment_organization" class="block text-sm font-medium text-gray-700">On Secondment/Organization</label>
-                <input type="text"  name="on_secondment_organization" id="on_secondment_organization" maxlength="100" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" value="N/A">
-            </div>
-            <div class="flex-1">
-                <label for="designation" class="block text-sm font-medium text-gray-700">Designation</label>
-                <input type="text" name="designation"  id="designation" maxlength="100" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" value="N/A">
-            </div>
-            <div class="flex-1">
-                <label for="job_group" class="block text-sm font-medium text-gray-700">Job Group</label>
-                <input type="text"  name="job_group" id="job_group" maxlength="100" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" value="N/A">
-            </div>
-        </div>
-
-        <div class="flex space-x-4">
-            <div class="flex-1">
-                <label for="terms_of_service" class="block text-sm font-medium text-gray-700">Terms of Service</label>
-                <select name="terms_of_service" id="terms_of_service" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                    <option value="">Select...</option>
-                    <option value="permanent_n_pensionable">Permanent & Pensionable</option>
-                    <option value="contract">Contract</option>
-                    <option value="other">Other</option>
-                </select>
-            </div>
-        </div>
-
-
-
-
-      <div class="flex justify-center"> <!-- This div will center the button -->
-    <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 " >
-        Save
-    </button>
-</div>
-
-      
-  
-
-
-
-
-  
-
-
-
-
-      
-
-  
-
-
-   
+      <!-- Form Actions -->
+      <div class="flex justify-center space-x-4 mt-8">
+        
+        <button type="submit" class="px-6 py-2 bg-[#D68C3C] text-white rounded-md hover:bg-[#bf7a2e] flex items-center">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+          Save Information
+        </button>
+      </div>
     </form>
-    
   </x-card>
-  </x-layout>
+
+  <script>
+    // Dynamic Other Fields
+    document.querySelectorAll('select[data-other-target]').forEach(select => {
+      const otherDiv = document.querySelector(select.dataset.otherTarget);
+      const toggleVisibility = () => {
+        otherDiv.classList.toggle('hidden', select.value !== 'other');
+        if (select.value !== 'other') {
+          otherDiv.querySelector('input').value = '';
+        }
+      };
+      select.addEventListener('change', toggleVisibility);
+      toggleVisibility(); // Initial check
+    });
+
+    // Disability Toggle
+    const disabilityQuestion = document.getElementById('disability_question');
+    const toggleDisabilityFields = () => {
+      const visible = disabilityQuestion.value === 'yes';
+      document.getElementById('nature_of_disability_container').classList.toggle('hidden', !visible);
+      document.getElementById('ncpd_registration_no_container').classList.toggle('hidden', !visible);
+    };
+    disabilityQuestion.addEventListener('change', toggleDisabilityFields);
+    toggleDisabilityFields(); // Initial state
+
+    // Phone Number Formatting
+    document.querySelectorAll('input[type="tel"]').forEach(input => {
+      input.addEventListener('input', function() {
+        this.value = this.value.replace(/\D/g, '').slice(0, 9);
+      });
+    });
+
+    // Loading State
+    document.querySelector('form').addEventListener('submit', (e) => {
+      const submitBtn = document.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `
+        <svg class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+        </svg>
+        Saving...`;
+    });
+  </script>
+</x-layout>

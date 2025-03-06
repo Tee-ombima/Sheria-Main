@@ -1,73 +1,83 @@
-<!-- resources/views/admin/pupillages/index.blade.php -->
 <x-layout>
-    <x-card class="p-10 max-w-6xl mx-auto mt-24 bg-white rounded-lg shadow-lg">
-    
-<a href="{{ url()->previous() }}" class="inline-flex items-center px-4 py-2 bg-gray-500 text-white font-semibold text-sm rounded-lg hover:bg-gray-700">
-            ← Back
+  <!-- Main card with creamy background -->
+  <x-card class="p-8 max-w-6xl mx-auto mt-24 bg-[#FFF5E6] rounded-lg shadow-lg">
+    <!-- Back Button -->
+    <a href="{{ url()->previous() }}" class="inline-flex items-center px-4 py-2 bg-[#D68C3C] text-white rounded-md hover:bg-[#bf7a2e] transition-colors shadow-sm mb-6">
+      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+      </svg>
+      Back
+    </a>
+
+    <!-- Header Section -->
+    <div class="flex justify-between items-center mb-8">
+      <h1 class="text-3xl font-bold text-gray-900">Pupillage Applications</h1>
+      <div class="flex space-x-4">
+        <!-- Download Excel Button -->
+        <a href="{{ route('admin.pupillages.export') }}" class="inline-flex items-center px-4 py-2 bg-[#D68C3C] text-white rounded-md hover:bg-[#bf7a2e] transition-colors shadow-sm">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+          </svg>
+          Download Excel
         </a>
 
+        <!-- View Accepted Applications Button -->
+        <a href="{{ route('admin.pupillages.accepted') }}" class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors shadow-sm">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+          Accepted
+        </a>
 
-        <div class="flex justify-between items-center mb-6">
-            <h1 class="text-3xl font-bold">Pupillage Applications</h1>
-            <div class="flex space-x-2">
-                <!-- Back to Dashboard Button -->
-                
+        <!-- View Not Accepted Applications Button -->
+        <a href="{{ route('admin.pupillages.not_accepted') }}" class="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors shadow-sm">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+          Not Accepted
+        </a>
+      </div>
+    </div>
 
-                <!-- Download Excel Button -->
-                <a href="{{ route('admin.pupillages.export') }}" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow">
-                    Download All Applications Excel
+    <!-- Pupillage Applications Table -->
+    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-[#F4EDE4]">
+          <tr>
+            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Full Name</th>
+            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Email</th>
+            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Status</th>
+            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          @foreach($applications as $application)
+            <tr class="hover:bg-gray-50 transition-colors">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $application->full_name }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <a href="{{ route('admin.pupillages.show', $application->id) }}" class="text-[#D68C3C] hover:text-[#bf7a2e] hover:underline">
+                  {{ $application->email_address }}
                 </a>
-
-                <!-- View Accepted Applications Button -->
-                <a href="{{ route('admin.pupillages.accepted') }}" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg shadow">
-                    View Accepted Applications
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <span class="px-2 py-1 text-xs font-semibold rounded-full {{ $application->status === 'Accepted' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                  {{ $application->status }}
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <a href="{{ route('admin.pupillages.show', $application->id) }}" class="text-[#D68C3C] hover:text-[#bf7a2e] hover:underline">
+                  View Details
                 </a>
+              </td>
+            </tr>
+          @endforeach
+        </tbody>
+      </table>
+    </div>
 
-                <!-- View Not Accepted Applications Button -->
-                <a href="{{ route('admin.pupillages.not_accepted') }}" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg shadow">
-                    View Not Accepted Applications
-                </a>
-            </div>
-        </div>
-
-        <!-- Pupillage Applications Table -->
-        <div class="bg-white shadow-md rounded-lg mb-6">
-            <div class="p-4">
-                <table class="min-w-full">
-                    <thead>
-                        <tr>
-                            <th class="px-6 py-3 text-left">Full Name</th>
-                            <th class="px-6 py-3 text-left">Email</th>
-                            <th class="px-6 py-3 text-left">Status</th>
-                            <th class="px-6 py-3 text-left">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($applications as $application)
-                        <tr>
-                            <td class="px-6 py-4">{{ $application->full_name }}</td>
-                            <td class="px-6 py-4">
-                                <a href="{{ route('admin.pupillages.show', $application->id) }}" class="text-blue-600">
-                                    {{ $application->email_address }}
-                                </a>
-                            </td>
-                            <td class="px-6 py-4">
-                                {{ $application->status }}
-                            </td>
-                            <td class="px-6 py-4">
-                                <!-- View Details Button -->
-                                <a href="{{ route('admin.pupillages.show', $application->id) }}" class="text-blue-600 hover:text-blue-800">
-                                    View Details
-                                </a>
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-
-                <!-- Pagination Links -->
-                {{ $applications->links() }}
-            </div>
-        </div>
-    </x-card>
+    <!-- Pagination -->
+    <div class="mt-6">
+      {{ $applications->links() }}
+    </div>
+  </x-card>
 </x-layout>

@@ -14,6 +14,8 @@ return new class extends Migration
     public function up()
     {
         Schema::create('constituencies', function (Blueprint $table) {
+            $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null');
+
             $table->id();
             $table->string('name')->unique();
             $table->foreignId('homecounty_id')->constrained('homecounties')->onDelete('cascade'); // Foreign key linking to homecounties table

@@ -19,4 +19,8 @@ class Constituency extends Model
     {
         return $this->hasMany(Subcounty::class);
     }
+    public function user()
+{
+    return $this->belongsTo(User::class);
+}
 }

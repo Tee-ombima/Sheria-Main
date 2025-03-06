@@ -23,7 +23,7 @@ class InternshipApplicationFactory extends Factory
             'email' => $this->faker->unique()->safeEmail(),
             'id_file' => $this->generateDummyFilePath('id_file'), // Generate dummy file paths
             'university_letter' => $this->generateDummyFilePath('university_letter'), // Generate dummy file paths
-            'kra_pin' => $this->generateDummyFilePath('kra_pin'), // Generate dummy file paths
+            'application_letter' => $this->generateDummyFilePath('application_letter'), // Generate dummy file paths
             'insurance' => $this->generateDummyFilePath(fileType: 'insurance'), // Generate dummy file paths
             'good_conduct' => $this->generateDummyFilePath(fileType: 'good_conduct'), // Generate dummy file paths
             'cv' => $this->generateDummyFilePath(fileType: 'cv'), // Generate dummy file paths

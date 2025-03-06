@@ -36,7 +36,7 @@ public function uploadFile(Request $request)
     {
         $fieldName = $request->file('id_file') ? 'id_file' :
                      ($request->file('university_letter') ? 'university_letter' :
-                     ($request->file('kra_pin') ? 'kra_pin' :
+                     ($request->file('application_letter') ? 'application_letter' :
                      ($request->file('insurance') ? 'insurance' :
                      ($request->file('good_conduct') ? 'good_conduct' :
                      ($request->file('cv') ? 'cv' : null)))));
@@ -88,7 +88,7 @@ public function uploadFile(Request $request)
         $uploadedFiles = session()->get('uploaded_files', []);
 
         // Check if all files have been uploaded
-        $requiredFiles = ['id_file', 'university_letter', 'kra_pin', 'insurance', 'good_conduct', 'cv'];
+        $requiredFiles = ['id_file', 'university_letter', 'application_letter', 'insurance', 'good_conduct', 'cv'];
         foreach ($requiredFiles as $file) {
             if (!isset($uploadedFiles[$file])) {
                 return back()->withErrors([$file => 'Please upload the ' . ucwords(str_replace('_', ' ', $file)) . '.']);
@@ -104,7 +104,7 @@ public function uploadFile(Request $request)
             'email' => $request->email,
             'id_file' => $uploadedFiles['id_file'],
             'university_letter' => $uploadedFiles['university_letter'],
-            'kra_pin' => $uploadedFiles['kra_pin'],
+            'application_letter' => $uploadedFiles['application_letter'],
             'insurance' => $uploadedFiles['insurance'],
             'good_conduct' => $uploadedFiles['good_conduct'],
             'cv' => $uploadedFiles['cv'],
@@ -141,81 +141,81 @@ public function edit($id)
     }
 
     public function update(Request $request, $id)
-    {
-        $internship = InternshipApplication::where('id', $id)
-            ->where('user_id', Auth::id())
-            ->firstOrFail();
+{
+    $internship = InternshipApplication::where('id', $id)
+        ->where('user_id', Auth::id())
+        ->firstOrFail();
 
-        // Validate the request
-        $request->validate([
-            'full_name' => 'required|string|max:255',
-        'phone' => 'required|string|max:20',
+    // Validate the request
+    $request->validate([
+        'full_name' => 'required|string|max:255',
+        'phone' => 'required|integer',
         'institution' => 'required|string|max:255',
         'email' => 'required|email|max:255',
-        'id_file' => 'required|file|mimes:pdf|max:2048', // 5 MB
-        'university_letter' => 'required|file|mimes:pdf|max:2048', // 5 MB
-        'kra_pin' => 'required|file|mimes:pdf|max:2048', // 5 MB
-        'insurance' => 'required|file|mimes:pdf|max:2048', // 5 MB
-        'good_conduct' => 'required|file|mimes:pdf|max:2048', // 5 MB
-        'cv' => 'required|file|mimes:pdf|max:2048', // 5 MB
-        ]);
+        'id_file' => 'nullable|file|mimes:pdf|max:2048',
+        'university_letter' => 'nullable|file|mimes:pdf|max:2048',
+        'application_letter' => 'nullable|file|mimes:pdf|max:2048',
+        'insurance' => 'nullable|file|mimes:pdf|max:2048',
+        'good_conduct' => 'nullable|file|mimes:pdf|max:2048',
+        'cv' => 'nullable|file|mimes:pdf|max:2048',
+    ]);
 
-        // Update the internship application
-        $internship->update([
-            'full_name' => $request->full_name,
-            'phone' => $request->phone,
-            'institution' => $request->institution,
-            'email' => $request->email,
-        ]);
+    // Update the internship application
+    $internship->update([
+        'full_name' => $request->full_name,
+        'phone' => $request->phone,
+        'institution' => $request->institution,
+        'email' => $request->email,
+    ]);
 
-        // Handle file uploads
-        if ($request->hasFile('id_file')) {
-            // Delete old file if exists
-            if ($internship->id_file) {
-                Storage::disk('public')->delete($internship->id_file);
-            }
-            $internship->id_file = $request->file('id_file')->store('internship_files', 'public');
+    // Handle file uploads only if a new file is uploaded
+    if ($request->hasFile('id_file')) {
+        if ($internship->id_file) {
+            Storage::disk('public')->delete($internship->id_file);
         }
-
-        if ($request->hasFile('university_letter')) {
-            if ($internship->university_letter) {
-                Storage::disk('public')->delete($internship->university_letter);
-            }
-            $internship->university_letter = $request->file('university_letter')->store('internship_files', 'public');
-        }
-
-        if ($request->hasFile('kra_pin')) {
-            if ($internship->kra_pin) {
-                Storage::disk('public')->delete($internship->kra_pin);
-            }
-            $internship->kra_pin = $request->file('kra_pin')->store('internship_files', 'public');
-        }
-
-        if ($request->hasFile('insurance')) {
-            if ($internship->insurance) {
-                Storage::disk('public')->delete($internship->insurance);
-            }
-            $internship->insurance = $request->file('insurance')->store('internship_files', 'public');
-        }
-
-        if ($request->hasFile('good_conduct')) {
-            if ($internship->good_conduct) {
-                Storage::disk('public')->delete($internship->good_conduct);
-            }
-            $internship->good_conduct = $request->file('good_conduct')->store('internship_files', 'public');
-        }
-
-        if ($request->hasFile('cv')) {
-            if ($internship->cv) {
-                Storage::disk('public')->delete($internship->cv);
-            }
-            $internship->cv = $request->file('cv')->store('internship_files', 'public');
-        }
-
-        $internship->save();
-
-        return redirect()->route('internships.index')->with('message', 'Internship application updated successfully.');
+        $internship->id_file = $request->file('id_file')->store('internship_files', 'public');
     }
+
+    if ($request->hasFile('university_letter')) {
+        if ($internship->university_letter) {
+            Storage::disk('public')->delete($internship->university_letter);
+        }
+        $internship->university_letter = $request->file('university_letter')->store('internship_files', 'public');
+    }
+
+    if ($request->hasFile('application_letter')) {
+        if ($internship->application_letter) {
+            Storage::disk('public')->delete($internship->application_letter);
+        }
+        $internship->application_letter = $request->file('application_letter')->store('internship_files', 'public');
+    }
+
+    if ($request->hasFile('insurance')) {
+        if ($internship->insurance) {
+            Storage::disk('public')->delete($internship->insurance);
+        }
+        $internship->insurance = $request->file('insurance')->store('internship_files', 'public');
+    }
+
+    if ($request->hasFile('good_conduct')) {
+        if ($internship->good_conduct) {
+            Storage::disk('public')->delete($internship->good_conduct);
+        }
+        $internship->good_conduct = $request->file('good_conduct')->store('internship_files', 'public');
+    }
+
+    if ($request->hasFile('cv')) {
+        if ($internship->cv) {
+            Storage::disk('public')->delete($internship->cv);
+        }
+        $internship->cv = $request->file('cv')->store('internship_files', 'public');
+    }
+
+    $internship->save();
+
+    return redirect()->route('internships.index')->with('message', 'Internship application updated successfully.');
+}
+
 
     public function destroy($id)
     {
@@ -231,8 +231,8 @@ public function edit($id)
         if ($internship->university_letter) {
             Storage::disk('public')->delete($internship->university_letter);
         }
-        if ($internship->kra_pin) {
-            Storage::disk('public')->delete($internship->kra_pin);
+        if ($internship->application_letter) {
+            Storage::disk('public')->delete($internship->application_letter);
         }
         if ($internship->insurance) {
             Storage::disk('public')->delete($internship->insurance);

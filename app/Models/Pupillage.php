@@ -50,7 +50,12 @@ class Pupillage extends Model
         'status',
         'remarks',
     ];
-    
+    // In your Pupillage model
+protected $casts = [
+    'declaration' => 'boolean',
+    'disability_status' => 'boolean',
+    'are_you_employed' => 'boolean'
+];
 
     // Relationships
     public function user()

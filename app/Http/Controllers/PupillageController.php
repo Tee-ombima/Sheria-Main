@@ -87,7 +87,7 @@ class PupillageController extends Controller
             'are_you_employed' => 'required|in:Yes,No',
             'employer_institution_name' => 'nullable|required_if:are_you_employed,Yes|string|max:255',
             'gross_salary' => 'nullable|required_if:are_you_employed,Yes|integer|min:0',
-            'declaration' => 'accepted',
+            'declaration' => 'required|accepted',
 
         ]);
         $homeCounty = $request->home_county == 'Other' ? $request->other_home_county : Countyp::find($request->home_county)->name;
@@ -163,7 +163,7 @@ class PupillageController extends Controller
             'are_you_employed' => $request->are_you_employed,
             'employer_institution_name' => $request->employer_institution_name,
             'gross_salary' => $request->gross_salary,
-            'declaration' => $request->declaration,
+            'declaration' => $request->has(key: 'declaration'), // Convert checkbox to boolean
 
             'status' => 'Pending',
         ]);
@@ -180,9 +180,10 @@ class PupillageController extends Controller
         $countyps = Countyp::orderByRaw("name = 'other' DESC, name ASC")->get();
 
         // Fetch options from the database
-        $ksceGrades = KSCEGrade::orderByRaw("name = 'other' DESC, name ASC")->get();
-        $institutions = Institution::orderByRaw("name = 'other' DESC, name ASC")->get();
-        $institutionGrades = InstitutionGrade::orderByRaw("name = 'other' DESC, name ASC")->get();
+        // In both create() and edit() methods
+$ksceGrades = KSCEGrade::orderByRaw("grade = 'Other' DESC, grade ASC")->get();
+$institutions = Institution::orderByRaw("name = 'Other' DESC, name ASC")->get();
+$institutionGrades = InstitutionGrade::orderByRaw("grade = 'Other' DESC, grade ASC")->get();
 
         return view('pupillages.edit', compact('pupillage', 'countyps', 'ksceGrades', 'institutions', 'institutionGrades'));
     }
@@ -233,7 +234,7 @@ class PupillageController extends Controller
             'are_you_employed' => 'required|in:Yes,No',
             'employer_institution_name' => 'nullable|required_if:are_you_employed,Yes|string|max:255',
             'gross_salary' => 'nullable|required_if:are_you_employed,Yes|integer|min:0',
-            'declaration' => 'accepted',
+            'declaration' => 'required|accepted',
         ]);
         $homeCounty = $request->home_county == 'Other' ? $request->other_home_county : Countyp::find($request->home_county)->name;
 
@@ -300,7 +301,7 @@ class PupillageController extends Controller
             'are_you_employed' => $request->are_you_employed,
             'employer_institution_name' => $request->employer_institution_name,
             'gross_salary' => $request->gross_salary,
-            'declaration' => $request->declaration,
+            'declaration' => $request->has('declaration'), // Convert checkbox to boolean
         ]);
 
         return redirect()->route('internships.index')->with('message', 'Pupillage application updated successfully.');

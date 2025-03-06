@@ -1,114 +1,146 @@
 <x-layout>
-    <x-card class="p-10 max-w-full mx-auto mt-24 bg-white rounded-lg shadow-lg">
-    <a href="{{ url()->previous() }}" class="inline-flex items-center px-4 py-2 bg-gray-500 text-white font-semibold text-sm rounded-lg hover:bg-gray-700">
-    ← Back
-</a>
+  <!-- Main card with creamy background -->
+  <x-card class="p-8 max-w-6xl mx-auto mt-24 bg-[#FFF5E6] rounded-lg shadow-lg">
+    <!-- Back Button -->
+    <a href="{{ url()->previous() }}" class="inline-flex items-center px-4 py-2 bg-[#D68C3C] text-white rounded-md hover:bg-[#bf7a2e] transition-colors shadow-sm mb-6">
+      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+      </svg>
+      Back
+    </a>
 
-        <h1 class="text-3xl font-bold mb-6">Application Details</h1>
+    <!-- Page Title -->
+    <h1 class="text-3xl font-bold mb-8 text-gray-900">Application Details</h1>
 
-<div class="bg-white shadow-md rounded-lg mb-6">
-    <div class="p-4">
-        <h2 class="text-2xl font-semibold mb-4">Applicant Information</h2>
-        <p><strong>Full Name:</strong> {{ $application->full_name }}</p>
-        <p><strong>Email:</strong> {{ $application->email }}</p>
-        <p><strong>Phone Number:</strong> {{ $application->phone }}</p>
-        <p><strong>Institution Name:</strong> {{ $application->institution }}</p>
-
-        <h3 class="text-xl font-semibold mt-6 mb-4">Uploaded Documents</h3>
-        <ul class="list-disc ml-6">
-            <li>
-                <strong>ID File:</strong>
-                @if($application->id_file)
-                    <a href="{{ asset('storage/' . $application->id_file) }}" target="_blank" class="text-blue-600">View Document</a>
-                @else
-                    Not Provided
-                @endif
-            </li>
-            <li>
-                <strong>University Letter:</strong>
-                @if($application->university_letter)
-                    <a href="{{ asset('storage/' . $application->university_letter) }}" target="_blank" class="text-blue-600">View Document</a>
-                @else
-                    Not Provided
-                @endif
-            </li>
-            <li>
-                <strong>Own Application Letter:</strong>
-                @if($application->kra_pin)
-                    <a href="{{ asset('storage/' . $application->kra_pin) }}" target="_blank" class="text-blue-600">View Document</a>
-                @else
-                    Not Provided
-                @endif
-            </li>
-            <li>
-                <strong>Insurance:</strong>
-                @if($application->insurance)
-                    <a href="{{ asset('storage/' . $application->insurance) }}" target="_blank" class="text-blue-600">View Document</a>
-                @else
-                    Not Provided
-                @endif
-            </li>
-            <li>
-                <strong>Good Conduct:</strong>
-                @if($application->good_conduct)
-                    <a href="{{ asset('storage/' . $application->good_conduct) }}" target="_blank" class="text-blue-600">View Document</a>
-                @else
-                    Not Provided
-                @endif
-            </li>
-            <li>
-                <strong>Curriculum Vitae (CV):</strong>
-                @if($application->cv)
-                    <a href="{{ asset('storage/' . $application->cv) }}" target="_blank" class="text-blue-600">View Document</a>
-                @else
-                    Not Provided
-                @endif
-            </li>
-        </ul>
-    </div>
-</div>
-
-<div class="bg-white shadow-md rounded-lg mb-6">
-    <div class="p-4">
-        <form action="{{ route('admin.internships.update', $application->id) }}" method="POST">
-            @csrf
-            <div class="mb-4">
-                <label for="status" class="block text-sm font-medium text-gray-700">Application Status</label>
-                <select name="status" id="status" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                    <option value="Pending" @if($application->status == 'Pending') selected @endif>Pending</option>
-                    <option value="Accepted" @if($application->status == 'Accepted') selected @endif>Accepted</option>
-                    <option value="Not_Successful" @if($application->status == 'Not_Successful') selected @endif>Not Successful</option>
-                </select>
-            </div>
-            <div class="mb-4">
-    <label for="department_id" class="block text-sm font-medium text-gray-700">Assign to Department</label>
-    <select name="department_id" id="department_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-        <option value="">-- Select Department --</option>
-        @foreach($departments as $department)
-            <option value="{{ $department->id }}" @if($application->department_id == $department->id) selected @endif>
-                {{ $department->name }} ({{ $department->email }})
-            </option>
-        @endforeach
-    </select>
-</div>
-
-            <div class="flex justify-end">
-                <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg shadow">
-                    Update Application
-                </button>
-            </div>
-        </form>
+    <!-- Applicant Information Section -->
+    <div class="bg-white p-6 rounded-lg shadow-sm mb-8">
+      <h2 class="text-2xl font-semibold mb-6 text-gray-800">Applicant Information</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <p class="text-sm text-gray-600">Full Name</p>
+          <p class="text-lg font-medium text-gray-900">{{ $application->full_name }}</p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-600">Email</p>
+          <p class="text-lg font-medium text-gray-900">{{ $application->email }}</p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-600">Phone Number</p>
+          <p class="text-lg font-medium text-gray-900">{{ $application->phone }}</p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-600">Institution Name</p>
+          <p class="text-lg font-medium text-gray-900">{{ $application->institution }}</p>
+        </div>
+      </div>
     </div>
 
-    </x-card>
+    <!-- Uploaded Documents Section -->
+    <div class="bg-white p-6 rounded-lg shadow-sm mb-8">
+      <h3 class="text-2xl font-semibold mb-6 text-gray-800">Uploaded Documents</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <p class="text-sm text-gray-600">ID File</p>
+          @if($application->id_file)
+            <a href="{{ asset('storage/' . $application->id_file) }}" target="_blank" class="text-[#D68C3C] hover:underline">View Document</a>
+          @else
+            <p class="text-gray-500">Not Provided</p>
+          @endif
+        </div>
+        <div>
+          <p class="text-sm text-gray-600">University Letter</p>
+          @if($application->university_letter)
+            <a href="{{ asset('storage/' . $application->university_letter) }}" target="_blank" class="text-[#D68C3C] hover:underline">View Document</a>
+          @else
+            <p class="text-gray-500">Not Provided</p>
+          @endif
+        </div>
+        <div>
+          <p class="text-sm text-gray-600">Own Application Letter</p>
+          @if($application->application_letter)
+            <a href="{{ asset('storage/' . $application->application_letter) }}" target="_blank" class="text-[#D68C3C] hover:underline">View Document</a>
+          @else
+            <p class="text-gray-500">Not Provided</p>
+          @endif
+        </div>
+        <div>
+          <p class="text-sm text-gray-600">Insurance</p>
+          @if($application->insurance)
+            <a href="{{ asset('storage/' . $application->insurance) }}" target="_blank" class="text-[#D68C3C] hover:underline">View Document</a>
+          @else
+            <p class="text-gray-500">Not Provided</p>
+          @endif
+        </div>
+        <div>
+          <p class="text-sm text-gray-600">Good Conduct</p>
+          @if($application->good_conduct)
+            <a href="{{ asset('storage/' . $application->good_conduct) }}" target="_blank" class="text-[#D68C3C] hover:underline">View Document</a>
+          @else
+            <p class="text-gray-500">Not Provided</p>
+          @endif
+        </div>
+        <div>
+          <p class="text-sm text-gray-600">Curriculum Vitae (CV)</p>
+          @if($application->cv)
+            <a href="{{ asset('storage/' . $application->cv) }}" target="_blank" class="text-[#D68C3C] hover:underline">View Document</a>
+          @else
+            <p class="text-gray-500">Not Provided</p>
+          @endif
+        </div>
+      </div>
+    </div>
 
+    <!-- Update Application Form -->
+    <div class="bg-white p-6 rounded-lg shadow-sm">
+      <form action="{{ route('admin.internships.update', $application->id) }}" method="POST">
+        @csrf
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Application Status -->
+          <div>
+            <label for="status" class="block text-sm font-medium text-gray-700 mb-2">Application Status</label>
+            <select name="status" id="status" class="w-full border-gray-300 rounded-md shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]">
+              <option value="Pending" @if($application->status == 'Pending') selected @endif>Pending</option>
+              <option value="Accepted" @if($application->status == 'Accepted') selected @endif>Accepted</option>
+              <option value="Not_Successful" @if($application->status == 'Not_Successful') selected @endif>Not Successful</option>
+            </select>
+          </div>
+          <!-- Assign to Department -->
+          <div>
+            <label for="department_id" class="block text-sm font-medium text-gray-700 mb-2">Assign to Department</label>
+            <select name="department_id" id="department_id" class="w-full border-gray-300 rounded-md shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]">
+              <option value="">-- Select Department --</option>
+              @foreach($departments as $department)
+                <option value="{{ $department->id }}" @if($application->department_id == $department->id) selected @endif>
+                  {{ $department->name }} ({{ $department->email }})
+                </option>
+              @endforeach
+            </select>
+          </div>
+        </div>
+        <!-- Submit Button -->
+        <div class="flex justify-end mt-6">
+          <button type="submit" class="px-6 py-2 bg-[#D68C3C] text-white rounded-md hover:bg-[#bf7a2e] transition-colors flex items-center">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+            Update Application
+          </button>
+        </div>
+      </form>
+    </div>
+  </x-card>
 
-    <script>
-      document.querySelector("form").addEventListener("submit", function() {
-          // Show the loader
-          document.getElementById("loader").style.display = "flex";
-      });
+  <!-- Loader Script -->
+  <script>
+    document.querySelector("form").addEventListener("submit", function() {
+      const submitBtn = this.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `
+        <svg class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+        </svg>
+        Updating...`;
+    });
   </script>
-
-
 </x-layout>

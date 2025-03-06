@@ -16,9 +16,9 @@ return new class extends Migration
         Schema::create('personal_infos', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('homecounty_id')->nullable();
-            $table->unsignedBigInteger('constituency_id')->nullable();;
-            $table->unsignedBigInteger('subcounty_id')->nullable();;
+            $table->unsignedBigInteger('homecounty_id')->nullable()->default(null);
+            $table->unsignedBigInteger('constituency_id')->nullable()->default(null);
+            $table->unsignedBigInteger('subcounty_id')->nullable()->default(null);
             $table->string('surname', 100)->default('Default');
             $table->string('firstname', 100)->default('Default');
             $table->string('lastname', 100)->nullable();
@@ -53,7 +53,7 @@ return new class extends Migration
             $table->string('job_group', 100)->nullable();
             $table->string('terms_of_service')->nullable();
             $table->timestamps();
-
+        
             // Foreign Key Constraints
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('homecounty_id')->references('id')->on('homecounties')->onDelete('cascade');

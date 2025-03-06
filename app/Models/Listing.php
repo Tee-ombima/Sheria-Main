@@ -33,10 +33,12 @@ class Listing extends Model
      *
      * A listing is active if it is not archived and the deadline has not passed.
      */
-    public function getIsActiveAttribute()
-    {
-        return !$this->archived && $this->deadline->isFuture();
-    }
+    
+    // In Listing.php model
+public function getIsActiveAttribute()
+{
+    return $this->deadline > now() && !$this->archived;
+}
 
     /**
      * Scope to get only active listings.
@@ -51,8 +53,7 @@ class Listing extends Model
 
     public function scopeFilter($query, array $filters) {
         if($filters['search'] ?? false) {
-            $query->where('title', 'like', '%' . request('search') . '%')
-                ->orWhere('description', 'like', '%' . request('search') . '%');
+            $query->where('title', 'like', '%' . request('search') . '%');
         }
     }
 }

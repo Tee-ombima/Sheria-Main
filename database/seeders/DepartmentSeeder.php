@@ -16,25 +16,28 @@ class DepartmentSeeder extends Seeder
     public function run()
     {
         $departments = [
-            'Legal Affairs',
-            'International Law',
-            'Advocates Complaints Commission',
-            'Government Transactions',
-            'Registrar of Marriages',
-            'Registrar of Societies',
-            'Coat of Arms',
-            'Legislative Drafting',
-            'Legal Advisory and Research',
-            'Civil Litigation',
+            ['name' => 'Legal Affairs', 'email' => 'legal@company.com'],
+            ['name' => 'International Law', 'email' => 'internationallaw@company.com'],
+            ['name' => 'Advocates Complaints Commission', 'email' => 'complaints@company.com'],
+            ['name' => 'Government Transactions', 'email' => 'transactions@company.com'],
+            ['name' => 'Registrar of Marriages', 'email' => 'marriages@company.com'],
+            ['name' => 'Registrar of Societies', 'email' => 'societies@company.com'],
+            ['name' => 'Coat of Arms', 'email' => 'coatofarms@company.com'],
+            ['name' => 'Legislative Drafting', 'email' => 'drafting@company.com'],
+            ['name' => 'Legal Advisory and Research', 'email' => 'advisory@company.com'],
+            ['name' => 'Civil Litigation', 'email' => 'litigation@company.com'],
         ];
 
-        foreach ($departments as $department) {
-            // Create the department
-            $createdDepartment = Department::create(['name' => $department]);
+        foreach ($departments as $data) {
+            // Create department with name and email
+            $department = Department::create([
+                'name' => $data['name'],
+                'email' => $data['email'],
+            ]);
 
-            // Create 10 applicants for each department
+            // Create 10 internship applications linked to the department
             InternshipApplication::factory()->count(10)->create([
-                'department_id' => null, // Assign the created department
+                'department_id' => $department->id, // Assign the created department
                 'user_id' => \App\Models\User::factory(), // Create a user for the application
             ]);
         }

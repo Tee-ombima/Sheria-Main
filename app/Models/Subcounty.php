@@ -14,4 +14,8 @@ class Subcounty extends Model
     {
         return $this->belongsTo(Constituency::class);
     }
+    public function user()
+{
+    return $this->belongsTo(User::class);
+}
 }

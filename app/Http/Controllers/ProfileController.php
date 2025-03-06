@@ -38,203 +38,231 @@ class ProfileController extends Controller
 
     public function showPersonalInfo(Request $request)
     {
-        
-        $userId = $request->user()->id; // Assuming the user ID is available via authenticated user
+        $userId = $request->user()->id; // Authenticated user's ID
         $personalInfoSubmitted = PersonalInfo::where('user_id', $userId)->exists();
-        $inputData = $request->session()->get('inputData', default: []);
-    
-        // Retrieve and sort salutations from the database (ensure 'other' is last)
-    $salutations = Salutation::orderByRaw("name = 'other' DESC, name ASC")->get();
-    
-    // Retrieve and sort ethnicities from the database (ensure 'other' is last)
-    $ethnicities = Ethnicity::orderByRaw("name = 'other' DESC, name ASC")->get();
-    
-    // Retrieve and sort home counties from the database (ensure 'other' is last)
-    $homecounties = Homecounty::orderByRaw("name = 'other' DESC, name ASC")->get();
-    // Retrieve and sort country codes from the database (ensure 'other' is last)
-    $countryCodes = CountryCode::orderByRaw("name = 'other' DESC, name ASC")->get();
         
+        // Retrieve session data (using [] as the default value)
+        $inputData = $request->session()->get('inputData', []);
     
-        // Pass personalInfo and salutations to the view
+        // Retrieve and sort options, ensuring "other" appears last
+        $salutations = Salutation::orderByRaw("name = 'other' DESC, name ASC")->get();
+        $ethnicities = Ethnicity::orderByRaw("name = 'other' DESC, name ASC")->get();
+        $homecounties = Homecounty::where(function ($query) use ($userId) {
+            $query->where('added_by_user', false)
+                  ->orWhere('user_id', $userId);
+        })
+        ->orderByRaw("name = 'other' DESC, name ASC")
+        ->get();
+        $subcounties = Subcounty::where(function ($query) use ($userId) {
+            $query->where('added_by_user', false)
+                  ->orWhere('user_id', $userId);
+        })
+        ->orderByRaw("name = 'other' DESC, name ASC")
+        ->get();
+        $constituencies = Constituency::where(function ($query) use ($userId) {
+            $query->where('added_by_user', false)
+                  ->orWhere('user_id', $userId);
+        })
+        ->orderByRaw("name = 'other' DESC, name ASC")
+        ->get();
+        
+        
+        
+        
+        
+        $countryCodes = CountryCode::orderByRaw("CASE WHEN code = '+254' THEN 0 ELSE 1 END, name ASC")->get();
+    
         return view('users.profile.personal-info', [
-            'inputData' => $inputData,
-            'personalInfoSubmitted'=>$personalInfoSubmitted,
-            'salutations' => $salutations,
-            'ethnicities' => $ethnicities,
-            'homecounties' => $homecounties,
-            
-            'countryCodes' => $countryCodes,
-            
+            'inputData'              => $inputData,
+            'personalInfoSubmitted'  => $personalInfoSubmitted,
+            'salutations'            => $salutations,
+            'ethnicities'            => $ethnicities,
+            'homecounties'           => $homecounties,
+            'countryCodes'           => $countryCodes,
+            'subcounties' =>$constituencies,
+            'constituencies'=>$constituencies,
         ]);
     }
 
-public function savePersonalInfo(Request $request)
-{
-    // Validate the incoming request
-    $validatedData = $request->validate([
-        // Personal Information
-        'surname' => 'required|string|max:50',
-        'firstname' => 'required|string|max:50',
-        'lastname' => 'nullable|string|max:50',
-        'dob' => 'required|date',
-        'idno' => 'required|digits:8',
-        'kra_pin' => 'required|string|max:11',
-        'nationality' => 'required|string|max:50',
+    public function savePersonalInfo(Request $request)
+    {
+        // Validate incoming data with custom error messages for required_if rules
+        $validatedData = $request->validate([
+            // Personal Information
+            'surname'      => 'required|string|max:50',
+            'firstname'    => 'required|string|max:50',
+            'lastname'     => 'nullable|string|max:50',
+            'dob'          => 'required|date',
+            'idno'         => 'required|digits:8',
+            'kra_pin'      => 'required|string|max:11',
+            'nationality'  => 'required|string|max:50',
 
-        // Salutation
-        'salutation' => 'required|string|max:50',
-        'salutation_other' => 'nullable|string|max:50',
+            // Salutation
+            'salutation'         => 'required|string|max:50',
+            'salutation_other'   => 'nullable|string|max:50',
 
-        // Ethnicity
-        'ethnicity' => 'required|string|max:50',
-        'ethnicity_other' => 'nullable|string|max:50',
+            // Ethnicity
+            'ethnicity'         => 'required|string|max:50',
+            'ethnicity_other'   => 'nullable|string|max:50',
 
-        // Homecounty
-        'homecounty_id' => [
-            'required',
-            function ($attribute, $value, $fail) {
-                if ($value !== 'other' && !Homecounty::where('id', $value)->exists()) {
-                    $fail('The selected home county is invalid.');
-                }
-            },
-        ],
-        'homecounty_other' => 'required_if:homecounty_id,other|string|max:50',
-        'constituency_id' => [
-            'required',
-            function ($attribute, $value, $fail) {
-                if ($value !== 'other' && !Constituency::where('id', $value)->exists()) {
-                    $fail('The selected constituency is invalid.');
-                }
-            },
-        ],
-        'constituency_other' => 'required_if:constituency_id,other|string|max:50',
-        'subcounty_id' => [
-            'required',
-            function ($attribute, $value, $fail) {
-                if ($value !== 'other' && !Subcounty::where('id', $value)->exists()) {
-                    $fail('The selected subcounty is invalid.');
-                }
-            },
-        ],
-        'subcounty_other' => 'required_if:subcounty_id,other|string|max:50',
-
-        // Contact Information
-        'postal_address' => 'required|string',
-        'code' => 'nullable|numeric',
-        'town_city' => 'required|string|max:50',
-        'telephone_num' => 'required|integer',
-        'telephone_country_code' => 'required|string|max:50',
-
-        'mobile_num' => 'required|integer',
-        'mobile_country_code' => 'required|string|max:50',
-
-        'email_address' => 'required|email|max:100',
-        'alt_contact_person' => 'required|string|max:100',
-        'alt_contact_telephone_num' => 'required|integer',
-        'alt_contact_country_code' => 'required|string|max:50',
-
-        'disability_question' => 'nullable|string',
-        'nature_of_disability' => 'nullable|string|max:100',
-        'ncpd_registration_no' => 'nullable|string|max:100',
-
-        // Employment Information
-        'ministry' => 'nullable|string|max:100',
-        'station' => 'nullable|string|max:100',
-        'personal_employment_number' => 'nullable|string|max:100',
-        'present_substantive_post' => 'nullable|string|max:100',
-        'job_grp_scale_grade' => 'nullable|string|max:100',
-        'date_of_current_appointment' => 'nullable|date',
-        'upgraded_post' => 'nullable|string|max:100',
-        'effective_date_previous_appointment' => 'nullable|date',
-        'on_secondment_organization' => 'nullable|string|max:100',
-        'designation' => 'nullable|string|max:100',
-        'job_group' => 'nullable|string|max:100',
-        'terms_of_service' => 'nullable|string',
-    ], [
-        // Custom error messages
-        'salutation_other.required_if' => 'Please specify your salutation.',
-        'ethnicity_other.required_if' => 'Please specify your ethnicity.',
-        'homecounty_other.required_if' => 'Please specify your home county.',
-        'constituency_other.required_if' => 'Please specify your constituency.',
-        'subcounty_other.required_if' => 'Please specify your subcounty.',
-    ]);
-
-    $user_id = Auth::id();
-
-    $data = $validatedData; // Initialize $data with validated data
-
-    // Handle Salutation
-    if (strtolower($request->salutation) === 'other') {
-        $data['salutation'] = $request->salutation_other;
-    }
-
-    // Handle Ethnicity
-    if (strtolower($request->ethnicity) === 'other') {
-        $data['ethnicity'] = $request->ethnicity_other;
-    }
-
-    // Handle Homecounty
-    if (strtolower($request->homecounty_id) !== 'other') {
-        $homecounty = Homecounty::find($request->homecounty_id);
-    } else {
-        $homecounty = Homecounty::firstOrCreate(
-            ['name' => $request->homecounty_other],
-            ['added_by_user' => true]
-        );
-    }
-
-    // Handle Constituency
-    if (strtolower($request->constituency_id) !== 'other') {
-        $constituency = Constituency::find($request->constituency_id);
-    } else {
-        $constituency = Constituency::firstOrCreate(
-            [
-                'name' => $request->constituency_other,
-                'homecounty_id' => $homecounty->id,
+            // Homecounty
+            'homecounty_id'     => [
+                'required',
+                function ($attribute, $value, $fail) {
+                    if ($value !== 'other' && !Homecounty::where('id', $value)->exists()) {
+                        $fail('The selected home county is invalid.');
+                    }
+                },
             ],
-            ['added_by_user' => true]
-        );
-    }
+            'homecounty_other'  => 'nullable|required_if:homecounty_id,other|string|max:50',
 
-    // Handle Subcounty
-    if (strtolower($request->subcounty_id) !== 'other') {
-        $subcounty = Subcounty::find($request->subcounty_id);
-    } else {
-        $subcounty = Subcounty::firstOrCreate(
-            [
-                'name' => $request->subcounty_other,
-                'constituency_id' => $constituency->id,
+            // Constituency
+            'constituency_id'   => [
+                'required',
+                function ($attribute, $value, $fail) {
+                    if ($value !== 'other' && !Constituency::where('id', $value)->exists()) {
+                        $fail('The selected constituency is invalid.');
+                    }
+                },
             ],
-            ['added_by_user' => true]
+            'constituency_other'=> 'nullable|required_if:constituency_id,other|string|max:50',
+
+            // Subcounty
+            'subcounty_id'      => [
+                'required',
+                function ($attribute, $value, $fail) {
+                    if ($value !== 'other' && !Subcounty::where('id', $value)->exists()) {
+                        $fail('The selected subcounty is invalid.');
+                    }
+                },
+            ],
+            'subcounty_other'   => 'nullable|required_if:subcounty_id,other|string|max:50',
+
+            // Contact Information
+            'postal_address'             => 'required|string',
+            'code'                       => 'nullable|numeric',
+            'town_city'                  => 'required|string|max:50',
+            'telephone_num'              => 'required|integer',
+            'telephone_country_code'     => 'required|string|max:50',
+            'mobile_num'                 => 'required|integer',
+            'mobile_country_code'        => 'required|string|max:50',
+            'email_address'              => 'required|email|max:100',
+            'alt_contact_person'         => 'required|string|max:100',
+            'alt_contact_telephone_num'  => 'required|integer',
+            'alt_contact_country_code'   => 'required|string|max:50',
+
+            'disability_question'        => 'nullable|string',
+            'nature_of_disability'       => 'nullable|string|max:100',
+            'ncpd_registration_no'       => 'nullable|string|max:100',
+
+            // Employment Information
+            'ministry'                   => 'nullable|string|max:100',
+            'station'                    => 'nullable|string|max:100',
+            'personal_employment_number' => 'nullable|string|max:100',
+            'present_substantive_post'   => 'nullable|string|max:100',
+            'job_grp_scale_grade'        => 'nullable|string|max:100',
+            'date_of_current_appointment'=> 'nullable|date',
+            'upgraded_post'              => 'nullable|string|max:100',
+            'effective_date_previous_appointment' => 'nullable|date',
+            'on_secondment_organization' => 'nullable|string|max:100',
+            'designation'                => 'nullable|string|max:100',
+            'job_group'                  => 'nullable|string|max:100',
+            'terms_of_service'           => 'nullable|string',
+        ], [
+            // Custom error messages
+            'salutation_other.required_if'  => 'Please specify your salutation.',
+            'ethnicity_other.required_if'    => 'Please specify your ethnicity.',
+            'homecounty_other.required_if'   => 'Please specify your home county.',
+            'constituency_other.required_if' => 'Please specify your constituency.',
+            'subcounty_other.required_if'    => 'Please specify your subcounty.',
+        ]);
+
+        $user_id = Auth::id();
+        $data = $validatedData; // Initialize $data with validated data
+
+        // Handle Salutation – use "other" value if applicable
+        if (strtolower($request->salutation) === 'other') {
+            $data['salutation'] = $request->salutation_other;
+        }
+
+        // Handle Ethnicity – use "other" value if applicable
+        if (strtolower($request->ethnicity) === 'other') {
+            $data['ethnicity'] = $request->ethnicity_other;
+        }
+
+        // Handle Homecounty – find by ID or create a new one if "other" is chosen
+        if (strtolower($request->homecounty_id) !== 'other') {
+            $homecounty = Homecounty::find($request->homecounty_id);
+        } else {
+            $homecounty = Homecounty::firstOrCreate(
+                ['name' => $request->homecounty_other],
+                [
+                    'added_by_user' => true,
+                    'user_id' => $user_id,
+                ]
+            );
+        }
+
+        // Handle Constituency – find by ID or create a new one linked to the homecounty if "other"
+        if (strtolower($request->constituency_id) !== 'other') {
+            $constituency = Constituency::find($request->constituency_id);
+        } else {
+            
+            $constituency = Constituency::firstOrCreate(
+                ['name' => $request->constituency_other],
+                [
+                    'added_by_user' => true,
+                    'user_id' => $user_id,
+                    'homecounty_id' => $homecounty->id, // Ensure homecounty_id is set
+
+                ]
+            );
+        }
+
+        // Handle Subcounty – find by ID or create a new one linked to the constituency if "other"
+        if (strtolower($request->subcounty_id) !== 'other') {
+            $subcounty = Subcounty::find($request->subcounty_id);
+        } else {
+            $subcounty = Subcounty::firstOrCreate(
+                ['name' => $request->subcounty_other],
+                [
+                    'added_by_user' => true,
+                    'user_id' => $user_id,
+                    'constituency_id' => $constituency->id, // Ensure constituency_id is set
+
+                ]
+            );
+        }
+
+        // Update the IDs in the data array to reference the proper records
+        $data['homecounty_id'] = $homecounty->id;
+        $data['constituency_id'] = $constituency->id;
+        $data['subcounty_id'] = $subcounty->id;
+        $data['user_id'] = $user_id;
+
+        // Remove temporary "other" fields before saving
+        unset(
+            $data['salutation_other'],
+            $data['ethnicity_other'],
+            $data['homecounty_other'],
+            $data['constituency_other'],
+            $data['subcounty_other']
         );
+
+        // Save (or update) the personal info for this user
+        PersonalInfo::updateOrCreate(
+            ['user_id' => $user_id],
+            $data
+        );
+
+        // Optionally, save the data to the session
+        $request->session()->put('inputData', $data);
+
+        return redirect()
+            ->route('profile.academic-info')
+            ->with('message', 'Profile Information submitted successfully!');
     }
 
-    // Update IDs in data
-    $data['homecounty_id'] = $homecounty->id;
-    $data['constituency_id'] = $constituency->id;
-    $data['subcounty_id'] = $subcounty->id;
-    $data['user_id'] = $user_id;
-
-    // Remove 'other' fields from data
-    unset(
-        $data['salutation_other'],
-        $data['ethnicity_other'],
-        $data['homecounty_other'],
-        $data['constituency_other'],
-        $data['subcounty_other']
-    );
-
-    // Save to the database
-    PersonalInfo::updateOrCreate(
-        ['user_id' => $user_id],
-        $data
-    );
-
-    // Save the data to the session if needed
-    $request->session()->put('inputData', $data);
-
-    return redirect()->route('profile.academic-info')->with('message', 'Profile Information submitted successfully!');
-}
 
 
 
@@ -992,210 +1020,3 @@ public function updateRelevantCourse(Request $request, $id)
 
 }
 
-
-
-// public function showSummary()
-//     {
-//         if (Auth::user()->role !== 'user') {
-//             abort(403, 'Limited Action');
-//         }
-
-//         $profileData = session('profile_data', []);
-
-//         return view('users.profile.summary', compact('profileData'));
-//     }
-
-//     public function saveProfile(Request $request)
-//     {
-//         // Validate the request data
-//         $validatedData = $request->validate([
-//             // Personal Info
-//             'surname' => 'required|string|max:100',
-//             'firstname' => 'required|string|max:100',
-//             'lastname' => 'nullable|string|max:100',
-//             'salutation' => 'required|string',
-//             'dob' => 'required|date',
-//             'idno' => 'required|string',
-//             'kra_pin' => 'required|string|max:11',
-//             'gender' => 'required|in:male,female',
-//             'nationality' => 'required|string|max:50',
-//             'ethnicity' => 'required|string',
-//             'homecounty' => 'required|string',
-//             'subcounty' => 'required|string',
-//             'constituency' => 'nullable|string|max:100',
-//             'postal_address' => 'required|string',
-//             'code' => 'nullable|string',
-//             'town_city' => 'required|string|max:50',
-//             'telephone_num' => 'nullable|string',
-//             'mobile_num' => 'required|string',
-//             'email_address' => 'required|email|max:100',
-//             'alt_contact_person' => 'required|string|max:100',
-//             'alt_contact_telephone_num' => 'required|string',
-//             'disability_question' => 'nullable|string',
-//             'nature_of_disability' => 'nullable|string|max:100',
-//             'ncpd_registration_no' => 'nullable|string|max:100',
-//             'ministry' => 'required|string|max:100',
-//             'station' => 'required|string|max:100',
-//             'personal_employment_number' => 'required|string|max:100',
-//             'present_substantive_post' => 'required|string|max:100',
-//             'job_grp_scale_grade' => 'required|string|max:100',
-//             'date_of_current_appointment' => 'nullable|date',
-//             'upgraded_post' => 'required|string|max:100',
-//             'effective_date_previous_appointment' => 'nullable|date',
-//             'on_secondment_organization' => 'required|string|max:100',
-//             'designation' => 'required|string|max:100',
-//             'job_group' => 'required|string|max:100',
-//             'terms_of_service' => 'nullable|string',
-
-//             // Academic Info
-//             'institution_name' => 'required|string|max:100',
-//             'student_admission_no' => 'nullable|string|max:100',
-//             'highschool' => 'required|string',
-//             'specialisation' => 'required|string',
-//             'award' => 'required|string',
-//             'course' => 'required|string',
-//             'grade' => 'required|string|max:100',
-//             'certificate_no' => 'required|string|max:100',
-//             'start_date' => 'nullable|date',
-//             'end_date' => 'nullable|date',
-//             'graduation_completion_date' => 'nullable|date',
-
-//             // Professional Info
-//             'prof_institution_name' => 'required|string|max:100',
-//             'prof_student_admission_no' => 'nullable|string|max:100',
-//             'prof_area_of_study_high_school_level' => 'required|string',
-//             'prof_area_of_specialisation' => 'required|string',
-//             'prof_award' => 'required|string',
-//             'prof_course' => 'nullable|string|max:100',
-//             'prof_grade' => 'required|string|max:100',
-//             'prof_certificate_no' => 'nullable|string|max:100',
-//             'prof_start_date' => 'required|date',
-//             'prof_end_date' => 'required|date',
-
-//             // Relevant Courses Info
-//             'rel_institution_name' => 'required|string|max:100',
-//             'rel_course' => 'required|string|max:100',
-//             'rel_certificate_no' => 'nullable|string|max:100',
-//             'rel_issue_date' => 'required|date',
-//         ]);
-
-//         $user_id = Auth::id();
-
-//         // ProfileInfo::create(array_merge($validatedData, ['user_id' => $user_id]));
-
-//         return redirect()->route('/')->with('message', 'Profile information saved successfully!');
-//     }
-
-
-
-
-
-// }
-
-// public function showProBodies()
-// {
-//     if (Auth::user()->role !== 'user') {
-//         abort(403, 'Limited Action');
-//     }
-//     // Retrieve stored data from session
-//     $data = session()->get('profileData', []);
-//     return view('users.profile.pro-bodies', compact('data'));
-// }
-
-// public function saveProBodies(Request $request)
-// {
-//     if (Auth::user()->role !== 'user') {
-//         abort(403, 'Limited Action');
-//     }
-//     // Define validation rules
-//     $rules = [
-//         'professional_body' => 'required|max:100',
-//         'membership_type' => 'required|max:100',
-//         'membership_num' => 'required|max:100',
-//         'mem_start_date' => 'required|date',
-//         'mem_end_date' => 'required|date',
-//     ];
-
-//     // Validate and save data
-//     $validatedData = $request->validate($rules);
-
-//     // Store data in session
-//     session()->put('profileData', array_merge(session()->get('profileData', []), $validatedData));
-
-//     // Redirect to the next step
-//     return redirect()->route('profile.emp-details');
-// }
-
-
-// public function showEmpDetails()
-// {
-//     if (Auth::user()->role !== 'user') {
-//         abort(403, 'Limited Action');
-//     }
-//     // Retrieve stored data from session
-//     $data = session()->get('profileData', []);
-//     return view('users.profile.emp-details', compact('data'));
-// }
-
-// public function saveEmpDetails(Request $request)
-// {
-//     if (Auth::user()->role !== 'user') {
-//         abort(403, 'Limited Action');
-//     }
-//     // Define validation rules
-//     $rules = [
-//         'position' => 'required|max:100',
-//         'salary' => 'required|max:100',
-//         'ministry' => 'required|max:100',
-//         'nature_of_work' => 'required|max:100',
-//         'emp_start_date' => 'required|date',
-//         'emp_end_date' => 'required|date',
-//     ];
-
-//     // Validate and save data
-//     $validatedData = $request->validate($rules);
-
-//     // Store data in session
-//     session()->put('profileData', array_merge(session()->get('profileData', []), $validatedData));
-
-//     // Redirect to the next step
-//     return redirect()->route('profile.referees');
-// }
-
-
-// public function showReferees()
-// {
-//     if (Auth::user()->role !== 'user') {
-//         abort(403, 'Limited Action');
-//     }
-//     // Retrieve stored data from session
-//     $data = session()->get('profileData', []);
-//     return view('users.profile.referees', compact('data'));
-// }
-
-// public function saveReferees(Request $request)
-// {
-//     if (Auth::user()->role !== 'user') {
-//         abort(403, 'Limited Action');
-//     }
-//     // Define validation rules
-//     $rules = [
-//         'ref_surname' => 'required|max:100',
-//         'ref_firstname' => 'required|max:100',
-//         'ref_postal_address' => 'required|max:255',
-//         'ref_code' => 'required|max:100',
-//         'ref_town_city' => 'required|max:100',
-//         'ref_mobile' => 'required|max:100',
-//         'ref_email_address' => 'required|email|max:100',
-//         'ref_designation' => 'required|integer',
-//     ];
-
-//     // Validate and save data
-//     $validatedData = $request->validate($rules);
-
-//     // Store data in session
-//     session()->put('profileData', array_merge(session()->get('profileData', []), $validatedData));
-
-//     // Redirect to the next step
-//     return redirect()->route('profile.summary');
-// }

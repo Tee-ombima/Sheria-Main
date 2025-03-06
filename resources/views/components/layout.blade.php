@@ -109,7 +109,37 @@
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
+/* Create hover buffer zone */
+.group:hover .dropdown-buffer {
+    display: block !important;
+}
 
+/* Smooth transitions */
+.group .absolute {
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.group:hover .absolute {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.group:hover .group-hover\:block {
+    display: block;
+}
+
+.transition-all {
+    transition-property: all;
+}
+
+.duration-300 {
+    transition-duration: 300ms;
+}
+
+.ease-out {
+    transition-timing-function: ease-out;
+}
 /* Keyframes for spinner animation */
 @keyframes spin {
     to {
@@ -118,7 +148,20 @@
 }
 
     </style>
-
+<style>
+.rotate-90 {
+    transform: rotate(90deg);
+}
+.rotate-180 {
+    transform: rotate(180deg);
+}
+.bg-admin-menu {
+    background-color: #3a4f29;
+}
+.hover\:bg-green-800:hover {
+    background-color: #2d3f1f;
+}
+</style>
 </head>
 
 <body class="mb-48 mt-16"> <!-- Adjust the margin-top to match the height of your navbar -->
@@ -153,28 +196,37 @@
       </li>
       @if(auth()->user()->role === 'user')
 
-      <li class="relative">
-        <button onclick="toggleUserProfileDropdown()" class="hover:text-laravel flex items-center" id="menu-button" aria-expanded="true" aria-haspopup="true">
-          <i class="fa-solid fa-user" style="color: #ffffff;"></i>
-          <span class="ml-2" style="color: #ffffff;">My Profile</span>
-          <!-- Heroicon name: solid/chevron-down -->
-          <svg class="ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" style="color: #ffffff;">
-              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-          </svg>
-        </button>
+      <li class="relative group">
+    <button class="hover:text-laravel text-white flex items-center gap-1 group" id="menu-button">
+        <i class="fa-solid fa-user" style="color: #ffffff;"></i>
+        <span class="ml-2">My Profile</span>
+        <svg class="ml-2 h-5 w-5 transform group-hover:rotate-180 transition-transform" 
+             xmlns="http://www.w3.org/2000/svg" 
+             viewBox="0 0 20 20" 
+             fill="currentColor">
+            <path fill-rule="evenodd" 
+                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" 
+                  clip-rule="evenodd" />
+        </svg>
+    </button>
 
-        <ul class="absolute hidden mt-2 w-48 bg-white shadow-lg rounded-md py-2 z-10" id="dropdownMenu" style="background-color: #3a4f29;">
-            @foreach(['personal-info' => 'Personal Info', 'academic-info' => 'Academic Information', 'prof-info' => 'Professional Information', 'relevant-courses' => 'Other relevant courses', 'attachments' => 'Attachments'] as $formName => $displayName)
-                <li>
-                    <a class="block px-4 py-2 hover:bg-green-800" href="{{ route('profile.' . $formName) }}" id="{{ $formName }}" style="color: #ffffff;">
-                        {{ $displayName }}
-                    </a>
-                </li>
-            @endforeach
-
+    <div class="absolute hidden group-hover:block shadow-lg rounded-lg w-48 pt-1 -mt-1 left-0 top-full transition-all duration-300 ease-out z-20">
+        <div class="p-2" style="background-color: #3a4f29;">
+            <!-- Invisible buffer zone -->
+            <div class="absolute -top-4 left-0 w-full h-4"></div>
             
-        </ul>
-      </li>
+            @foreach(['personal-info' => 'Personal Info', 'academic-info' => 'Academic Information', 
+                    'prof-info' => 'Professional Information', 'relevant-courses' => 'Other relevant courses', 
+                    'attachments' => 'Attachments'] as $formName => $displayName)
+                <a class="flex items-center px-4 py-2 text-sm text-white hover:bg-green-800 transition-colors" 
+                   href="{{ route('profile.' . $formName) }}">
+                    <i class="fa-solid fa-chevron-right mr-2 text-sm text-laravel"></i>
+                    {{ $displayName }}
+                </a>
+            @endforeach
+        </div>
+    </div>
+</li>
 
 
 
@@ -183,178 +235,276 @@
 
       @if(auth()->user()->role === 'user')
       <li class="relative group">
-        <a href="{{ route('internships.index') }}" class="hover:text-laravel text-white" style="color: #ffffff;">
-            <i class="fa-solid fa-briefcase" style="color: #ffffff;"></i> Opportunities
-        </a>
-        
-    </li>
-    <!-- View Advertised Jobs Link -->
-<li class="ml-6">
-    <a class="flex items-center hover:text-laravel" href="{{ route('index') }}">
-        <!-- SVG Icon for briefcase -->
-        <svg class="h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" style="color: #ffffff;">
-            <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v2H2v4a2 2 0 002 2v6a2 2 0 002 2h8a2 2 0 002-2v-6a2 2 0 002-2V6h-2V4a2 2 0 00-2-2H6zm8 4V4H6v2h8zM4 10v6h12v-6H4z" clip-rule="evenodd" />
-        </svg>
-        <span style="color: #ffffff;">Advertised Jobs</span>
+    <a href="#" class="hover:text-laravel text-white flex items-center gap-1 ">
+        <i class="fa-solid fa-graduation-cap" style="color: #ffffff;"></i>
+        Programs
+        <i class="fa-solid fa-caret-down ml-1"></i>
+    </a>
+    
+    <!-- Dropdown menu -->
+    <div class="absolute hidden group-hover:block shadow-lg rounded-lg w-64 pt-1 -mt-1 left-0 top-full transition-all duration-300 ease-out" style="background-color: #3a4f29;">
+        <div class="p-2">
+            <!-- Add invisible buffer area -->
+            <div class="absolute -top-4 left-0 w-full h-4"></div>
+            
+            <!-- Law Student Programs -->
+            <p class="text-xs text-gray-300 px-3 py-1 uppercase font-semibold">Legal Programs</p>
+            <a href="{{ route('pupillages.create') }}" class="flex items-center px-4 py-2 text-sm text-white hover:bg-green-800">
+                <i class="fa-solid fa-scale-balanced mr-2 text-laravel"></i>
+                Pupillage Program
+            </a>
+            <a href="{{ route('postPupillages.create') }}" class="flex items-center px-4 py-2 text-sm text-white hover:bg-green-800">
+                <i class="fa-solid fa-gavel mr-2 text-laravel"></i>
+                Post-Pupillage Program
+            </a>
+
+            <!-- Non-Law Programs -->
+            <p class="text-xs text-gray-300 px-3 py-1 mt-2 uppercase font-semibold">Attachment Programs</p>
+            <a href="{{ route('internships.create') }}" class="flex items-center px-4 py-2 text-sm text-white hover:bg-green-800">
+                <i class="fa-solid fa-building mr-2 text-laravel"></i>
+                Campus Attachment Program
+            </a>
+
+            <!-- Application Status Section -->
+            <div class="border-t border-green-700 my-2"></div>
+            <a href="{{ route('internships.index') }}" class="flex items-center px-4 py-2 text-sm text-white hover:bg-green-800">
+                <i class="fa-solid fa-file-lines mr-2 text-laravel"></i>
+                View Application Status
+            </a>
+        </div>
+    </div>
+</li>
+ <!-- Career Center Section -->
+<li class="relative group ml-6">
+    <a href="#" class="hover:text-laravel text-white flex items-center gap-1">
+        <i class="fa-solid fa-briefcase" style="color: #ffffff;"></i>
+        Career Center
+        <i class="fa-solid fa-caret-down ml-1"></i>
+    </a>
+    
+    <!-- Dropdown Menu -->
+    <div class="absolute hidden group-hover:block shadow-lg rounded-lg w-64 pt-1 -mt-1 left-0 top-full transition-all duration-300 ease-out z-20" style="background-color: #3a4f29;">
+        <div class="p-2">
+            <!-- Invisible buffer area -->
+            <div class="absolute -top-4 left-0 w-full h-4"></div>
+
+            <!-- Advertised Jobs -->
+            <a class="flex items-center px-4 py-2 text-sm text-white hover:bg-green-800" 
+               href="{{ route('index') }}">
+                <i class="fa-solid fa-bullhorn mr-2 text-laravel"></i>
+                View Advertised Jobs
+            </a>
+
+            <!-- Application Status -->
+            <a class="flex items-center px-4 py-2 text-sm text-white hover:bg-green-800" 
+               href="/my-applications">
+                <i class="fa-solid fa-clipboard-list mr-2 text-laravel"></i>
+                Application Status
+            </a>
+
+            
+    </div>
+</li>
+
+      @endif
+      
+
+      @if(auth()->user()->role === 'admin')
+<!-- Admin Menu Section -->
+<li class="relative group">
+    <!-- Manage Users -->
+    <a href="{{ route('admin.role-management') }}" class="hover:text-laravel text-white flex items-center gap-1 ml-6">
+        <i class="fa-solid fa-users-cog"></i>
+        Manage Users
     </a>
 </li>
 
+@if(auth()->user()->role === 'admin')
+<li class="relative group ml-6">
+    <button class="hover:text-laravel text-white flex items-center gap-1 group">
+        <i class="fa-solid fa-briefcase"></i>
+        Manage Careers
+        <svg class="ml-1 h-5 w-5 transform group-hover:rotate-180 transition-transform" 
+             xmlns="http://www.w3.org/2000/svg" 
+             viewBox="0 0 20 20" 
+             fill="currentColor">
+            <path fill-rule="evenodd" 
+                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" 
+                  clip-rule="evenodd" />
+        </svg>
+    </button>
 
-      <li>
-        <a href="/my-applications" class="hover:text-laravel" style="color: #ffffff;"><i class="fa-solid fa-clipboard" style="color: #ffffff;"></i> View your job applications</a>
-      </li>
-
-      @endif
-      @if(auth()->user()->role === 'admin')
-    <!-- Manage Users Tab (Only for Admins) -->
-    <li>
-        <a href="{{ route('admin.role-management') }}" class="hover:text-laravel" style="color: #ffffff;">
-            <i class="fa-solid fa-users-cog" style="color: #ffffff;"></i> Manage Users
-        </a>
-    </li>
-    
-<li>
-        <a href="{{ route('admin.index') }}" class="hover:text-laravel" style="color: #ffffff;"><i class="fa-solid fa-clipboard-list" style="color: #ffffff;"></i> Manage Job Applications</a>
-      </li>
-
+    <div class="absolute hidden group-hover:block shadow-lg rounded-lg w-48 pt-1 -mt-1 left-0 top-full transition-all duration-300 ease-out z-20 bg-admin-menu">
+        <div class="p-2">
+            <a class="flex items-center px-4 py-2 text-sm text-white hover:bg-green-800" 
+               href="/listings/create">
+                <i class="fa-solid fa-plus-circle mr-2"></i>
+                Create New Job Career
+            </a>
+            <a class="flex items-center px-4 py-2 text-sm text-white hover:bg-green-800" 
+               href="/listings">
+                <i class="fa-solid fa-list-check mr-2"></i>
+                Manage existing Careers
+            </a>
+        </div>
+    </div>
+</li>
 @endif
-
-      @if(auth()->user()->role === 'admin')
 <!-- Trainings & Programs Dropdown -->
-<li class="relative">
-    <button onclick="toggleProgramsDropdown('programs-dropdown')" class="hover:text-laravel flex items-center" id="programs-menu-button" aria-expanded="true" aria-haspopup="true">
-        <i class="fa-solid fa-graduation-cap" style="color: #ffffff;"></i>
-        <span class="ml-2" style="color: #ffffff;">Trainings & Programs</span>
-        <!-- Heroicon name: solid/chevron-down -->
-        <svg class="ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="currentColor" style="color: #ffffff;" viewBox="0 0 20 20" aria-hidden="true">
-            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414L10 13.414l-4.707-4.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+<li class="relative ml-6">
+    <button onclick="toggleMainDropdown('programs-dropdown')" class="hover:text-laravel text-white flex items-center gap-1">
+        <i class="fa-solid fa-graduation-cap"></i>
+        Trainings & Programs
+        <svg class="ml-1 h-5 w-5 transform" id="programs-chevron" 
+             xmlns="http://www.w3.org/2000/svg" 
+             viewBox="0 0 20 20" 
+             fill="currentColor">
+            <path fill-rule="evenodd" 
+                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" 
+                  clip-rule="evenodd" />
         </svg>
     </button>
 
-    <ul class="absolute hidden mt-2 w-48 shadow-lg rounded-md py-2 z-10" id="programs-dropdown" style="background-color: #3a4f29;">
-        <!-- Attachees Submenu -->
-        <li class="relative">
-            <button onclick="toggleSubDropdown('attachees-dropdown')" class="block w-full text-left px-4 py-2 hover:bg-green-800" style="color: #ffffff;">
-                Attachees
-                <svg class="inline-block ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="currentColor" style="color: #ffffff;" viewBox="0 0 20 20" aria-hidden="true">
-                    <path fill-rule="evenodd" d="M6 8l4 4 4-4H6z" clip-rule="evenodd" />
-                </svg>
-            </button>
-            <ul class="absolute hidden left-full top-0 mt-0 w-48 shadow-lg rounded-md py-2 z-10" id="attachees-dropdown" style="background-color: #3a4f29;">
-                <li>
-                    <a class="block px-4 py-2 hover:bg-green-800" href="{{ route('admin.departments.index') }}" style="color: #ffffff;">
-                        Create Attachee's Department
-                    </a>
-                </li>
-                <li>
-            <form action="{{ route('admin.internships.toggleApply') }}" method="POST">
-                @csrf
-                <button type="submit" class="block w-full text-left px-4 py-2 hover:bg-green-800" style="color: #ffffff;">
-                    @if($internshipApplicationsEnabled)
-                        Disable Attachee's Applications
-                    @else
-                        Enable Attachee's Applications
-                    @endif
+    <!-- Main Dropdown -->
+    <div class="absolute hidden shadow-lg rounded-lg w-64 pt-1 left-0 top-full transition-all duration-300 ease-out z-20 bg-admin-menu" id="programs-dropdown">
+        <div class="p-2">
+            <!-- Dashboard Section -->
+            <a class="flex items-center px-4 py-2 text-sm text-white hover:bg-green-800" 
+               href="{{ route('admin.dashboard') }}">
+                <i class="fa-solid fa-gauge-high mr-2"></i> <!-- Dashboard icon -->
+                Dashboard
+            </a>
+
+            <!-- Attachees Submenu -->
+            <div class="relative">
+                <button onclick="toggleSubDropdown('attachees-dropdown', this)" class="w-full text-left flex items-center justify-between px-4 py-2 text-sm text-white hover:bg-green-800">
+                    <div class="flex items-center">
+                        <i class="fa-solid fa-user-graduate mr-2 text-laravel"></i>
+                        Attachees
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-xs submenu-arrow"></i>
                 </button>
-            </form>
-        </li>
-                <li>
-                    <a class="block px-4 py-2 hover:bg-green-800" href="{{ route('admin.internships.index') }}" style="color: #ffffff;">
-                        Manage Attachment Applications
-                    </a>
-                </li>
-            </ul>
-        </li>
+                <!-- Nested Dropdown -->
+                <div class="absolute hidden left-full top-0 ml-1 w-56 shadow-lg rounded-lg z-30 bg-admin-menu" id="attachees-dropdown">
+                    <div class="p-2">
+                        <a class="flex items-center px-4 py-2 text-sm text-white hover:bg-green-800" 
+                           href="{{ route('admin.departments.index') }}">
+                            <i class="fa-solid fa-building mr-2"></i>
+                            Create Department
+                        </a>
+                        <form action="{{ route('admin.internships.toggleApply') }}" method="POST">
+                            @csrf
+                            <button type="submit" class="w-full text-left flex items-center px-4 py-2 text-sm text-white hover:bg-green-800">
+                                <i class="fa-solid fa-toggle-{{ $internshipApplicationsEnabled ? 'on' : 'off' }} mr-2"></i>
+                                {{ $internshipApplicationsEnabled ? 'Disable' : 'Enable' }} Applications
+                            </button>
+                        </form>
+                        <a class="flex items-center px-4 py-2 text-sm text-white hover:bg-green-800" 
+                           href="{{ route('admin.internships.index') }}">
+                            <i class="fa-solid fa-list-check mr-2"></i>
+                            Manage Applications
+                        </a>
+                    </div>
+                </div>
+            </div>
 
-        <!-- Pupillage Submenu -->
-        <li class="relative">
-            <button onclick="toggleSubDropdown('pupillage-dropdown')" class="block w-full text-left px-4 py-2 hover:bg-green-800" style="color: #ffffff;">
-                Pupillage
-                <svg class="inline-block ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="currentColor" style="color: #ffffff;" viewBox="0 0 20 20" aria-hidden="true">
-                    <path fill-rule="evenodd" d="M6 8l4 4 4-4H6z" clip-rule="evenodd" />
-                </svg>
-            </button>
-            <ul class="absolute hidden left-full top-0 mt-0 w-48 shadow-lg rounded-md py-2 z-10" id="pupillage-dropdown" style="background-color: #3a4f29;">
-                <li>
-                    <a class="block px-4 py-2 hover:bg-green-800" href="{{ route('admin.pupillages.index') }}" style="color: #ffffff;">
-                        Manage Pupillages
-                    </a>
-                </li>
-                <li>
-                    <form action="{{ route('admin.pupillages.toggleApply') }}" method="POST">
-                        @csrf
-                        <button type="submit" class="block w-full text-left px-4 py-2 hover:bg-green-800" style="color: #ffffff;">
-                            @if($pupillageApplicationsEnabled)
-                                Disable Pupillage Applications
-                            @else
-                                Enable Pupillage Applications
-                            @endif
-                        </button>
-                    </form>
-                </li>
-            </ul>
-        </li>
+            <!-- Pupillage Submenu -->
+            <div class="relative">
+                <button onclick="toggleSubDropdown('pupillage-dropdown', this)" class="w-full text-left flex items-center justify-between px-4 py-2 text-sm text-white hover:bg-green-800">
+                    <div class="flex items-center">
+                        <i class="fa-solid fa-scale-balanced mr-2 text-laravel"></i>
+                        Pupillage
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-xs submenu-arrow"></i>
+                </button>
+                <!-- Nested Dropdown -->
+                <div class="absolute hidden left-full top-0 ml-1 w-56 shadow-lg rounded-lg z-30 bg-admin-menu" id="pupillage-dropdown">
+                    <div class="p-2">
+                        <a class="flex items-center px-4 py-2 text-sm text-white hover:bg-green-800" 
+                           href="{{ route('admin.pupillages.index') }}">
+                            <i class="fa-solid fa-gear mr-2"></i>
+                            Manage Pupillages
+                        </a>
+                        <form action="{{ route('admin.pupillages.toggleApply') }}" method="POST">
+                            @csrf
+                            <button type="submit" class="w-full text-left flex items-center px-4 py-2 text-sm text-white hover:bg-green-800">
+                                <i class="fa-solid fa-toggle-{{ $pupillageApplicationsEnabled ? 'on' : 'off' }} mr-2"></i>
+                                {{ $pupillageApplicationsEnabled ? 'Disable' : 'Enable' }} Applications
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
 
-        <!-- Post Pupillage Submenu -->
-<li class="relative">
-    <button onclick="toggleSubDropdown('post-pupillage-dropdown')" class="block w-full text-left px-4 py-2 hover:bg-green-800" style="color: #ffffff;">
-        Post Pupillage
-        <svg class="inline-block ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="currentColor" style="color: #ffffff;" viewBox="0 0 20 20" aria-hidden="true">
-            <path fill-rule="evenodd" d="M6 8l4 4 4-4H6z" clip-rule="evenodd" />
+            <!-- Post Pupillage Submenu -->
+            <div class="relative">
+                <button onclick="toggleSubDropdown('post-pupillage-dropdown', this)" class="w-full text-left flex items-center justify-between px-4 py-2 text-sm text-white hover:bg-green-800">
+                    <div class="flex items-center">
+                        <i class="fa-solid fa-gavel mr-2 text-laravel"></i>
+                        Post Pupillage
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-xs submenu-arrow"></i>
+                </button>
+                <!-- Nested Dropdown -->
+                <div class="absolute hidden left-full top-0 ml-1 w-56 shadow-lg rounded-lg z-30 bg-admin-menu" id="post-pupillage-dropdown">
+                    <div class="p-2">
+                        <a class="flex items-center px-4 py-2 text-sm text-white hover:bg-green-800" 
+                           href="{{ route('admin.postPupillages.index') }}">
+                            <i class="fa-solid fa-gear mr-2"></i>
+                            Manage Post Pupillage
+                        </a>
+                        <form action="{{ route('admin.postPupillages.toggleApply') }}" method="POST">
+                            @csrf
+                            <button type="submit" class="w-full text-left flex items-center px-4 py-2 text-sm text-white hover:bg-green-800">
+                                <i class="fa-solid fa-toggle-{{ $postPupillageApplicationsEnabled ? 'on' : 'off' }} mr-2"></i>
+                                {{ $postPupillageApplicationsEnabled ? 'Disable' : 'Enable' }} Applications
+                            </button>
+                        </form>
+                        <a class="flex items-center px-4 py-2 text-sm text-white hover:bg-green-800" 
+                           href="{{ route('admin.postPupillages.editVacancyNumber') }}">
+                            <i class="fa-solid fa-pen-to-square mr-2"></i>
+                            Edit Vacancy Number
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</li>
+
+<!-- Admin Reports Dropdown -->
+<li class="relative group ml-6">
+    <button class="hover:text-laravel text-white flex items-center gap-1 group">
+        <i class="fa-solid fa-chart-line"></i>
+        Analytics & Reports
+        <svg class="ml-1 h-5 w-5 transform group-hover:rotate-180 transition-transform" 
+             xmlns="http://www.w3.org/2000/svg" 
+             viewBox="0 0 20 20" 
+             fill="currentColor">
+            <path fill-rule="evenodd" 
+                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" 
+                  clip-rule="evenodd" />
         </svg>
     </button>
-    <ul class="absolute hidden left-full top-0 mt-0 w-48 shadow-lg rounded-md py-2 z-10" id="post-pupillage-dropdown" style="background-color: #3a4f29;">
-        <li>
-            <a class="block px-4 py-2 hover:bg-green-800" href="{{ route('admin.postPupillages.index') }}" style="color: #ffffff;">
-                Manage Post Pupillage
-            </a>
-        </li>
-        <li>
-            <form action="{{ route('admin.postPupillages.toggleApply') }}" method="POST">
-                @csrf
-                <button type="submit" class="block w-full text-left px-4 py-2 hover:bg-green-800" style="color: #ffffff;">
-                    @if($postPupillageApplicationsEnabled)
-                        Disable Post Pupillage Applications
-                    @else
-                        Enable Post Pupillage Applications
-                    @endif
-                </button>
-            </form>
-        </li>
-        <li>
-            <a class="block px-4 py-2 hover:bg-green-800" href="{{ route('admin.postPupillages.editVacancyNumber') }}" style="color: #ffffff;">
-                Edit Vacancy Number
-            </a>
-        </li>
-    </ul>
-</li>
 
-    </ul>
+    <div class="absolute hidden group-hover:block shadow-lg rounded-lg w-48 pt-1 -mt-1 left-0 top-full transition-all duration-300 ease-out z-20" style="background-color: #3a4f29;">
+        <div class="p-2">
+            <div class="absolute -top-4 left-0 w-full h-4"></div>
+            <a class="flex items-center px-4 py-2 text-sm text-white hover:bg-green-800" 
+               href="{{ route('admin.reports.selected') }}">
+                <i class="fa-solid fa-user-check mr-2 text-laravel"></i>
+                Shortlisted for Interview
+            </a>
+            <a class="flex items-center px-4 py-2 text-sm text-white hover:bg-green-800" 
+               href="{{ route('admin.reports.appointed') }}">
+                <i class="fa-solid fa-badge-check mr-2 text-laravel"></i>
+                Final Appointees
+            </a>
+            <div class="border-t border-green-700 my-2"></div>
+            
+        </div>
+    </div>
 </li>
-    <!-- Make Updates Dropdown -->
-    <li class="relative">
-        <button onclick="toggleAdminReportsDropdown('updates-dropdown')" class="hover:text-laravel flex items-center" id="updates-menu-button" aria-expanded="true" aria-haspopup="true">
-            <i class="fa-solid fa-chart-line" style="color: #ffffff;"></i>
-            <span class="ml-2" style="color: #ffffff;">Admin Reports</span>
-            <!-- Heroicon name: solid/chevron-down -->
-            <svg class="ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="currentColor" style="color: #ffffff;" viewBox="0 0 20 20" aria-hidden="true">
-                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414L10 13.414l-4.707-4.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-            </svg>
-        </button>
-
-        <ul class="absolute hidden mt-2 w-48 shadow-lg rounded-md py-2 z-10" id="updates-dropdown" style="background-color: #3a4f29;">
-            <li>
-                <a class="block px-4 py-2 hover:bg-green-800" href="{{ route('admin.reports.selected') }}" style="color: #ffffff;">
-                    Selected for Interview
-                </a>
-            </li>
-            <li>
-                <a class="block px-4 py-2 hover:bg-green-800" href="{{ route('admin.reports.appointed') }}" style="color: #ffffff;">
-                    Appointed
-                </a>
-            </li>
-        </ul>
-    </li>
 @endif
 
       <li>
@@ -924,48 +1074,62 @@ $(document).ready(function(){
         });
     });
 </script>
-<!-- JavaScript Functions -->
 <script>
-    function toggleProgramsDropdown(menuId) {
-        const dropdownMenu = document.getElementById(menuId);
-        dropdownMenu.classList.toggle('hidden');
+let openDropdown = null;
+let openSubDropdown = null;
+
+function toggleMainDropdown(dropdownId) {
+    const dropdown = document.getElementById(dropdownId);
+    const chevron = document.getElementById('programs-chevron');
+    
+    // Close other dropdowns
+    if (openDropdown && openDropdown !== dropdown) {
+        openDropdown.classList.add('hidden');
     }
-
-    function toggleAdminReportsDropdown(menuId) {
-        const dropdownMenu = document.getElementById(menuId);
-        dropdownMenu.classList.toggle('hidden');
+    if (openSubDropdown) {
+        openSubDropdown.classList.add('hidden');
+        openSubDropdown = null;
     }
-
-    // Close the dropdowns if the user clicks outside of them
-    document.addEventListener('click', function(event) {
-        const programsDropdown = document.getElementById('programs-dropdown');
-        const updatesDropdown = document.getElementById('updates-dropdown');
-
-        const programsMenuButton = document.getElementById('programs-menu-button');
-        const updatesMenuButton = document.getElementById('updates-menu-button');
-
-        // Check if the click is inside the Programs dropdown or its button
-        const isClickInsidePrograms = programsDropdown.contains(event.target) || programsMenuButton.contains(event.target);
-        // Check if the click is inside the Updates dropdown or its button
-        const isClickInsideUpdates = updatesDropdown.contains(event.target) || updatesMenuButton.contains(event.target);
-
-        // If the click is outside Programs dropdown, hide it
-        if (!isClickInsidePrograms) {
-            programsDropdown.classList.add('hidden');
-        }
-
-        // If the click is outside Updates dropdown, hide it
-        if (!isClickInsideUpdates) {
-            updatesDropdown.classList.add('hidden');
-        }
-    });
-</script>
-
-<script>
-function toggleSubDropdown(id) {
-    var dropdown = document.getElementById(id);
+    
+    // Toggle current dropdown
     dropdown.classList.toggle('hidden');
+    chevron.classList.toggle('rotate-180');
+    
+    // Update state
+    openDropdown = dropdown.classList.contains('hidden') ? null : dropdown;
 }
+
+function toggleSubDropdown(subDropdownId, button) {
+    const subDropdown = document.getElementById(subDropdownId);
+    const arrow = button.querySelector('.submenu-arrow');
+    
+    // Close other subdropdowns
+    if (openSubDropdown && openSubDropdown !== subDropdown) {
+        openSubDropdown.classList.add('hidden');
+    }
+    
+    // Toggle current subdropdown
+    subDropdown.classList.toggle('hidden');
+    arrow.classList.toggle('rotate-90');
+    
+    // Update state
+    openSubDropdown = subDropdown.classList.contains('hidden') ? null : subDropdown;
+}
+
+// Close dropdowns when clicking outside
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.relative')) {
+        if (openDropdown) {
+            openDropdown.classList.add('hidden');
+            document.getElementById('programs-chevron').classList.remove('rotate-180');
+            openDropdown = null;
+        }
+        if (openSubDropdown) {
+            openSubDropdown.classList.add('hidden');
+            openSubDropdown = null;
+        }
+    }
+});
 </script>
 
 

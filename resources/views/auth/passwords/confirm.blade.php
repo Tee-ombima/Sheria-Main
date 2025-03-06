@@ -14,7 +14,7 @@
       <!-- Password Input -->
       <div class="mb-6">
         <label for="password" class="inline-block text-lg mb-2">{{ __('Password') }}</label>
-        <input id="password" type="password" class="border border-gray-200 rounded p-2 w-full @error('password') border-red-500 @enderror" name="password" required autocomplete="current-password">
+        <input id="password" type="password" class="border border-gray-200 rounded p-2 w-full @error('password') @enderror" name="password" required autocomplete="current-password">
         @error('password')
         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
         @enderror
@@ -37,4 +37,11 @@
       @endif
     </form>
   </x-card>
+
+  <script>
+      document.querySelector("form").addEventListener("submit", function() {
+          // Show the loader
+          document.getElementById("loader").style.display = "flex";
+      });
+  </script>
 </x-layout>

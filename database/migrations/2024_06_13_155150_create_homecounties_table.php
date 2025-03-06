@@ -14,6 +14,8 @@ return new class extends Migration
     public function up()
     {
         Schema::create('homecounties', function (Blueprint $table) {
+            $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null');
+
             $table->id();
             $table->string('name')->unique();
             $table->timestamps();

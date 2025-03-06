@@ -13,7 +13,8 @@
             </div>
         @endif
 
-        <form action="{{ route('update.academic.info', $academicInfo->id) }}" method="POST" id="academicInfoForm">
+        <form action="{{ route('update.academic.info', $academicInfo->id) }}" method="POST">
+        
             @csrf
 
             <!-- Institution Name Field -->
@@ -224,3 +225,9 @@
         </form>
     </x-card>
 </x-layout>
+<script>
+      document.querySelector("form").addEventListener("submit", function() {
+          // Show the loader
+          document.getElementById("loader").style.display = "flex";
+      });
+  </script>

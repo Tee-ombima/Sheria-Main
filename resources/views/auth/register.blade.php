@@ -17,7 +17,7 @@
       <!-- Name Field -->
       <div class="mb-6">
         <label for="name" class="block text-lg mb-2">Name</label>
-        <input id="name" type="text" class="border border-gray-200 rounded p-2 w-full @error('name') border-red-500 @enderror" name="name" value="{{ old('name') }}" required autofocus>
+        <input id="name" type="text" class="border border-gray-200 rounded p-2 w-full @error('name') @enderror" name="name" value="{{ old('name') }}" required autofocus>
         @error('name')
         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
         @enderror

@@ -30,7 +30,10 @@ class PostPupillage extends Model
         'status',
         'remarks',
     ];
-    
+    protected $casts = [
+        'declaration' => 'boolean',
+        'disability_status' => 'boolean',
+    ];
     // Relationships
     public function user()
     {

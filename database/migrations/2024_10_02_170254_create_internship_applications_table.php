@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('email');
             $table->string('id_file');
             $table->string('university_letter');
-            $table->string('kra_pin');
+            $table->string('application_letter');
             $table->string('insurance');
             $table->string('good_conduct'); // Add this line
             $table->string('cv'); // Add this line

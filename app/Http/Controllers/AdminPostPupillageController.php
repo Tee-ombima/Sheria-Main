@@ -172,7 +172,7 @@ class AdminPostPupillageController extends Controller
         $setting->vacancy_no = $request->input('vacancy_no');
         $setting->save();
     
-        return redirect()->route('postPupillages.editVacancyNumber')->with('message', 'Vacancy number updated successfully.');
+        return redirect()->route('admin.postPupillages.editVacancyNumber')->with('message', 'Vacancy number updated successfully.');
     }
     
 

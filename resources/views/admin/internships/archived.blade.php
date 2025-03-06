@@ -30,8 +30,8 @@
                 </p>
 
                 <p><strong>Own Application Letter:</strong> 
-                    @if($application->kra_pin)
-                        <a href="{{ Storage::url($application->kra_pin) }}" class="text-blue-500 underline" target="_blank">Download</a>
+                    @if($application->application_letter)
+                        <a href="{{ Storage::url($application->application_letter) }}" class="text-blue-500 underline" target="_blank">Download</a>
                     @else
                         N/A
                     @endif
