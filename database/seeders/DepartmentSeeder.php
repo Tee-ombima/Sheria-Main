@@ -16,16 +16,16 @@ class DepartmentSeeder extends Seeder
     public function run()
     {
         $departments = [
-            ['name' => 'Legal Affairs', 'email' => 'legal@company.com'],
-            ['name' => 'International Law', 'email' => 'internationallaw@company.com'],
-            ['name' => 'Advocates Complaints Commission', 'email' => 'complaints@company.com'],
-            ['name' => 'Government Transactions', 'email' => 'transactions@company.com'],
-            ['name' => 'Registrar of Marriages', 'email' => 'marriages@company.com'],
-            ['name' => 'Registrar of Societies', 'email' => 'societies@company.com'],
-            ['name' => 'Coat of Arms', 'email' => 'coatofarms@company.com'],
-            ['name' => 'Legislative Drafting', 'email' => 'drafting@company.com'],
-            ['name' => 'Legal Advisory and Research', 'email' => 'advisory@company.com'],
-            ['name' => 'Civil Litigation', 'email' => 'litigation@company.com'],
+            ['name' => 'Legal Affairs', 'email' => 'ombimatitus51@gmail.com'],
+    ['name' => 'International Law', 'email' => 'ombimatitus51@gmail.com'],
+    ['name' => 'Advocates Complaints Commission', 'email' => 'ombimatitus51@gmail.com'],
+    ['name' => 'Government Transactions', 'email' => 'ombimatitus51@gmail.com'],
+    ['name' => 'Registrar of Marriages', 'email' => 'ombimatitus51@gmail.com'],
+    ['name' => 'Registrar of Societies', 'email' => 'ombimatitus51@gmail.com'],
+    ['name' => 'Coat of Arms', 'email' => 'ombimatitus51@gmail.com'],
+    ['name' => 'Legislative Drafting', 'email' => 'ombimatitus51@gmail.com'],
+    ['name' => 'Legal Advisory and Research', 'email' => 'ombimatitus51@gmail.com'],
+    ['name' => 'Civil Litigation', 'email' => 'ombimatitus51@gmail.com'],
         ];
 
         foreach ($departments as $data) {

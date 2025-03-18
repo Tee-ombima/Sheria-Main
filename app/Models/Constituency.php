@@ -9,16 +9,13 @@ class Constituency extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'homecounty_id','added_by_user'];
+    protected $fillable = ['name','subcounty_id','added_by_user'];
 
-    public function homecounty()
+    public function subcounty()
     {
-        return $this->belongsTo(HomeCounty::class);
+        return $this->belongsTo(SubCounty::class);
     }
-    public function subcounties()
-    {
-        return $this->hasMany(Subcounty::class);
-    }
+    
     public function user()
 {
     return $this->belongsTo(User::class);

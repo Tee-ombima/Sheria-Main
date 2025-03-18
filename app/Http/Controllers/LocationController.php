@@ -1,23 +1,21 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Constituency;
 use App\Models\Subcounty;
+use App\Models\Constituency;
+
 class LocationController extends Controller
 {
-    //
-
-    public function getConstituencies($homecounty_id)
+    public function getSubcounties($homecounty_id)
     {
-        $constituencies = Constituency::where('homecounty_id', $homecounty_id)->get();
-        return response()->json($constituencies);
+        $subcounties = Subcounty::where('homecounty_id', $homecounty_id)->get();
+        return response()->json($subcounties);
     }
 
-    public function getSubcounties($constituency_id)
+    public function getConstituencies($subcounty_id)
     {
-        $subcounties = Subcounty::where('constituency_id', $constituency_id)->get();
-        return response()->json($subcounties);
+        $constituencies = Constituency::where('subcounty_id', $subcounty_id)->get();
+        return response()->json($constituencies);
     }
 }

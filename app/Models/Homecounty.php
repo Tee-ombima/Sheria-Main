@@ -10,9 +10,10 @@ class Homecounty extends Model
     use HasFactory;
     protected $fillable = ['name','added_by_user'];
 
-    public function constituencies()
+    
+    public function subcounties()
     {
-        return $this->hasMany(Constituency::class);
+        return $this->hasMany(Subcounty::class);
     }
     public function user()
 {

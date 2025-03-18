@@ -57,7 +57,7 @@ class HomecountySeeder extends Seeder
             ['name' => 'Migori'],
             ['name' => 'Kisii'],
             ['name' => 'Nyamira'],
-            ['name' => 'Nairobi City'],
+            ['name' => 'Nairobi'],
         ];
 
         Homecounty::insert($homecounties);

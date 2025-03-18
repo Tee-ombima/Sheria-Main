@@ -192,7 +192,33 @@
         <span class="text-red-500 text-xs">{{ $message }}</span>
     @enderror
 </div>
+<!-- Subcounty Field -->
+<div class="flex-1">
+    <label for="subcounty" class="block text-sm font-medium text-gray-700">
+        Subcounty<span class="text-red-500">*</span>
+    </label>
+    <select name="subcounty_id" id="subcounty" required 
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]">
+        <option value="" disabled selected>Select Subcounty</option>
+        <option value="other" {{ old('subcounty_id', $inputData['subcounty_id'] ?? '') == 'other' ? 'selected' : '' }}>Other</option>
+    </select>
+    @error('subcounty_id')
+        <span class="text-red-500 text-xs">{{ $message }}</span>
+    @enderror
+</div>
 
+<!-- Input Field for "Other" Subcounty -->
+<div class="flex-1" id="subcounty_other_div" style="display: {{ old('subcounty_id', $inputData['subcounty_id'] ?? '') == 'other' ? 'block' : 'none' }};">
+    <label for="subcounty_other" class="block text-sm font-medium text-gray-700">
+        Please Specify Subcounty<span class="text-red-500">*</span>
+    </label>
+    <input type="text" name="subcounty_other" id="subcounty_other" 
+           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]"
+           value="{{ old('subcounty_other', $inputData['subcounty_other'] ?? '') }}">
+    @error('subcounty_other')
+        <span class="text-red-500 text-xs">{{ $message }}</span>
+    @enderror
+</div>
 <!-- Constituency Field -->
 <div class="flex-1">
     <label for="constituency" class="block text-sm font-medium text-gray-700">
@@ -221,33 +247,7 @@
     @enderror
 </div>
 
-<!-- Subcounty Field -->
-<div class="flex-1">
-    <label for="subcounty" class="block text-sm font-medium text-gray-700">
-        Subcounty<span class="text-red-500">*</span>
-    </label>
-    <select name="subcounty_id" id="subcounty" required 
-            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]">
-        <option value="" disabled selected>Select Subcounty</option>
-        <option value="other" {{ old('subcounty_id', $inputData['subcounty_id'] ?? '') == 'other' ? 'selected' : '' }}>Other</option>
-    </select>
-    @error('subcounty_id')
-        <span class="text-red-500 text-xs">{{ $message }}</span>
-    @enderror
-</div>
 
-<!-- Input Field for "Other" Subcounty -->
-<div class="flex-1" id="subcounty_other_div" style="display: {{ old('subcounty_id', $inputData['subcounty_id'] ?? '') == 'other' ? 'block' : 'none' }};">
-    <label for="subcounty_other" class="block text-sm font-medium text-gray-700">
-        Please Specify Subcounty<span class="text-red-500">*</span>
-    </label>
-    <input type="text" name="subcounty_other" id="subcounty_other" 
-           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]"
-           value="{{ old('subcounty_other', $inputData['subcounty_other'] ?? '') }}">
-    @error('subcounty_other')
-        <span class="text-red-500 text-xs">{{ $message }}</span>
-    @enderror
-</div>
       </div>
 
       <!-- Contact Information -->

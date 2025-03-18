@@ -654,7 +654,36 @@ $(document).ready(function(){
         if (homecountyID && homecountyID !== 'other') {
             $.ajax({
                 type:"GET",
-                url:"/getConstituencies/"+homecountyID,
+                url:"/getSubcounties/"+homecountyID, // Changed endpoint
+                success:function(res){               
+                    if(res){
+                        $("#subcounty").empty();
+                        $("#subcounty").append('<option value="" disabled selected>Select Subcounty</option>');
+                        $.each(res,function(key,value){
+                            $("#subcounty").append('<option value="'+value.id+'">'+value.name+'</option>');
+                        });
+                        $("#subcounty").append('<option value="other">Other</option>');
+                        $("#constituency").empty(); // Clear constituency when subcounty changes
+                    } else {
+                        $("#subcounty").empty();
+                    }
+                }
+            });
+        } else {
+            $("#subcounty").empty();
+            $("#subcounty").append('<option value="" disabled selected>Select Subcounty</option>');
+            $("#subcounty").append('<option value="other">Other</option>');
+            $("#constituency").empty();
+        }      
+    });
+
+    $('#subcounty').change(function(){ // Changed from #constituency to #subcounty
+        toggleSubcountyOther();
+        var subcountyID = $(this).val();
+        if (subcountyID && subcountyID !== 'other') {
+            $.ajax({
+                type:"GET",
+                url:"/getConstituencies/"+subcountyID, // Changed endpoint
                 success:function(res){               
                     if(res){
                         $("#constituency").empty();
@@ -663,8 +692,6 @@ $(document).ready(function(){
                             $("#constituency").append('<option value="'+value.id+'">'+value.name+'</option>');
                         });
                         $("#constituency").append('<option value="other">Other</option>');
-                        $("#subcounty").empty();
-                        $("#subcounty").append('<option value="" disabled selected>Select Subcounty</option>');
                     } else {
                         $("#constituency").empty();
                     }
@@ -674,36 +701,6 @@ $(document).ready(function(){
             $("#constituency").empty();
             $("#constituency").append('<option value="" disabled selected>Select Constituency</option>');
             $("#constituency").append('<option value="other">Other</option>');
-            $("#subcounty").empty();
-            $("#subcounty").append('<option value="" disabled selected>Select Subcounty</option>');
-            $("#subcounty").append('<option value="other">Other</option>');
-        }      
-    });
-
-    $('#constituency').change(function(){
-        toggleConstituencyOther();
-        var constituencyID = $(this).val();
-        if (constituencyID && constituencyID !== 'other') {
-            $.ajax({
-                type:"GET",
-                url:"/getSubcounties/"+constituencyID,
-                success:function(res){               
-                    if(res){
-                        $("#subcounty").empty();
-                        $("#subcounty").append('<option value="" disabled selected>Select Subcounty</option>');
-                        $.each(res,function(key,value){
-                            $("#subcounty").append('<option value="'+value.id+'">'+value.name+'</option>');
-                        });
-                        $("#subcounty").append('<option value="other">Other</option>');
-                    } else {
-                        $("#subcounty").empty();
-                    }
-                }
-            });
-        } else {
-            $("#subcounty").empty();
-            $("#subcounty").append('<option value="" disabled selected>Select Subcounty</option>');
-            $("#subcounty").append('<option value="other">Other</option>');
         }
     });
 

@@ -18,7 +18,7 @@ return new class extends Migration
 
             $table->id();
             $table->string('name');
-            $table->foreignId('constituency_id')->constrained('constituencies')->onDelete('cascade'); // Foreign key linking to constituencies table
+            $table->foreignId('homecounty_id')->constrained('homecounties')->onDelete('cascade'); // Foreign key linking to constituencies table
             $table->timestamps();
         });
     }

@@ -26,8 +26,9 @@ class DatabaseSeeder extends Seeder
             
         SalutationSeeder::class,               // Seed salutations first
         HomecountySeeder::class,               // Seed home counties before constituencies and subcounties
-        ConstituencySeeder::class,             // Seed constituencies after home counties
         SubcountySeeder::class,                // Seed subcounties after constituencies
+        ConstituencySeeder::class,             // Seed constituencies after home counties
+
         EthnicitySeeder::class,                // Seed ethnicities, no dependency on other seeders
         CountryCodeSeeder::class,              // Seed country codes, no dependency on other seeders
         HighschoolSeeder::class,               // Seed high schools, no dependency on other seeders
@@ -40,7 +41,8 @@ class DatabaseSeeder extends Seeder
         GradeSeeder::class,                    // Seed grades after awards
         ProfGradeSeeder::class,                // Seed professional grades after awards
         DocumentNameSeeder::class,             // Seed document names, no dependency on other seeders
-        ListingSeeder::class,                  // Seed job listings, after users and other essential data
+        ListingSeeder::class,  
+                
         UserSeeder::class,                     // Seed users after essential data such as salutation, county, etc.
         ApplicationSeeder::class,
         DepartmentSeeder::class,
@@ -59,12 +61,6 @@ class DatabaseSeeder extends Seeder
         ]);
 
 
-        // Create a user and assign the "user" role to it
-        $user = User::factory()->create([
-            'name' => 'John Doe',
-            'email' => 'john@gmail.com'
-            
-        ]);
         
 
         // // Create listings associated with the user

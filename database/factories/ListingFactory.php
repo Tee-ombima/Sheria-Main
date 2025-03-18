@@ -16,29 +16,60 @@ class ListingFactory extends Factory
      */
     public function definition()
     {
-        // Generate random job titles
-        $jobTitle = $this->faker->jobTitle();
+        // Legal-related job titles
+        $legalJobTitles = [
+            'Legal Officer',
+            'Corporate Lawyer',
+            'Litigation Attorney',
+            'Compliance Officer',
+            'Legal Counsel',
+            'Paralegal',
+            'Legal Assistant',
+            'Contracts Manager',
+            'Intellectual Property Lawyer',
+            'Legal Advisor',
+            'Legal Researcher',
+            'Legal Secretary',
+            'Judicial Clerk',
+            'Mediator',
+            'Arbitrator',
+            'Legal Consultant',
+            'Legal Analyst',
+            'Legal Operations Manager',
+            'Legal Risk Manager',
+            'Legal Document Reviewer',
+        ];
+
+        // Randomly select a legal job title
+        $jobTitle = $this->faker->randomElement($legalJobTitles);
 
         // Generate a reference number format: [Dept]/[Year]/[Unique ID]
-        $departmentAbbreviations = ['ICT', 'HR', 'FIN', 'MK', 'DEV', 'LEG', 'CS', 'OPS'];
+        $departmentAbbreviations = ['LEG', 'HR', 'FIN', 'CS', 'OPS']; // LEG for Legal
         $department = $this->faker->randomElement($departmentAbbreviations);
         $year = date('Y');
         $uniqueId = $this->faker->unique()->numberBetween(10000, 99999);
         $jobReferenceNumber = "$department/$year/$uniqueId";
-        $deadline = $this->faker->dateTimeBetween('-10 days', '+30 days');
-        $filePath = $this->generateDummyFilePath();
 
+        // Generate a deadline within the next 30 days
+        $deadline = $this->faker->dateTimeBetween('now', '+30 days');
+
+        // Generate a dummy file path
+        $filePath = $this->generateDummyFilePath();
 
         return [
             'title' => $jobTitle,
             'job_reference_number' => $jobReferenceNumber,
-            'vacancies' => $this->faker->numberBetween(1, 10), // Random number of vacancies
+            'vacancies' => $this->faker->numberBetween(1, 5), // Fewer vacancies for legal roles
             'deadline' => $deadline,
             'file' => $filePath,
-            
-
         ];
     }
+
+    /**
+     * Generate a dummy PDF file and return its path.
+     *
+     * @return string
+     */
     private function generateDummyFilePath(): string
     {
         $fileName = Str::uuid() . '.pdf';
