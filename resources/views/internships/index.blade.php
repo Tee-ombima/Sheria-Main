@@ -2,9 +2,7 @@
     <x-card class="p-8 max-w-7xl mx-auto mt-12">
         <!-- Back Button -->
         <a href="{{ url()->previous() }}" class="mb-6 inline-flex items-center px-4 py-2 bg-[#D68C3C] text-white rounded-md hover:bg-[#bf7a2e] transition-colors">
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-            </svg>
+            <!-- SVG arrow -->
             Back
         </a>
 
@@ -37,13 +35,16 @@
                                     <tr>
                                         <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Full Name</th>
                                         <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Status</th>
-                                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Actions</th>
+                                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">State</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-200">
                                     @foreach ($internships as $application)
-                                    <tr>
-                                        <td class="px-4 py-3 text-sm text-gray-900">{{ $application->full_name }}</td>
+                                    <tr class="{{ $application->trashed() ? 'bg-gray-50' : '' }}">
+                                        <td class="px-4 py-3 text-sm text-gray-900">
+                                            {{ $application->full_name }}
+                                           
+                                        </td>
                                         <td class="px-4 py-3">
                                             <span class="px-2 py-1 text-xs font-medium rounded-full 
                                                 {{ $application->status === 'approved' ? 'bg-green-100 text-green-800' : 
@@ -52,14 +53,12 @@
                                                 {{ ucfirst($application->status) }}
                                             </span>
                                         </td>
-                                        <td class="px-4 py-3">
-                                            <a href="{{ route('internships.edit', $application->id) }}" 
-                                               class="text-[#D68C3C] hover:text-[#bf7a2e] flex items-center">
-                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
-                                                </svg>
-                                                Edit
-                                            </a>
+                                        <td class="px-4 py-3 text-sm text-gray-500">
+                                            @if($application->trashed())
+                                                Already Processed
+                                            @else
+                                                Active
+                                            @endif
                                         </td>
                                     </tr>
                                     @endforeach
@@ -98,13 +97,16 @@
                                     <tr>
                                         <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Full Name</th>
                                         <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Status</th>
-                                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Actions</th>
+                                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">State</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-200">
                                     @foreach ($pupillages as $application)
-                                    <tr>
-                                        <td class="px-4 py-3 text-sm text-gray-900">{{ $application->full_name }}</td>
+                                    <tr class="{{ $application->trashed() ? 'bg-gray-50' : '' }}">
+                                        <td class="px-4 py-3 text-sm text-gray-900">
+                                            {{ $application->full_name }}
+                                           
+                                        </td>
                                         <td class="px-4 py-3">
                                             <span class="px-2 py-1 text-xs font-medium rounded-full 
                                                 {{ $application->status === 'approved' ? 'bg-green-100 text-green-800' : 
@@ -113,14 +115,12 @@
                                                 {{ ucfirst($application->status) }}
                                             </span>
                                         </td>
-                                        <td class="px-4 py-3">
-                                            <a href="{{ route('pupillages.edit', $application->id) }}" 
-                                               class="text-[#D68C3C] hover:text-[#bf7a2e] flex items-center">
-                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
-                                                </svg>
-                                                Edit
-                                            </a>
+                                        <td class="px-4 py-3 text-sm text-gray-500">
+                                            @if($application->trashed())
+                                                Already Processed
+                                            @else
+                                                Active
+                                            @endif
                                         </td>
                                     </tr>
                                     @endforeach
@@ -159,13 +159,16 @@
                                     <tr>
                                         <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Full Name</th>
                                         <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Status</th>
-                                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Actions</th>
+                                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">State</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-200">
                                     @foreach ($postpupillages as $application)
-                                    <tr>
-                                        <td class="px-4 py-3 text-sm text-gray-900">{{ $application->full_name }}</td>
+                                    <tr class="{{ $application->trashed() ? 'bg-gray-50' : '' }}">
+                                        <td class="px-4 py-3 text-sm text-gray-900">
+                                            {{ $application->full_name }}
+                                           
+                                        </td>
                                         <td class="px-4 py-3">
                                             <span class="px-2 py-1 text-xs font-medium rounded-full 
                                                 {{ $application->status === 'approved' ? 'bg-green-100 text-green-800' : 
@@ -174,14 +177,12 @@
                                                 {{ ucfirst($application->status) }}
                                             </span>
                                         </td>
-                                        <td class="px-4 py-3">
-                                            <a href="{{ route('postPupillages.edit', $application->id) }}" 
-                                               class="text-[#D68C3C] hover:text-[#bf7a2e] flex items-center">
-                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
-                                                </svg>
-                                                Edit
-                                            </a>
+                                        <td class="px-4 py-3 text-sm text-gray-500">
+                                            @if($application->trashed())
+                                                Already Processed
+                                            @else
+                                                Active
+                                            @endif
                                         </td>
                                     </tr>
                                     @endforeach
@@ -200,6 +201,8 @@
             </div>
         </div>
     </x-card>
+
+    <!-- Pagination style remains same -->
 
     <style>
         .pagination {

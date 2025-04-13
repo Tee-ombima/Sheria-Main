@@ -13,6 +13,7 @@ use Spatie\Permission\Traits\HasRoles; // Import HasRoles trait if you're using 
 
 class ListingController extends Controller
 {
+   
     use HasRoles; // Use HasRoles trait if you're using spatie/laravel-permission
 
     // Show all listings
@@ -23,7 +24,7 @@ class ListingController extends Controller
          $query = Listing::latest()->filter(request(['tag', 'search']));
  
          // If the user is not authenticated or is not an admin
-         if (!Auth::check() || Auth::user()->role !== 'admin') {
+         if (!Auth::check() || (Auth::user()->role !== 'admin' && Auth::user()->role !== 'superadmin')) {
              // Use the 'active' scope to get only active listings
              $query->active();
          }
@@ -37,7 +38,7 @@ class ListingController extends Controller
      public function show(Listing $listing)
      {
          // If the user is not an admin
-         if (!Auth::check() || Auth::user()->role !== 'admin') {
+         if (!Auth::check() || (Auth::user()->role !== 'admin' && Auth::user()->role !== 'superadmin')) {
              // Check if the listing is active
              if (!$listing->isActive) {
                  abort(403, 'Unauthorized Access - This listing is archived or has expired.');
@@ -50,7 +51,7 @@ class ListingController extends Controller
     // Show Create Form
     public function create() {
         // Only allow admins to create listings
-        if (Auth::user()->role !== 'admin') {
+        if (Auth::user()->role !== 'admin' && Auth::user()->role !== 'superadmin') {
             abort(403, 'Unauthorized Action');
         }
         return view('listings.create');
@@ -59,7 +60,7 @@ class ListingController extends Controller
     public function store(Request $request)
 {
     // Only allow admins to create listings
-    if (Auth::user()->role !== 'admin') {
+    if (Auth::user()->role !== 'admin' && Auth::user()->role !== 'superadmin') {
         abort(403, 'Unauthorized Action');
     }
 
@@ -75,8 +76,16 @@ class ListingController extends Controller
     if ($request->hasFile('file')) {
         $formFields['file'] = $request->file('file')->store('files', 'public');
     }
-
     Listing::create($formFields);
+    $listing = Listing::create($formFields);
+activity()
+    ->causedBy(auth()->user())
+    ->performedOn($listing)
+    ->withProperties([
+        'admin_email' => auth()->user()->email,
+        'listing_details' => $listing->toArray()
+    ])
+    ->log('New listing created');
 
     return redirect('/')->with('message', 'Listing created successfully!');
 }
@@ -84,7 +93,7 @@ class ListingController extends Controller
     // Show Edit Form
     public function edit(Listing $listing) {
         // Only allow admins to edit listings
-        if (Auth::user()->role !== 'admin') {
+        if (Auth::user()->role !== 'admin' && Auth::user()->role !== 'superadmin') {
             abort(403, 'Unauthorized Action');
         }
         return view('listings.edit', ['listing' => $listing]);
@@ -93,7 +102,7 @@ class ListingController extends Controller
     public function update(Request $request, Listing $listing)
 {
     // Only allow admins to update listings
-    if (Auth::user()->role !== 'admin') {
+    if (Auth::user()->role !== 'admin' && Auth::user()->role !== 'superadmin') {
         abort(403, 'Unauthorized Action');
     }
 
@@ -116,6 +125,14 @@ class ListingController extends Controller
     }
 
     $listing->update($formFields);
+    activity()
+    ->causedBy(auth()->user())
+    ->performedOn($listing)
+    ->withProperties([
+        'admin_email' => auth()->user()->email,
+        'changes' => $listing->getChanges()
+    ])
+    ->log('Listing updated');
 
     return redirect('/')->with('message', 'Listing updated successfully!');
 }
@@ -123,19 +140,27 @@ class ListingController extends Controller
     // Delete Listing
     public function destroy(Listing $listing) {
         // Only allow admins to delete listings
-        if (Auth::user()->role !== 'admin') {
+        if (Auth::user()->role !== 'superadmin') {
             abort(403, 'Unauthorized Action');
         }
-
+        activity()
+        ->causedBy(auth()->user())
+        ->performedOn($listing)
+        ->withProperties([
+            'admin_email' => auth()->user()->email,
+        ])
+        ->log('Listing deleted');
+    $listing->delete();
         
         $listing->delete();
+        
         return redirect('/')->with('message', 'Listing deleted successfully');
     }
 
     // Manage Listings
     public function manage() {
         // Only allow admins to manage listings
-        if (Auth::user()->role !== 'admin') {
+        if (Auth::user()->role !== 'admin' && Auth::user()->role !== 'superadmin') {
             abort(403, 'Unauthorized Action');
         }
     
@@ -145,7 +170,7 @@ class ListingController extends Controller
     public function archive(Listing $listing)
     {
         // Only allow admins to archive listings
-        if (Auth::user()->role !== 'admin') {
+        if (Auth::user()->role !== 'admin' && Auth::user()->role !== 'superadmin') {
             abort(403, 'Unauthorized Action');
         }
 
@@ -158,7 +183,7 @@ class ListingController extends Controller
     public function unarchive(Listing $listing)
     {
         // Only allow admins to unarchive listings
-        if (Auth::user()->role !== 'admin') {
+        if (Auth::user()->role !== 'admin' && Auth::user()->role !== 'superadmin') {
             abort(403, 'Unauthorized Action');
         }
 

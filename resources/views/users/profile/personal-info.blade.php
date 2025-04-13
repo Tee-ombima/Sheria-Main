@@ -1,6 +1,5 @@
 <x-layout>
-  <x-card class="p-8 mx-auto mt-12 max-w-7xl">
-    <!-- Status Header -->
+  <x-card class="p-8 mx-auto mt-12 max-w-7xl">    <!-- Status Header -->
     <div class="text-center mb-8">
       <h1 class="text-3xl font-bold text-gray-900 mb-2">
         Personal Information
@@ -10,7 +9,9 @@
       </h1>
       <p class="text-gray-600 mt-2">All fields marked with <span class="text-red-500">*</span> are required</p>
     </div>
-
+@foreach ($errors->all() as $error)
+<li>{{ $error }}</li>
+@endforeach
     <!-- Error Messages -->
     @if ($errors->any())
     <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
@@ -26,6 +27,7 @@
             @foreach ($errors->all() as $error)
             <li>{{ $error }}</li>
             @endforeach
+            
           </ul>
         </div>
       </div>
@@ -159,8 +161,7 @@
       </div>
 
       <!-- Location Information -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Home County Field -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6"> <!-- Home County Field -->
 <div class="flex-1">
     <label for="homecounty" class="block text-sm font-medium text-gray-700">
         Home County<span class="text-red-500">*</span>
@@ -246,7 +247,7 @@
         <span class="text-red-500 text-xs">{{ $message }}</span>
     @enderror
 </div>
-
+      
 
       </div>
 
@@ -467,7 +468,6 @@
     // Loading State
     document.querySelector('form').addEventListener('submit', (e) => {
       const submitBtn = document.querySelector('button[type="submit"]');
-      submitBtn.disabled = true;
       submitBtn.innerHTML = `
         <svg class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/>
@@ -475,5 +475,63 @@
         </svg>
         Saving...`;
     });
+
+
+    // Location Selector Logic
+document.getElementById('homecounty').addEventListener('change', function() {
+    const homecountyId = this.value;
+    const subcountySelect = document.getElementById('subcounty');
+    
+    // Clear existing options
+    subcountySelect.innerHTML = '<option value="" disabled selected>Select Subcounty</option>';
+    
+    if (homecountyId === 'other') {
+        document.getElementById('homecounty_other_div').style.display = 'block';
+        subcountySelect.innerHTML += '<option value="other">Other</option>';
+    } else {
+        document.getElementById('homecounty_other_div').style.display = 'none';
+        // Fetch subcounties via AJAX
+        fetch(`/get-subcounties/${homecountyId}`)
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(subcounty => {
+                    const option = new Option(subcounty.name, subcounty.id);
+                    subcountySelect.add(option);
+                });
+                subcountySelect.innerHTML += '<option value="other">Other</option>';
+            });
+    }
+});
+
+document.getElementById('subcounty').addEventListener('change', function() {
+    const subcountyId = this.value;
+    const constituencySelect = document.getElementById('constituency');
+    
+    // Clear existing options
+    constituencySelect.innerHTML = '<option value="" disabled selected>Select Constituency</option>';
+    
+    if (subcountyId === 'other') {
+        document.getElementById('subcounty_other_div').style.display = 'block';
+        constituencySelect.innerHTML += '<option value="other">Other</option>';
+    } else {
+        document.getElementById('subcounty_other_div').style.display = 'none';
+        // Fetch constituencies via AJAX
+        fetch(`/get-constituencies/${subcountyId}`)
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(constituency => {
+                    const option = new Option(constituency.name, constituency.id);
+                    constituencySelect.add(option);
+                });
+                constituencySelect.innerHTML += '<option value="other">Other</option>';
+            });
+    }
+});
+
+// Constituency Other toggle
+document.getElementById('constituency').addEventListener('change', function() {
+    document.getElementById('constituency_other_div').style.display = 
+        this.value === 'other' ? 'block' : 'none';
+});
   </script>
 </x-layout>

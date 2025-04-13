@@ -11,6 +11,8 @@ use App\Models\Pupillage;
 use App\Models\PostPupillage;
 use Illuminate\Support\Facades\Validator;
 use App\Models\ApplicationSetting;
+use App\Models\InternshipApplicationSetting;
+use Illuminate\Support\Facades\DB; // Add this import
 
 class InternshipController extends Controller
 {
@@ -18,19 +20,36 @@ class InternshipController extends Controller
      * Show available departments for attachments.
      */
     public function create()
-{
-    $existingApplication = InternshipApplication::where('user_id', Auth::id())->first();
-
-    if ($existingApplication) {
-        return redirect()->route('internships.index')->with('message', 'You have already applied for an internship.');
+    {
+        $settings = InternshipApplicationSetting::first();
+        $currentPending = InternshipApplication::where('status', 'pending')->count();
+    
+        if ($currentPending >= $settings->max_pending_applications) {
+            return redirect()->route('internships.index')
+                ->with('message', 'Application submissions are currently paused. Maximum capacity reached.');
+        }
+        // Check for existing non-deleted application
+        $existingApplication = InternshipApplication::where('user_id', Auth::id())->first();
+        if ($existingApplication) {
+            return redirect()->route('internships.index')->with('message', 'You have already applied for an internship.');
+        }
+    
+        // Check if user was blocked by admin deletion
+        $deletedByAdmin = InternshipApplication::withTrashed()
+            ->where('user_id', Auth::id())
+            ->where('deleted_by_admin', true)
+            ->exists();
+        if ($deletedByAdmin) {
+            return redirect()->route('internships.index')->with('message', 'You cannot apply again as your previous application was already processed.');
+        }
+    
+        if (!$this->internshipApplicationsEnabled()) {
+            return redirect()->back()->with('message', 'No Attachment available at this time.');
+        }
+    
+        return view('internships.create');
     }
-    if (!$this->internshipApplicationsEnabled()) {
-        return redirect()->back()->with('message', 'No Attachment available at this time.');
-    }
 
-
-    return view('internships.create');
-}
 
 public function uploadFile(Request $request)
     {
@@ -67,6 +86,16 @@ public function uploadFile(Request $request)
 
     public function store(Request $request)
     {
+        DB::transaction(function () use ($request) {
+
+        $settings = InternshipApplicationSetting::lockForUpdate()->first();
+    $currentCount = InternshipApplication::where('status', 'pending')->count();
+    
+    if ($currentCount >= $settings->max_pending_applications) {
+        return redirect()->back()->withErrors([
+            'limit' => 'We are no longer accepting Applications.'
+        ]);
+    }
         $existingApplication = InternshipApplication::where('user_id', Auth::id())->first();
 
         if ($existingApplication) {
@@ -110,9 +139,10 @@ public function uploadFile(Request $request)
             'cv' => $uploadedFiles['cv'],
             'status' => 'Pending',
         ]);
-
+    });
         // Clear the uploaded files from the session
         session()->forget('uploaded_files');
+        
 
         return redirect()->route('internships.index')->with('message', 'Internship application submitted successfully.');
     }
@@ -121,135 +151,23 @@ public function uploadFile(Request $request)
 public function index()
 {
     // Retrieve internships applied by the authenticated user
-    $internships = InternshipApplication::where('user_id', Auth::id())->paginate(10);
-    $pupillages = Pupillage::where('user_id', Auth::id())->paginate(10);
-    $postpupillages = PostPupillage::where('user_id', Auth::id())->paginate(10);
+    $internships = InternshipApplication::withTrashed()
+        ->where('user_id', Auth::id())
+        ->paginate(10);
+        $pupillages = Pupillage::withTrashed()
+        ->where('user_id', Auth::id())
+        ->paginate(10);
+        $postpupillages = PostPupillage::withTrashed()
+        ->where('user_id', Auth::id())
+        ->paginate(10);
 
 
     return view('internships.index', compact('internships', 'pupillages','postpupillages'));
 }
 
-
-
-public function edit($id)
-    {
-        $internship = InternshipApplication::where('id', $id)
-            ->where('user_id', Auth::id())
-            ->firstOrFail();
-
-        return view('internships.edit', compact('internship'));
-    }
-
-    public function update(Request $request, $id)
-{
-    $internship = InternshipApplication::where('id', $id)
-        ->where('user_id', Auth::id())
-        ->firstOrFail();
-
-    // Validate the request
-    $request->validate([
-        'full_name' => 'required|string|max:255',
-        'phone' => 'required|integer',
-        'institution' => 'required|string|max:255',
-        'email' => 'required|email|max:255',
-        'id_file' => 'nullable|file|mimes:pdf|max:2048',
-        'university_letter' => 'nullable|file|mimes:pdf|max:2048',
-        'application_letter' => 'nullable|file|mimes:pdf|max:2048',
-        'insurance' => 'nullable|file|mimes:pdf|max:2048',
-        'good_conduct' => 'nullable|file|mimes:pdf|max:2048',
-        'cv' => 'nullable|file|mimes:pdf|max:2048',
-    ]);
-
-    // Update the internship application
-    $internship->update([
-        'full_name' => $request->full_name,
-        'phone' => $request->phone,
-        'institution' => $request->institution,
-        'email' => $request->email,
-    ]);
-
-    // Handle file uploads only if a new file is uploaded
-    if ($request->hasFile('id_file')) {
-        if ($internship->id_file) {
-            Storage::disk('public')->delete($internship->id_file);
-        }
-        $internship->id_file = $request->file('id_file')->store('internship_files', 'public');
-    }
-
-    if ($request->hasFile('university_letter')) {
-        if ($internship->university_letter) {
-            Storage::disk('public')->delete($internship->university_letter);
-        }
-        $internship->university_letter = $request->file('university_letter')->store('internship_files', 'public');
-    }
-
-    if ($request->hasFile('application_letter')) {
-        if ($internship->application_letter) {
-            Storage::disk('public')->delete($internship->application_letter);
-        }
-        $internship->application_letter = $request->file('application_letter')->store('internship_files', 'public');
-    }
-
-    if ($request->hasFile('insurance')) {
-        if ($internship->insurance) {
-            Storage::disk('public')->delete($internship->insurance);
-        }
-        $internship->insurance = $request->file('insurance')->store('internship_files', 'public');
-    }
-
-    if ($request->hasFile('good_conduct')) {
-        if ($internship->good_conduct) {
-            Storage::disk('public')->delete($internship->good_conduct);
-        }
-        $internship->good_conduct = $request->file('good_conduct')->store('internship_files', 'public');
-    }
-
-    if ($request->hasFile('cv')) {
-        if ($internship->cv) {
-            Storage::disk('public')->delete($internship->cv);
-        }
-        $internship->cv = $request->file('cv')->store('internship_files', 'public');
-    }
-
-    $internship->save();
-
-    return redirect()->route('internships.index')->with('message', 'Internship application updated successfully.');
-}
-
-
-    public function destroy($id)
-    {
-        // Find the internship application by ID and ensure it belongs to the authenticated user
-        $internship = InternshipApplication::where('id', $id)
-            ->where('user_id', Auth::id())
-            ->firstOrFail();
     
-        // Delete associated files if they exist
-        if ($internship->id_file) {
-            Storage::disk('public')->delete($internship->id_file);
-        }
-        if ($internship->university_letter) {
-            Storage::disk('public')->delete($internship->university_letter);
-        }
-        if ($internship->application_letter) {
-            Storage::disk('public')->delete($internship->application_letter);
-        }
-        if ($internship->insurance) {
-            Storage::disk('public')->delete($internship->insurance);
-        }
-        if ($internship->good_conduct) {
-            Storage::disk('public')->delete($internship->good_conduct);
-        }
-        if ($internship->cv) {
-            Storage::disk('public')->delete($internship->cv);
-        }
+
     
-        // Delete the internship application
-        $internship->delete();
-    
-        // Redirect to the internship index page with a success message
-        return redirect()->route('internships.index')->with('message', 'Internship application deleted successfully.');
-    }
     private function internshipApplicationsEnabled()
 {
     $applicationSetting = ApplicationSetting::first();

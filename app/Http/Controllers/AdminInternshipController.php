@@ -3,6 +3,11 @@
 namespace App\Http\Controllers;
 use App\Models\ApplicationSetting;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use App\Models\InternshipApplicationSetting;
+use Illuminate\Support\Facades\Cache;
+use App\Mail\ApplicationAcceptedNotification;
+use App\Models\User;
 
 use App\Models\InternshipApplication;
 use App\Models\Department;
@@ -24,26 +29,38 @@ public function archive(InternshipApplication $application)
 
 // Adjust the index method to exclude archived applications
 // app/Http/Controllers/AdminInternshipController.php
-
 public function index(Request $request)
-    {
-        $query = InternshipApplication::with('user', 'department')
-            ->where('status', 'Pending');
+{
+    $query = InternshipApplication::with(['user', 'department'])
+        ->when($request->search_email, function($q) use ($request) {
+            $q->whereHas('user', function($subQuery) use ($request) {
+                $subQuery->where('email', 'like', '%'.$request->search_email.'%');
+            });
+        })
+        ->when($request->assignment_filter, function($q) use ($request) {
+            if ($request->assignment_filter === 'assigned') {
+                $q->whereNotNull('department_id');
+            } elseif ($request->assignment_filter === 'not_assigned') {
+                $q->whereNull('department_id');
+            }
+        })
+        // New status filter
+        ->when($request->status_filter, function($q) use ($request) {
+            $q->where('status', $request->status_filter);
+        });
 
-        // Apply Assignment Filter
-        $assignmentFilter = $request->input('assignment_filter');
+    // Optimized count with caching
+    $showTotal = !$request->hasAny(['search_email', 'assignment_filter']);
+    $totalApplications = $showTotal ? Cache::remember('internship_count', now()->addHours(6), function() {
+        return InternshipApplication::count();
+    }) : null;
 
-        if ($assignmentFilter == 'assigned') {
-            $query->whereNotNull('department_id');
-        } elseif ($assignmentFilter == 'not_assigned') {
-            $query->whereNull('department_id');
-        }
-
-        $applications = $query->paginate(10);
-
-        return view('admin.internships.index', compact('applications'));
-    }
-
+    return view('admin.internships.index', [
+        'applications' => $query->paginate(10),
+        'showTotal' => $showTotal,
+        'totalApplications' => $totalApplications
+    ]);
+}
     public function nonPending()
     {
         $applications = InternshipApplication::with('user')
@@ -81,7 +98,6 @@ public function unarchive(InternshipApplication $application)
 
 
 
-
 public function update(Request $request, InternshipApplication $application)
 {
     $request->validate([
@@ -89,32 +105,65 @@ public function update(Request $request, InternshipApplication $application)
         'department_id' => 'nullable|exists:departments,id',
     ]);
 
+    $originalStatus = $application->status;
+    
     $application->update([
         'status' => $request->status,
         'department_id' => $request->department_id,
     ]);
+    $user = $application->user; // Assuming 'user' is a relationship in InternshipApplication
 
-    // If a department is assigned, send emails
-    if ($request->department_id) {
-        $department = Department::find($request->department_id);
-        $departmentEmails = explode(',', $department->email); // Assuming multiple emails are comma-separated
-        $user = $application->user;
-
-        // Send email to department emails
-        foreach ($departmentEmails as $email) {
-            Mail::to(trim($email))->send(new UserAssignedToDepartmentMail($user, $department, $application));
-        }
+    // Notify department if assigned
+    // In your update method
+if ($request->department_id) {
+    $department = Department::find($request->department_id);
+    // Split, trim, and filter emails
+    $departmentEmails = array_filter(array_map('trim', explode(',', $department->email)));
+    
+    foreach ($departmentEmails as $email) {
+        Mail::to($email)->send(new UserAssignedToDepartmentMail($user, $department, $application));
     }
+}
+
+    
 
     return redirect()->route('admin.internships.index')->with('message', 'Application updated successfully.');
 }
 
-public function destroy(InternshipApplication $application)
+// Add this in your AdminInternshipController (or relevant controller)
+public function destroy($id)
 {
-    // You can choose to just delete the application or change its status to inactive
+    $application = InternshipApplication::findOrFail($id);
+    
+    
+    // Prevent deletion if status is Pending
+    if ($application->status === 'Pending') {
+        return redirect()->back()->with('error', 'Cannot delete application with Pending status.');
+    }
+    
+    // Delete associated files
+    $files = ['id_file', 'university_letter', 'application_letter', 'insurance', 'good_conduct', 'cv'];
+    foreach ($files as $file) {
+        if ($application->$file) {
+            Storage::disk('public')->delete($application->$file);
+        }
+    }
+    
+    // Mark as deleted by admin and soft delete
+    $application->deleted_by_admin = true;
+    $application->save();
     $application->delete();
-
-    return back()->with(    'message','Application removed successfully!');
+    activity()
+    ->causedBy(auth()->user())
+    ->performedOn($application)
+    ->withProperties([
+        'admin_email' => auth()->user()->email,
+        'applicant_email' => $application->email_address,
+        'status' => $application->status
+    ])
+    ->log('Application deleted');
+    return redirect()->route('admin.internships.index')
+        ->with('message', 'Application deleted successfully');
 }
 
 
@@ -152,6 +201,7 @@ public function accepted()
     {
         return Excel::download(new InternshipApplicationsExport, 'accepted_internship_applications.xlsx');
     }
+    // In your Admin controller
     public function toggleApply()
     {
         // Only allow admins
@@ -165,4 +215,27 @@ public function accepted()
 
         return redirect()->back()->with('message', 'Attachement application status updated.');
     }
+// In your Admin controller
+// In your AdminController method that serves the view
+// In AdminController
+public function editSettings()
+{
+    $settings = InternshipApplicationSetting::first();
+    
+    return view('admin.settings.edit', compact('settings'));
+}
+
+public function updateSettings(Request $request)
+{
+    $validated = $request->validate([
+        'max_pending_applications' => 'required|integer|min:1',
+    ]);
+
+    $settings = InternshipApplicationSetting::first();
+    $oldValue = $settings->max_pending_applications;
+    $settings->update($validated);
+
+    return redirect()->route('admin.settings.edit')
+        ->with('message', "Capacity updated from {$oldValue} to {$settings->max_pending_applications} successfully!");
+}
 }

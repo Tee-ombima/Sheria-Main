@@ -16,7 +16,11 @@ return new class extends Migration
         Schema::create('departments', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('email');
+
             $table->timestamps();
+            $table->boolean('archived')->default(false); // Archived column
+            $table->softDeletes(); // Enable soft deletes
         });
         
     }

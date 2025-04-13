@@ -42,7 +42,8 @@ class DatabaseSeeder extends Seeder
         ProfGradeSeeder::class,                // Seed professional grades after awards
         DocumentNameSeeder::class,             // Seed document names, no dependency on other seeders
         ListingSeeder::class,  
-                
+                PupillageSeeder::class,
+                PostPupillageSeeder::class,
         UserSeeder::class,                     // Seed users after essential data such as salutation, county, etc.
         ApplicationSeeder::class,
         DepartmentSeeder::class,

@@ -16,6 +16,11 @@ class CreateApplicationSettingsTable extends Migration
 
             $table->boolean('pupillage_applications_enabled')->default(true);
             $table->boolean('post_pupillage_applications_enabled')->default(true);
+            $table->integer('max_pending_applications')->default(100);
+            $table->integer('max_pupillage_applications')->default(100);
+            $table->integer('max_postpupillage_applications')->default(100);
+
+
             $table->timestamps();
         });
 

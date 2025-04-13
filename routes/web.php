@@ -35,20 +35,10 @@ Auth::routes(['verify' => true]);
 Route::get('/', [ListingController::class, 'index'])->name('index');
 
 Route::middleware(['auth','verified'])->group(function () {
-    // Existing routes...
-
-    // Edit Internship Application
-    Route::get('/internships/{id}/edit', [InternshipController::class, 'edit'])->name('internships.edit');
-    Route::put('/internships/{id}', [InternshipController::class, 'update'])->name('internships.update');
-    Route::get('/pupillages/{id}/edit', [PupillageController::class, 'edit'])->name('pupillages.edit');
-    Route::put('/pupillages/{id}', [PupillageController::class, 'update'])->name('pupillages.update');
-    Route::get('/post-pupillages/{id}/edit', [PostPupillageController::class, 'edit'])->name('postPupillages.edit');
-    Route::put('/post-pupillages/{id}', [PostPupillageController::class, 'update'])->name('postPupillages.update');
+    
 
 
-    Route::delete('/internships/{id}', [InternshipController::class, 'destroy'])->name('internships.destroy');
-    Route::delete('/pupillages/{id}', [PupillageController::class, 'destroy'])->name('pupillages.destroy');
-    Route::delete('/post-pupillages/{id}', [PostPupillageController::class, 'destroy'])->name('postPupillages.destroy');
+    
 
 });
 
@@ -56,8 +46,11 @@ Route::middleware(['auth','verified'])->group(function () {
 // Profile Routes (Accessible only to authenticated users)
 Route::middleware(['auth', 'verified'])->group(function () {   
     
-    Route::get('/getConstituencies/{homecounty_id}', [LocationController::class, 'getConstituencies']);
-    Route::get('/getSubcounties/{constituency_id}', [LocationController::class, 'getSubcounties']);
+    // Route::get('/getConstituencies/{homecounty_id}', [LocationController::class, 'getConstituencies']);
+    // Route::get('/getSubcounties/{constituency_id}', [LocationController::class, 'getSubcounties']);
+    // Correct the routes to match the controller's expected parameters
+Route::get('/getSubcounties/{homecounty_id}', [LocationController::class, 'getSubcounties']);
+Route::get('/getConstituencies/{subcounty_id}', [LocationController::class, 'getConstituencies']);
     Route::get('/profile-dropdown', [ProfileController::class, 'showDropdown'])->name('profile.dropdown');
 
     // Add more profile routes here...
@@ -127,45 +120,51 @@ Route::get('/my-applications', [ApplicationController::class, 'index'])->name('a
 
 // Listings Routes (Accessible only to authenticated users)
 Route::middleware(['auth', 'verified'])->group(function () {
-
-    Route::get('/listings/manage', [ListingController::class, 'manage']);
-
-    Route::get('/listings/create', [ListingController::class, 'create']);
+    Route::get('/listings/create', [ListingController::class, 'create'])->middleware(['auth', 'permission:manage_listings']);
 
     Route::get('/listings', [ListingController::class, 'index']);
-    Route::get('/listings/{listing}', [ListingController::class, 'show']); // Ensure normal users can view listings
+    Route::get('/listings/{listing}', [ListingController::class, 'show']);  
     Route::post('/listings/{id}/apply', [ApplicationController::class, 'apply'])->middleware('auth');
-    Route::put('/listings/{listing}/archive', [ListingController::class, 'archive'])->name('listings.archive');
-    Route::put('/listings/{listing}/unarchive', [ListingController::class, 'unarchive'])->name('listings.unarchive');
+
+    Route::get('/listings/manage', [ListingController::class, 'manage'])->middleware(['auth', 'permission:manage_listings']);
+   
+    Route::put('/listings/{listing}/archive', [ListingController::class, 'archive'])->name('listings.archive')->middleware(['auth', 'permission:manage_listings']);
+    Route::put('/listings/{listing}/unarchive', [ListingController::class, 'unarchive'])->name('listings.unarchive')->middleware(['auth', 'permission:manage_listings']);
+    Route::get('/admin/export/listing/{listing}', [AdminController::class, 'exportFullListing'])
+     ->name('admin.export.listing')->middleware(['auth', 'permission:manage_listings']);
 
 
 });
 
 Route::middleware(['auth', 'verified', 'admin'])->group(function () {
 
-    Route::get('/admin', [AdminController::class, 'index'])->name('admin.index');
-    Route::get('/admin/{job}', [AdminController::class, 'show'])->name('admin.show');
-    Route::get('/reports', [AdminController::class, 'reports'])->name('admin.reports');
-    Route::get('/reports/download', [AdminController::class, 'downloadPDF'])->name('reports.download');
-    Route::post('/admin/update-status', [AdminController::class, 'updateStatus'])->name('admin.updateStatus');
+    Route::get('/admin', [AdminController::class, 'index'])->name('admin.index')->middleware(['auth', 'permission:manage_listings']);
+    Route::get('/admin/{job}', [AdminController::class, 'show'])->name('admin.show')->middleware(['auth', 'permission:manage_listings']);
+    Route::get('/reports', [AdminController::class, 'reports'])->name('admin.reports')->middleware(['auth', 'permission:manage_listings']);
+    Route::get('/reports/download', [AdminController::class, 'downloadPDF'])->name('reports.download')->middleware(['auth', 'permission:manage_listings']);
+    Route::post('/admin/update-status', [AdminController::class, 'updateStatus'])->name('admin.updateStatus')->middleware(['auth', 'permission:manage_listings']);
+    Route::post('/admin/jobs/{job}/bulk-update', [AdminController::class, 'updateStatusBulk'])->name('admin.updateStatusBulk')
+->middleware(['auth', 'permission:manage_listings']);
 
 
-    Route::get('/admin/reports/selected', [AdminController::class, 'showSelectedForInterview'])->name('admin.reports.selected');
-    Route::get('/admin/reports/appointed', [AdminController::class, 'showAppointed'])->name('admin.reports.appointed');
+    Route::get('/admin/reports/selected', [AdminController::class, 'showSelectedForInterview'])->name('admin.reports.selected')->middleware(['auth', 'permission:manage_listings']);
+    Route::get('/admin/reports/appointed', [AdminController::class, 'showAppointed'])->name('admin.reports.appointed')->middleware(['auth', 'permission:manage_listings']);
 
-    Route::get('/admin/reports/export/csv', [AdminController::class, 'exportCSV'])->name('export.csv');
-    Route::get('/admin/reports/export/pdf', [AdminController::class, 'exportPDF'])->name('export.pdf');
+    Route::get('/admin/reports/export/csv', [AdminController::class, 'exportCSV'])->name('export.csv')->middleware(['auth', 'permission:manage_listings']);
+    Route::get('/admin/reports/export/pdf', [AdminController::class, 'exportPDF'])->name('export.pdf')->middleware(['auth', 'permission:manage_listings']);
 
     Route::get('/role-management', [UserRoleController::class, 'index'])->name('admin.role-management');
     Route::post('/role-management/{user}/toggle-role', [UserRoleController::class, 'toggleRole'])->name('admin.role-management.toggleRole');
     Route::delete('admin/users/{user}', [UserRoleController::class, 'destroy'])->name('admin.users.destroy');
+    Route::match(['post', 'put'], '/users/{user}/permissions', [UserRoleController::class, 'updatePermissions'])
+    ->name('users.update-permissions');
 
 
     
-    Route::post('/listings', [ListingController::class, 'store']);
-    Route::get('/listings/{listing}/edit', [ListingController::class, 'edit']);
-    Route::put('/listings/{listing}', [ListingController::class, 'update']);
-    Route::delete('/listings/{listing}', [ListingController::class, 'destroy']);
+    Route::post('/listings', [ListingController::class, 'store'])->middleware(['auth', 'permission:manage_listings']);
+    Route::get('/listings/{listing}/edit', [ListingController::class, 'edit'])->middleware(['auth', 'permission:manage_listings']);
+    Route::put('/listings/{listing}', [ListingController::class, 'update'])->middleware(['auth', 'permission:manage_listings']);
+    Route::delete('/listings/{listing}', [ListingController::class, 'destroy'])->middleware(['auth', 'permission:manage_listings']);
     // Add more admin-exclusive routes here...
     
 
@@ -192,7 +191,7 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/post-pupillages/create', [PostPupillageController::class, 'create'])->name('postPupillages.create');
     Route::post('/post-pupillages', [PostPupillageController::class, 'store'])->name('postPupillages.store');
-    Route::get('/post-pupillages', [AdminPostPupillageController::class, 'index'])->name('postPupillages.index');
+    Route::get('/post-pupillages', [AdminPostPupillageController::class, 'index'])->name('postPupillages.index')->middleware(['auth','admin', 'permission:manage_post_pupillages']);
     Route::get('/getSubCounties/{county_id}', [PostPupillageController::class, 'getSubCounties'])->name('getSubCounties');
 
 });
@@ -203,82 +202,117 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('admin/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
 
-    Route::get('/admin/internships', [AdminInternshipController::class, 'index'])->name('internships.index');
-    Route::get('/admin/internships/{department}', [AdminInternshipController::class, 'show'])->name('internships.show');
-    Route::post('/admin/departments', [AdminInternshipController::class, 'storeDepartment'])->name('departments.store');
-    Route::delete('/admin/internships/{application}', [AdminInternshipController::class, 'destroy'])->name('internships.destroy');
-    Route::post('/admin/internships/{application}/archive', [AdminInternshipController::class, 'archive'])->name('internships.archive');
-    Route::get('/admin/archived-applications', [AdminInternshipController::class, 'archivedApplications'])->name('archived.applications');
+    Route::get('/admin/internships', [AdminInternshipController::class, 'index'])->name('internships.index')->middleware(['auth', 'permission:manage_internships']);
+    Route::get('/admin/internships/{department}', [AdminInternshipController::class, 'show'])->name('internships.show')->middleware(['auth', 'permission:manage_internships']);
+    Route::post('/admin/departments', [AdminInternshipController::class, 'storeDepartment'])->name('departments.store')->middleware(['auth', 'permission:manage_internships']);
+    // routes/web.php
+Route::delete('/admin/internships/{id}', [AdminInternshipController::class, 'destroy'])
+->name('internships.destroy')->middleware(['auth', 'permission:manage_internships']);
+
+
+Route::get('/admin/settings', [AdminInternshipController::class, 'editSettings'])->name('settings.edit')->middleware(['auth', 'permission:manage_internships']);
+Route::put('/admin/settings', [AdminInternshipController::class, 'updateSettings'])->name('settings.update')->middleware(['auth', 'permission:manage_internships']);
+
+
+
+
+
+
+    Route::post('/admin/internships/{application}/archive', [AdminInternshipController::class, 'archive'])->name('internships.archive')->middleware(['auth', 'permission:manage_internships']);
+    Route::get('/admin/archived-applications', [AdminInternshipController::class, 'archivedApplications'])->name('archived.applications')->middleware(['auth', 'permission:manage_internships']);
     Route::patch('/admin/internships/{application}/unarchive', [AdminInternshipController::class, 'unarchive'])->name('internships.unarchive');
-    Route::get('/internships/non-pending', [AdminInternshipController::class, 'nonPending'])->name('internships.nonPending');
+    Route::get('/internships/non-pending', [AdminInternshipController::class, 'nonPending'])->name('internships.nonPending')->middleware(['auth', 'permission:manage_internships']);
 
-    Route::post('/admin/internships/{application}/update', [AdminInternshipController::class, 'update'])->name('internships.update');
+    Route::post('/admin/internships/{application}/update', [AdminInternshipController::class, 'update'])->name('internships.update')->middleware(['auth', 'permission:manage_internships']);
 
-    Route::get('/departments/create', [DepartmentController::class, 'create'])->name('admin.departments.create');
+    Route::get('/departments/create', [DepartmentController::class, 'create'])->name('admin.departments.create')->middleware(['auth', 'permission:manage_internships']);
     
     // Add other department-related routes if not already added
-    Route::post('/admin/departments', [DepartmentController::class, 'store'])->name('departments.store');
-    Route::get('/admin/departments', [DepartmentController::class, 'index'])->name('departments.index');
+    Route::post('/admin/departments', [DepartmentController::class, 'store'])->name('departments.store')->middleware(['auth', 'permission:manage_internships']);
+    Route::get('/admin/departments', [DepartmentController::class, 'index'])->name('departments.index')->middleware(['auth', 'permission:manage_internships']);
 
-    Route::resource('/admin/departments', DepartmentController::class)->except(['show']);
-    Route::patch('/admindepartments/{department}/archive', [DepartmentController::class, 'archive'])->name('departments.archive');
-    Route::patch('/admindepartments/{department}/unarchive', [DepartmentController::class, 'unarchive'])->name('departments.unarchive');
-    Route::delete('/admindepartments/{department}', [DepartmentController::class, 'destroy'])->name('admin.departments.destroy');
-    Route::get('/admindepartments/archived', [DepartmentController::class, 'archived'])->name('departments.archived');
+    Route::resource('/admin/departments', DepartmentController::class)->except(['show'])->middleware(['auth', 'permission:manage_internships']);
+    Route::patch('/admindepartments/{department}/archive', [DepartmentController::class, 'archive'])->name('departments.archive')->middleware(['auth', 'permission:manage_internships']);
+    Route::patch('/admindepartments/{department}/unarchive', [DepartmentController::class, 'unarchive'])->name('departments.unarchive')->middleware(['auth', 'permission:manage_internships']);
+    Route::delete('/admindepartments/{department}', [DepartmentController::class, 'destroy'])->name('admin.departments.destroy')->middleware(['auth', 'permission:manage_internships']);
+    Route::get('/admindepartments/archived', [DepartmentController::class, 'archived'])->name('departments.archived')->middleware(['auth', 'permission:manage_internships']);
 
-    Route::get('internships/accepted', [AdminInternshipController::class, 'accepted'])->name('internships.accepted');
-    Route::get('internships/not_accepted', [AdminInternshipController::class, 'notAccepted'])->name('internships.not_accepted');
-    Route::get('internships/export', [AdminInternshipController::class, 'export'])->name('internships.export');
+    Route::get('internships/accepted', [AdminInternshipController::class, 'accepted'])->name('internships.accepted')->middleware(['auth', 'permission:manage_internships']);
+    Route::get('internships/not_accepted', [AdminInternshipController::class, 'notAccepted'])->name('internships.not_accepted')->middleware(['auth', 'permission:manage_internships']);
+    Route::get('internships/export', [AdminInternshipController::class, 'export'])->name('internships.export')->middleware(['auth', 'permission:manage_internships']);
     // ... other routes ...
-    Route::post('/internships/toggle-apply', [AdminInternshipController::class, 'toggleApply'])->name('internships.toggleApply');
+    Route::post('/internships/toggle-apply', [AdminInternshipController::class, 'toggleApply'])->name('internships.toggleApply')->middleware(['auth', 'permission:manage_internships']);
 
 });
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
 
     // Pupillage Applications
-    Route::get('/admin/pupillages', [AdminPupillageController::class, 'index'])->name('pupillages.index');
-    Route::get('/admin/pupillages/{application}', [AdminPupillageController::class, 'show'])->name('pupillages.show');
-    Route::post('/admin/pupillages/departments', [AdminPupillageController::class, 'storeDepartment'])->name('pupillage.departments.store');
-    Route::delete('/admin/pupillages/{application}', [AdminPupillageController::class, 'destroy'])->name('pupillages.destroy');
-    Route::post('/admin/pupillages/{application}/archive', [AdminPupillageController::class, 'archive'])->name('pupillages.archive');
-    Route::get('/admin/pupillages/archived-applications', [AdminPupillageController::class, 'archivedApplications'])->name('pupillages.archived.applications');
-    Route::patch('/admin/pupillages/{application}/unarchive', [AdminPupillageController::class, 'unarchive'])->name('pupillages.unarchive');
-    Route::get('/pupillages/non-pending', [AdminPupillageController::class, 'nonPending'])->name('pupillages.nonPending');
+    Route::get('/admin/pupillages', [AdminPupillageController::class, 'index'])->name('pupillages.index')->middleware(['auth', 'permission:manage_pupillages']);
+    Route::get('/admin/pupillages/{application}', [AdminPupillageController::class, 'show'])->name('pupillages.show')->middleware(['auth', 'permission:manage_pupillages']);
+    Route::post('/admin/pupillages/departments', [AdminPupillageController::class, 'storeDepartment'])->name('pupillage.departments.store')->middleware(['auth', 'permission:manage_pupillages']);
+    Route::delete('/admin/pupillages/{application}', [AdminPupillageController::class, 'destroy'])->name('pupillages.destroy')->middleware(['auth', 'permission:manage_pupillages']);
+    Route::post('/admin/pupillages/{application}/archive', [AdminPupillageController::class, 'archive'])->name('pupillages.archive')->middleware(['auth', 'permission:manage_pupillages']);
+    Route::get('/admin/pupillages/archived-applications', [AdminPupillageController::class, 'archivedApplications'])->name('pupillages.archived.applications')->middleware(['auth', 'permission:manage_pupillages']);
+    Route::patch('/admin/pupillages/{application}/unarchive', [AdminPupillageController::class, 'unarchive'])->name('pupillages.unarchive')->middleware(['auth', 'permission:manage_pupillages']);
+    Route::get('/pupillages/non-pending', [AdminPupillageController::class, 'nonPending'])->name('pupillages.nonPending')->middleware(['auth', 'permission:manage_pupillages']);
+    // In web.php
+
+Route::post('/admin/pupillages/bulk-update', [AdminPupillageController::class, 'bulkUpdate'])
+->name('pupillages.bulk-update')->middleware(['auth', 'permission:manage_pupillages']);
+
+Route::delete('/admin/pupillages/bulk-destroy', [AdminPupillageController::class, 'bulkDestroy'])
+->name('pupillages.bulk-destroy')->middleware(['auth', 'permission:manage_pupillages']);
 
     // Other admin routes...
     // Corrected to PUT
 Route::put('/pupillages/{application}', [AdminPupillageController::class, 'update'])
-->name('admin.pupillages.update');
-    Route::get('pupillages/accepted', [AdminPupillageController::class, 'accepted'])->name('pupillages.accepted');
-    Route::get('pupillages/not_accepted', [AdminPupillageController::class, 'notAccepted'])->name('pupillages.not_accepted');
-    Route::get('pupillages/export', [AdminPupillageController::class, 'export'])->name('pupillages.export');
-    Route::post('/pupillages/toggle-apply', [AdminPupillageController::class, 'toggleApply'])->name('pupillages.toggleApply');
+->name('admin.pupillages.update')->middleware(['auth', 'permission:manage_pupillages']);
+    Route::get('pupillages/accepted', [AdminPupillageController::class, 'accepted'])->name('pupillages.accepted')->middleware(['auth', 'permission:manage_pupillages']);
+    Route::get('pupillages/not_accepted', [AdminPupillageController::class, 'notAccepted'])->name('pupillages.not_accepted')->middleware(['auth', 'permission:manage_pupillages']);
+    Route::get('pupillages/export', [AdminPupillageController::class, 'export'])->name('pupillages.export')->middleware(['auth', 'permission:manage_pupillages']);
+    Route::post('/pupillages/toggle-apply', [AdminPupillageController::class, 'toggleApply'])->name('pupillages.toggleApply')->middleware(['auth', 'permission:manage_pupillages']);
+
+    
+Route::get('/admin/settings/pupillage', [AdminPupillageController::class, 'editSettings'])->name('pupillage.edit')->middleware(['auth', 'permission:manage_pupillages']);
+Route::put('/admin/settings/pupillage', [AdminPupillageController::class, 'updateSettings'])->name('pupillage.update')->middleware(['auth', 'permission:manage_pupillages']);
 
 });
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
 
     // Pupillage Applications
-    Route::get('/admin/post-pupillages', [AdminPostPupillageController::class, 'index'])->name('postPupillages.index');
-    Route::get('/admin/post-pupillages/{application}', [AdminPostPupillageController::class, 'show'])->name('postPupillages.show');
-    Route::post('/admin/post-pupillages/departments', [AdminPostPupillageController::class, 'storeDepartment'])->name('postPupillages.departments.store');
-    Route::delete('/admin/post-pupillages/{application}', [AdminPostPupillageController::class, 'destroy'])->name('postPupillages.destroy');
-    Route::post('/admin/post-pupillages/{application}/archive', [AdminPostPupillageController::class, 'archive'])->name('postPupillages.archive');
-    Route::get('/admin/post-pupillages/archived-applications', [AdminPostPupillageController::class, 'archivedApplications'])->name('postPupillages.archived.applications');
-    Route::patch('/admin/post-pupillages/{application}/unarchive', [AdminPostPupillageController::class, 'unarchive'])->name('postPupillages.unarchive');
-    Route::get('/post-pupillages/non-pending', [AdminPostPupillageController::class, 'nonPending'])->name('postPupillages.nonPending');
+    Route::get('/admin/post-pupillages', [AdminPostPupillageController::class, 'index'])->name('postPupillages.index')->middleware(['auth', 'permission:manage_post_pupillages']);
+    Route::get('/admin/post-pupillages/{application}', [AdminPostPupillageController::class, 'show'])->name('postPupillages.show')->middleware(['auth', 'permission:manage_post_pupillages']);
+    Route::post('/admin/post-pupillages/departments', [AdminPostPupillageController::class, 'storeDepartment'])->name('postPupillages.departments.store')->middleware(['auth', 'permission:manage_post_pupillages']);
+    Route::delete('/admin/post-pupillages/{application}', [AdminPostPupillageController::class, 'destroy'])->name('postPupillages.destroy')->middleware(['auth', 'permission:manage_post_pupillages']);
+    Route::post('/admin/post-pupillages/{application}/archive', [AdminPostPupillageController::class, 'archive'])->name('postPupillages.archive')->middleware(['auth', 'permission:manage_post_pupillages']);
+    Route::get('/admin/post-pupillages/archived-applications', [AdminPostPupillageController::class, 'archivedApplications'])->name('postPupillages.archived.applications')->middleware(['auth', 'permission:manage_post_pupillages']);
+    Route::patch('/admin/post-pupillages/{application}/unarchive', [AdminPostPupillageController::class, 'unarchive'])->name('postPupillages.unarchive')->middleware(['auth', 'permission:manage_post_pupillages']);
+    Route::get('/post-pupillages/non-pending', [AdminPostPupillageController::class, 'nonPending'])->name('postPupillages.nonPending')->middleware(['auth', 'permission:manage_post_pupillages']);
 
     // Other admin routes...
-    Route::patch('/post-pupillages/{application}', [AdminPostPupillageController::class, 'update'])->name('admin.postPupillages.update');
+    Route::patch('/post-pupillages/{application}', [AdminPostPupillageController::class, 'update'])->name('admin.postPupillages.update')->middleware(['auth', 'permission:manage_post_pupillages']);
 
-    Route::get('postPupillages/accepted', [AdminPostPupillageController::class, 'accepted'])->name('postPupillages.accepted');
-    Route::get('postPupillages/not_accepted', [AdminPostPupillageController::class, 'notAccepted'])->name('postPupillages.not_accepted');
-    Route::get('postPupillages/export', [AdminPostPupillageController::class, 'export'])->name('postPupillages.export');
-    Route::post('/postPupillages/toggle-apply', [AdminPostPupillageController::class, 'toggleApply'])->name('postPupillages.toggleApply');
+    Route::get('postPupillages/accepted', [AdminPostPupillageController::class, 'accepted'])->name('postPupillages.accepted')->middleware(['auth', 'permission:manage_post_pupillages']);
+    Route::get('postPupillages/not_accepted', [AdminPostPupillageController::class, 'notAccepted'])->name('postPupillages.not_accepted')->middleware(['auth', 'permission:manage_post_pupillages']);
+    Route::get('postPupillages/export', [AdminPostPupillageController::class, 'export'])->name('postPupillages.export')->middleware(['auth', 'permission:manage_post_pupillages']);
+    Route::post('/postPupillages/toggle-apply', [AdminPostPupillageController::class, 'toggleApply'])->name('postPupillages.toggleApply')->middleware(['auth', 'permission:manage_post_pupillages']);
 
 
-    Route::get('/post-pupillage/vacancy-number', [AdminPostPupillageController::class, 'editVacancyNumber'])->name('postPupillages.editVacancyNumber');
-    Route::post('/post-pupillage/vacancy-number', [AdminPostPupillageController::class, 'updateVacancyNumber'])->name('postPupillages.updateVacancyNumber');
+    Route::get('/post-pupillage/vacancy-number', [AdminPostPupillageController::class, 'editVacancyNumber'])->name('postPupillages.editVacancyNumber')->middleware(['auth', 'permission:manage_post_pupillages']);
+    Route::post('/post-pupillage/vacancy-number', [AdminPostPupillageController::class, 'updateVacancyNumber'])->name('postPupillages.updateVacancyNumber')->middleware(['auth', 'permission:manage_post_pupillages']);
+    
+Route::get('/admin/settings/post-pupillage', [AdminPostPupillageController::class, 'editSettings'])->name('postpupillage.edit')->middleware(['auth', 'permission:manage_post_pupillages']);
+Route::put('/admin/settings/post-pupillage', [AdminPostPupillageController::class, 'updateSettings'])->name('postpupillage.update')->middleware(['auth', 'permission:manage_post_pupillages']);
+
+// web.php
+
+Route::post('/admin/post-pupillages/bulk-update', [AdminPostPupillageController::class, 'bulkUpdate'])
+     ->name('postPupillages.bulk-update')->middleware(['auth', 'permission:manage_post_pupillages']);
+
+Route::delete('/admin/post-pupillages/bulk-destroy', [AdminPostPupillageController::class, 'bulkDestroy'])
+     ->name('postPupillages.bulk-destroy')->middleware(['auth', 'permission:manage_post_pupillages']);
+
 });
 
 

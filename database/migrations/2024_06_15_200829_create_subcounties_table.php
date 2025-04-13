@@ -18,6 +18,8 @@ return new class extends Migration
 
             $table->id();
             $table->string('name');
+            $table->boolean('added_by_user')->default(false);
+
             $table->foreignId('homecounty_id')->constrained('homecounties')->onDelete('cascade'); // Foreign key linking to constituencies table
             $table->timestamps();
         });

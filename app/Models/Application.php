@@ -16,7 +16,7 @@ class Application extends Model
 
     public function listing()
     {
-        return $this->belongsTo(Listing::class, 'job_id'); // Use 'job_id' as the foreign key
+        return $this->belongsTo(Listing::class, 'job_id'); 
     }
 
     public function user()

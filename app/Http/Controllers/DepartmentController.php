@@ -8,6 +8,7 @@ use App\Models\Department;
 
 class DepartmentController extends Controller
 {
+   
     // Show form to create a department
     public function create()
     {
@@ -20,12 +21,34 @@ class DepartmentController extends Controller
         // Validate input
         $request->validate([
             'name' => 'required|string|max:255|unique:departments,name',
-        'email' => 'required|email|max:255|unique:departments,email',
-
+// In DepartmentController's store and update methods
+'email' => [
+    'required',
+    'max:255',
+    function ($attribute, $value, $fail) {
+        $emails = explode(',', $value);
+        foreach ($emails as $email) {
+            if (!filter_var(trim($email), FILTER_VALIDATE_EMAIL)) {
+                $fail("The $attribute contains an invalid email address: " . trim($email));
+            }
+        }
+    },
+    // For store method, include unique rule
+    'unique:departments,email',
+],
         ]);
 
         // Create and save department
         Department::create($request->only('name','email'));
+        $department = Department::create($request->only('name','email'));
+activity()
+    ->causedBy(auth()->user())
+    ->performedOn($department)
+    ->withProperties([
+        'admin_email' => auth()->user()->email,
+        'department_email' => $request->email
+    ])
+    ->log('New department created');
 
         // Redirect with success message
         return redirect()->route('admin.departments.index')->with('message', 'Department created successfully.');

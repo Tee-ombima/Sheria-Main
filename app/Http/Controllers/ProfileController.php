@@ -9,6 +9,7 @@ use App\Models\Prof_grade;
 use App\Models\Specialisation;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use App\Models\User;
 
 use App\Models\Subcounty;
 use App\Models\Salutation; // Add this line
@@ -25,6 +26,7 @@ use App\Models\RelevantCourses;
 use App\Models\Constituency;
 use App\Models\FormSubmission;
 use App\Models\CountryCode;
+use Spatie\Activitylog\Models\Activity;
 
 
 use Illuminate\Http\Request;
@@ -79,7 +81,7 @@ class ProfileController extends Controller
             'ethnicities'            => $ethnicities,
             'homecounties'           => $homecounties,
             'countryCodes'           => $countryCodes,
-            'subcounties' =>$constituencies,
+            'subcounties' =>$subcounties,
             'constituencies'=>$constituencies,
         ]);
     }
@@ -106,49 +108,57 @@ class ProfileController extends Controller
             'ethnicity_other'   => 'nullable|string|max:50',
 
             // Homecounty
-            'homecounty_id'     => [
+            'homecounty_id' => [
                 'required',
                 function ($attribute, $value, $fail) {
                     if ($value !== 'other' && !Homecounty::where('id', $value)->exists()) {
                         $fail('The selected home county is invalid.');
+                    }
+                    if ($value === 'other' && empty(request('homecounty_other'))) {
+                        $fail('Please specify the home county.');
                     }
                 },
             ],
             'homecounty_other'  => 'nullable|required_if:homecounty_id,other|string|max:50',
 
             // Constituency
-            'constituency_id'   => [
+            'constituency_id' => [
                 'required',
                 function ($attribute, $value, $fail) {
                     if ($value !== 'other' && !Constituency::where('id', $value)->exists()) {
                         $fail('The selected constituency is invalid.');
+                    }
+                    if ($value === 'other' && empty(request('constituency_other'))) {
+                        $fail('Please specify the constituency.');
                     }
                 },
             ],
             'constituency_other'=> 'nullable|required_if:constituency_id,other|string|max:50',
 
             // Subcounty
-            'subcounty_id'      => [
+            'subcounty_id' => [
                 'required',
                 function ($attribute, $value, $fail) {
                     if ($value !== 'other' && !Subcounty::where('id', $value)->exists()) {
                         $fail('The selected subcounty is invalid.');
                     }
+                    if ($value === 'other' && empty(request('subcounty_other'))) {
+                        $fail('Please specify the subcounty.');
+                    }
                 },
             ],
             'subcounty_other'   => 'nullable|required_if:subcounty_id,other|string|max:50',
 
-            // Contact Information
             'postal_address'             => 'required|string',
-            'code'                       => 'nullable|numeric',
+            'code'                       => 'required|numeric',
             'town_city'                  => 'required|string|max:50',
-            'telephone_num'              => 'required|integer',
+            'telephone_num' => 'required|digits:9',
             'telephone_country_code'     => 'required|string|max:50',
-            'mobile_num'                 => 'required|integer',
+            'mobile_num' => 'required|digits:9',
             'mobile_country_code'        => 'required|string|max:50',
             'email_address'              => 'required|email|max:100',
             'alt_contact_person'         => 'required|string|max:100',
-            'alt_contact_telephone_num'  => 'required|integer',
+            'alt_contact_telephone_num' => 'required|digits:9',
             'alt_contact_country_code'   => 'required|string|max:50',
 
             'disability_question'        => 'nullable|string',
@@ -254,10 +264,30 @@ class ProfileController extends Controller
             ['user_id' => $user_id],
             $data
         );
+        $personalInfo = PersonalInfo::updateOrCreate(
+            ['user_id' => auth()->id()],  // Condition to find the record
+            $data                          // Data to be updated/created
+        );
 
         // Optionally, save the data to the session
         $request->session()->put('inputData', $data);
+        $action = $personalInfo->wasRecentlyCreated ? 'created' : 'updated';
+$logMessage = "Personal information $action";
 
+activity()
+    ->causedBy(auth()->user())
+    ->performedOn($personalInfo)
+    ->withProperties([
+        'user_email' => auth()->user()->email,
+        'changes' => $personalInfo->getChanges(),
+        'key_fields' => [
+            'name' => $personalInfo->fullname,
+            'id_number' => $personalInfo->idno,
+            'location' => $personalInfo->constituency->name
+        ]
+    ])
+    ->log($logMessage);
+       
         return redirect()
             ->route('profile.academic-info')
             ->with('message', 'Profile Information submitted successfully!');
@@ -275,7 +305,7 @@ public function showAcademicInfo(Request $request)
     $academicInfoSubmitted = AcademicInfo::where('user_id', $userId)->exists();
     
     // Retrieve stored data from the database
-    $academicInfos = AcademicInfo::where('user_id', Auth::id())->paginate(10); // Adjust the number per page as needed
+    $academicInfo = AcademicInfo::where('user_id', Auth::id())->paginate(10); // Adjust the number per page as needed
 
     $awards = Award::orderByRaw("name = 'other' DESC, name ASC")->get();
 
@@ -287,7 +317,7 @@ public function showAcademicInfo(Request $request)
     
 
     return view('users.profile.academic-info', [
-        'academicInfos' => $academicInfos,
+        'academicInfo' => $academicInfo,
         'academicInfoSubmitted'=>$academicInfoSubmitted,
         'awards' => $awards,
         'grades' => $grades,
@@ -299,6 +329,7 @@ public function showAcademicInfo(Request $request)
 }
 public function addRow(Request $request)
 {
+    
     // Define validation rules
     $rules = [
         'institution_name' => 'required|string|max:50',
@@ -535,6 +566,15 @@ public function saveAcademicInfo(Request $request)
         // Save to database
         AcademicInfo::create($row);
     }
+    $createdCount = count($rows);
+activity()
+    ->causedBy(auth()->user())
+    ->withProperties([
+        'user_email' => auth()->user()->email,
+        'entries_count' => $createdCount,
+        'degrees' => array_column($rows, 'award')
+    ])
+    ->log("Submitted $createdCount academic records");
 
     // Clear the session
     session()->forget('rows');
@@ -575,7 +615,7 @@ public function showProfInfo(Request $request)
     $profInfoSubmitted = ProfInfo::where('user_id', $userId)->exists();
     
     // Retrieve stored data from the database
-    $profInfos = ProfInfo::where('user_id', $userId)->paginate(10); // Get all records, not paginated
+    $profInfo = ProfInfo::where('user_id', $userId)->paginate(10); // Get all records, not paginated
 
     $prof_awards = Prof_award::orderByRaw("name = 'other' DESC, name ASC")->get();
     $prof_grades = Prof_grade::orderByRaw("name = 'other' DESC, name ASC")->get();
@@ -584,7 +624,7 @@ public function showProfInfo(Request $request)
     
 
     return view('users.profile.prof-info', [
-        'profInfos' => $profInfos,
+        'profInfo' => $profInfo,
         'profInfoSubmitted'=>$profInfoSubmitted,
         'prof_awards' => $prof_awards,
         'prof_grades' => $prof_grades,
@@ -850,6 +890,15 @@ public function saveProfInfo(Request $request)
         // Save to database
         ProfInfo::create($row);
     }
+    $createdCount = count($rows);
+activity()
+    ->causedBy(auth()->user())
+    ->withProperties([
+        'user_email' => auth()->user()->email,
+        'entries_count' => $createdCount,
+        'institutions' => array_column($rows, 'prof_institution_name')
+    ])
+    ->log("Added $createdCount professional info entries");
 
     // Clear the session
     session()->forget('rows');
@@ -896,30 +945,28 @@ public function showRelevantCourses(Request $request)
         'relevantCourses' => $relevantCourses,   
         'relevantCoursesSubmitted'=>$relevantCoursesSubmitted,
     ]);
-}
-public function addRelRow(Request $request)
+}public function addRelRow(Request $request)
 {
     // Save each row to the session temporarily
     $row = $request->only([
-        
         'rel_institution_name',
         'rel_course',
         'rel_certificate_no',
         'rel_issue_date',
     ]);
 
-    $rows = session()->get('rows', []);
+    // Note: Changed from 'rows' to 'rel_rows'
+    $rows = session()->get('rel_rows', []);
     $rows[] = $row;
-    session()->put('rows', $rows);
+    session()->put('rel_rows', $rows);
 
-
-
-    return redirect()->back()->with('message','Row added successfully.Please Save before proceeding');
+    return redirect()->back()->with('message','Row added successfully. Please Save before proceeding');
 }
+
 
 public function saveRelevantCourses(Request $request)
 {
-    $rows = session()->get('rows', []);
+    $rows = session()->get('rel_rows', []);
     $user_id = Auth::id();
     if (empty($rows)) {
 
@@ -951,8 +998,16 @@ public function saveRelevantCourses(Request $request)
     
 
     // Clear the session
-    session()->forget('rows');
-    
+    session()->forget('rel_rows');
+    $createdCount = count($rows);
+activity()
+    ->causedBy(auth()->user())
+    ->withProperties([
+        'user_email' => auth()->user()->email,
+        'entries_count' => $createdCount,
+        'entries_sample' => array_slice($rows, 0, 3) // Show first 3 entries as sample
+    ])
+    ->log("Submitted $createdCount relevant courses");
     // Update the form submission status in local storage
     echo "<script>localStorage.setItem('relevant-courses-submitted', 'true');</script>";
     return redirect()->route('profile.attachments')->with('message','Relevant Courses submitted successfully');
@@ -962,13 +1017,13 @@ public function saveRelevantCourses(Request $request)
 public function removeRelSessionRow(Request $request)
 {
     $index = $request->input('index');
-    $rows = session()->get('rows', []);
+    $rows = session()->get('rel_rows', []); // Changed to rel_rows
+    
     if (isset($rows[$index])) {
         unset($rows[$index]);
-        session()->put('rows', array_values($rows)); // Reindex the array
+        session()->put('rel_rows', array_values($rows));
     }
-
-
+    
     return redirect()->back()->with('message','Row removed successfully');
 }
 

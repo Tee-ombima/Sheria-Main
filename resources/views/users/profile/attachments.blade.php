@@ -31,7 +31,20 @@
       </div>
     </div>
     @endif
-
+@if (session('error'))
+<div class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
+    <div class="flex">
+        <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+            </svg>
+        </div>
+        <div class="ml-3">
+            <p class="text-sm text-red-700">{{ session('error') }}</p>
+        </div>
+    </div>
+</div>
+@endif
     <!-- Upload Form -->
     <form id="upload-attachment-form" action="{{ route('profile.upload-attachment') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
       @csrf
@@ -75,6 +88,18 @@
         </button>
       </div>
     </form>
+<!-- Add after the closing </form> tag -->
+<div class="mt-6 flex justify-center">
+    <a href="{{ route('index') }}" 
+       class="px-6 py-2 bg-[#D68C3C]/10 text-[#D68C3C] rounded-md border border-[#D68C3C] hover:bg-[#D68C3C]/20 inline-flex items-center transition">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+        </svg>
+        Return to Job Application
+    </a>
+</div>
+
 
     <!-- Attachments Table -->
     <div class="mt-12 flow-root">
@@ -166,6 +191,8 @@
             </button>
           </div>
         </form>
+
+        
       </div>
     </div>
 

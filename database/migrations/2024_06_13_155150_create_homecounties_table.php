@@ -18,7 +18,10 @@ return new class extends Migration
 
             $table->id();
             $table->string('name')->unique();
+            $table->boolean('added_by_user')->default(false);
+
             $table->timestamps();
+            
         });
     }
 

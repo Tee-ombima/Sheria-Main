@@ -6,6 +6,8 @@ namespace App\Http\Controllers;
 use App\Models\ApplicationSetting;
 use Illuminate\Support\Facades\Auth;
 use App\Models\PostPupillageSetting;
+use App\Models\PostPupillageApplicationSetting;
+use Illuminate\Support\Facades\Cache;
 
 use App\Models\PostPupillage;
 use App\Models\Department;
@@ -14,20 +16,32 @@ use App\Exports\PostPupillageExport;
 use Maatwebsite\Excel\Facades\Excel;
 class AdminPostPupillageController extends Controller
 {
+    
     /**
      * Display a listing of pending post pupillage applications.
      */
     public function index(Request $request)
-    {
-        $query = PostPupillage::with('user')
-            ->where('status', 'Pending');
+{
+    $query = PostPupillage::with('user')
+        ->when($request->search_email, function($q) use ($request) {
+            $q->where('email_address', 'like', '%'.$request->search_email.'%');
+        })
+        ->when($request->status_filter, function($q) use ($request) {
+            $q->where('status', $request->status_filter);
+        });
 
-        
+    // Optimized count with caching
+    $showTotalPostPupillage = !$request->hasAny(['search_email', 'status_filter']);
+    $totalPostPupillage = $showTotalPostPupillage ? Cache::remember('postpupillage_count', now()->addHours(6), function() {
+        return PostPupillage::count();
+    }) : null;
 
-        $applications = $query->paginate(10);
-
-        return view('admin.post_pupillages.index', compact('applications'));
-    }
+    return view('admin.post_pupillages.index', [
+        'applications' => $query->paginate(10),
+        'showTotalPostPupillage' => $showTotalPostPupillage, // Changed key name
+    'totalPostPupillage' => $totalPostPupillage
+    ]);
+}
 
     
 
@@ -63,11 +77,28 @@ class AdminPostPupillageController extends Controller
      * Remove the specified application.
      */
     public function destroy(PostPupillage $application)
-    {
-        $application->delete();
-
-        return back()->with('message', 'Application removed successfully!');
+{
+    if (Auth::user()->role !== 'superadmin') {
+        abort(403, 'Unauthorized Action');
     }
+    if ($application->status === 'Pending') {
+        return back()->with('error', 'Cannot delete pending applications');
+    }
+
+    // Mark as deleted by admin and soft delete
+    $application->update(['deleted_by_admin' => true]);
+    $application->delete();
+    activity()
+    ->causedBy(auth()->user())
+    ->performedOn($application)
+    ->withProperties([
+        'admin_email' => auth()->user()->email,
+        'applicant_email' => $application->email_address,
+        'status' => $application->status
+    ])
+    ->log('Application deleted');
+    return back()->with('message', 'Application removed successfully!');
+}
 
     /**
      * Archive the specified application.
@@ -131,13 +162,21 @@ class AdminPostPupillageController extends Controller
     public function toggleApply()
     {
         // Only allow admins
-        if (Auth::user()->role !== 'admin') {
+        if (Auth::user()->role !== 'admin' && Auth::user()->role !== 'superadmin') {
             abort(403, 'Unauthorized Action');
         }
 
         $setting = ApplicationSetting::first();
         $setting->post_pupillage_applications_enabled = !$setting->post_pupillage_applications_enabled;
         $setting->save();
+        activity()
+    ->causedBy(auth()->user())
+    ->performedOn($setting)
+    ->withProperties([
+        'admin_email' => auth()->user()->email,
+        'new_status' => $setting->post_pupillage_applications_enabled
+    ])
+    ->log('Application toggle status changed');
 
         return redirect()->back()->with('message', 'Post Pupillage application status updated.');
     }
@@ -145,18 +184,27 @@ class AdminPostPupillageController extends Controller
     public function editVacancyNumber()
     {
         // Only allow admins
-        if (Auth::user()->role !== 'admin') {
+        if (Auth::user()->role !== 'admin' && Auth::user()->role !== 'superadmin') {
             abort(403, 'Unauthorized Action');
         }
     
         $setting = PostPupillageSetting::first();
+        activity()
+    ->causedBy(auth()->user())
+    ->performedOn($setting)
+    ->withProperties([
+        'admin_email' => auth()->user()->email,
+        'old_value' => $setting->vacancy_no,
+        'new_value' => $setting->vacancy_no
+    ])
+    ->log('Vacancy number updated');
         return view('admin.post_pupillages.editVacancyNumber', compact('setting'));
     }
     
     public function updateVacancyNumber(Request $request)
     {
         // Only allow admins
-        if (Auth::user()->role !== 'admin') {
+        if (Auth::user()->role !== 'admin' && Auth::user()->role !== 'superadmin') {
             abort(403, 'Unauthorized Action');
         }
     
@@ -175,5 +223,92 @@ class AdminPostPupillageController extends Controller
         return redirect()->route('admin.postPupillages.editVacancyNumber')->with('message', 'Vacancy number updated successfully.');
     }
     
+    public function editSettings()
+    {
+        $settings = PostPupillageApplicationSetting::first();
+        
+        return view('admin.settings.post_pupillages.editpostpupillage', compact('settings'));
+    }
+    
+    public function updateSettings(Request $request)
+    {
+        $validated = $request->validate([
+            'max_postpupillage_applications' => 'required|integer|min:1',
+        ]);
+    
+        $settings = PostPupillageApplicationSetting::first();
+        $oldValue = $settings->max_postpupillage_applications;
+        $settings->update($validated);
+        activity()
+    ->causedBy(auth()->user())
+    ->performedOn($settings)
+    ->withProperties([
+        'admin_email' => auth()->user()->email,
+        'old_value' => $oldValue,
+        'new_value' => $validated['max_postpupillage_applications']
+    ])
+    ->log('Application settings updated');
+    
+        return redirect()->route('admin.postpupillage.edit')
+            ->with('message', "Capacity updated from {$oldValue} to {$settings->max_postpupillage_applications} successfully!");
+    }
+    
+// PostPupillageController.php
+
+public function bulkUpdate(Request $request)
+{
+    $validated = $request->validate([
+        'emails' => 'required|string',
+        'status' => 'required|in:Pending,Accepted,Not_Successful,Removed'
+    ]);
+
+    $emails = array_unique(array_filter(array_map('trim', explode(',', $validated['emails']))));
+
+    $updated = PostPupillage::whereIn('email_address', $emails)
+        ->update(['status' => $validated['status']]);
+        activity()
+        ->causedBy(auth()->user())
+        ->withProperties([
+            'admin_email' => auth()->user()->email,
+            'affected_emails' => $emails,
+            'new_status' => $validated['status'],
+            'count' => $updated
+        ])
+        ->log("Bulk updated $updated applications");
+    return back()->with('message', "Successfully updated $updated applications");
+}
+
+public function bulkDestroy(Request $request)
+{
+    $validated = $request->validate([
+        'emails' => 'required|string'
+    ]);
+
+    $emails = array_unique(array_filter(array_map('trim', explode(',', $validated['emails']))));
+
+    // Retrieve the applications as a collection
+    $applications = PostPupillage::whereIn('email_address', $emails)
+        ->where('status', '!=', 'Pending')
+        ->get();
+
+    $deletedCount = $applications->count();
+
+    // Loop through each application to mark and delete it
+    $applications->each(function ($application) {
+        $application->update(['deleted_by_admin' => true]);
+        $application->delete();
+    });
+    activity()
+    ->causedBy(auth()->user())
+    ->withProperties([
+        'admin_email' => auth()->user()->email,
+        'affected_emails' => $emails,
+        'count' => $deletedCount
+    ])
+    ->log("Bulk deleted $deletedCount applications");
+
+    return back()->with('message', "Successfully deleted $deletedCount applications");
+}
+
 
 }

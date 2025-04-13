@@ -1,33 +1,117 @@
 <x-layout>
-    <x-card class="p-10 max-w-6xl mx-auto mt-24">
-
-    <h1 class="text-3xl font-bold mb-6">{{ $listing->title }}</h1>
-
-    <!-- Filter Form -->
-<form method="GET" action="{{ route('admin.show', ['job' => $listing->id]) }}" class="mb-6">
-    <div class="flex flex-wrap items-center bg-gray-100 p-4 rounded-lg shadow-md">
-        <!-- ID Number Filter -->
-        <div class="w-full md:w-1/2 px-2 mb-4 md:mb-0">
-            <label for="filter_idno" class="block text-sm font-medium text-gray-700">Filter by ID Number</label>
-            <input type="text" name="filter_idno" id="filter_idno" value="{{ request('filter_idno') }}" class="mt-1 block w-full border border-gray-400 bg-white text-black rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200">
-        </div>
-        <!-- Email Filter -->
-        <div class="w-full md:w-1/2 px-2 mb-4 md:mb-0">
-            <label for="filter_email" class="block text-sm font-medium text-gray-700">Search by Email</label>
-            <input type="text" name="filter_email" id="filter_email" value="{{ request('filter_email') }}" class="mt-1 block w-full border border-gray-400 bg-white text-black rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200">
-        </div>
-        <!-- Submit and Clear Buttons -->
-        <div class="w-full px-2 mt-4 flex items-center">
-            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow mr-2">
-                Filter
-            </button>
-            <a href="{{ route('admin.show', ['job' => $listing->id]) }}" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg shadow">
-                Clear Filter
+    <x-card class="p-10 max-w-6xl mx-auto mt-24" x-data="{ showBulk: false, showFilter: false }">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-3xl font-bold">{{ $listing->title }}</h1>
+            <a href="{{ route('admin.export.listing', $listing->id) }}" 
+               class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                Export Excel
             </a>
         </div>
-    </div>
-</form>
 
+        <!-- Buttons to toggle forms -->
+        <div class="flex justify-end space-x-4 mb-6">
+            <button @click="showBulk = !showBulk" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+                Bulk Status Update
+            </button>
+            <button @click="showFilter = !showFilter" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">
+                Filter Applications
+            </button>
+        </div>
+
+        <!-- Bulk Update Form (collapsible) -->
+        <div x-show="showBulk" x-transition.duration.300ms class="bg-white p-6 rounded-lg shadow-md mb-8">
+            <h3 class="text-xl font-semibold mb-4">Bulk Status Update</h3>
+            <form action="{{ route('admin.updateStatusBulk', ['job' => $listing->id]) }}" method="POST">
+                @csrf
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Email List Input -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Emails (comma-separated)
+                        </label>
+                        <textarea 
+                            name="emails" 
+                            rows="5"
+                            class="w-full border border-gray-300 rounded-md p-2"
+                            placeholder="Enter emails separated by commas..."></textarea>
+                    </div>
+
+                    <!-- Status and Remarks -->
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Action for Listed Emails
+                            </label>
+                            <select 
+                                name="status" 
+                                class="w-full border border-gray-300 rounded-md p-2">
+                                <option value="Processing">Processing</option>
+                                <option value="Selected">Selected for Interview</option>
+                                <option value="Appointed">Appointed</option>
+                                <option value="Not_Successful">Not Successful</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Remarks for Listed Emails
+                            </label>
+                            <textarea 
+                                name="remarks" 
+                                rows="3"
+                                class="w-full border border-gray-300 rounded-md p-2"
+                                placeholder="Enter remarks for selected emails..."></textarea>
+                        </div>
+
+                        <div class="mt-4">
+                            <label class="inline-flex items-center">
+                                <input 
+                                    type="checkbox" 
+                                    name="handle_remaining" 
+                                    class="rounded border-gray-300 text-blue-600 shadow-sm">
+                                <span class="ml-2 text-sm text-gray-600">
+                                    Set all other applicants to "Not Successful"
+                                </span>
+                            </label>
+                        </div>
+
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                            Apply Bulk Updates
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Filter Form (collapsible) -->
+        <div x-show="showFilter" x-transition.duration.300ms class="bg-gray-100 p-4 rounded-lg shadow-md mb-6">
+            <form method="GET" action="{{ route('admin.show', ['job' => $listing->id]) }}">
+                <div class="flex flex-wrap items-center">
+                    <!-- ID Number Filter -->
+                    <div class="w-full md:w-1/2 px-2 mb-4 md:mb-0">
+                        <label for="filter_idno" class="block text-sm font-medium text-gray-700">
+                            Filter by ID Number
+                        </label>
+                        <input type="text" name="filter_idno" id="filter_idno" value="{{ request('filter_idno') }}" 
+                            class="mt-1 block w-full border border-gray-400 bg-white text-black rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200">
+                    </div>
+                   
+                    <!-- Submit and Clear Buttons -->
+                    <div class="w-full px-2 mt-4 flex items-center">
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow mr-2">
+                            Filter
+                        </button>
+                        <a href="{{ route('admin.show', ['job' => $listing->id]) }}" 
+                           class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg shadow">
+                            Clear Filter
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
 
     <div class="bg-white shadow-md rounded-lg mb-6">
         <div class="p-4">
@@ -168,28 +252,35 @@
                             </div>
 
                             <!-- Form to Update Job Status and Remarks -->
-                            <form action="{{ route('admin.updateStatus') }}" method="POST" class="mt-4">
-                                @csrf
-                                <input type="hidden" name="application_id" value="{{ $application->id }}">
-                                <div class="mb-4">
-                                    <label for="job_status_{{ $application->id }}" class="block text-sm font-medium text-gray-700">Job Status</label>
-                                    <select name="job_status" id="job_status_{{ $application->id }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                                        <option value="Processing" @if($application->job_status == 'Processing') selected @endif>Processing</option>
-                                        <option value="Selected" @if($application->job_status == 'Selected') selected @endif>Selected for Interview</option>
-                                        <option value="Appointed" @if($application->job_status == 'Appointed') selected @endif>Appointed</option>
-                                        <option value="Not_Successful" @if($application->job_status == 'Not_Successful') selected @endif>Not Successful</option>
-                                    </select>
-                                </div>
-                                <div class="mb-4">
-                                    <label for="remarks_{{ $application->id }}" class="block text-sm font-medium text-gray-700">Remarks</label>
-                                    <textarea name="remarks" id="remarks_{{ $application->id }}" rows="3" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">{{ $application->remarks }}</textarea>
-                                </div>
-                                <div class="flex justify-end">
-                                    <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg shadow">
-                                        Update Application
-                                    </button>
-                                </div>
-                            </form>
+<form action="{{ route('admin.updateStatus') }}" method="POST" class="mt-4">
+    @csrf
+    <input type="hidden" name="application_id" value="{{ $application->id }}">
+    <div class="mb-6">
+        <label for="job_status_{{ $application->id }}" class="block text-sm font-semibold text-gray-800 mb-2">
+            <strong>Job Status</strong>
+        </label>
+        <select name="job_status" id="job_status_{{ $application->id }}" 
+                class="w-full px-4 py-2 border-2 border-gray-400 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-200">
+            <option value="Processing" @if($application->job_status == 'Processing') selected @endif>Processing</option>
+            <option value="Selected" @if($application->job_status == 'Selected') selected @endif>Selected for Interview</option>
+            <option value="Appointed" @if($application->job_status == 'Appointed') selected @endif>Appointed</option>
+            <option value="Not_Successful" @if($application->job_status == 'Not_Successful') selected @endif>Not Successful</option>
+        </select>
+    </div>
+    <div class="mb-6">
+        <label for="remarks_{{ $application->id }}" class="block text-sm font-semibold text-gray-800 mb-2">
+           <strong>Remarks</strong> 
+        </label>
+        <textarea name="remarks" id="remarks_{{ $application->id }}" rows="4"
+                  class="w-full px-4 py-2 border-2 border-gray-400 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-200 placeholder-gray-400">{{ $application->remarks }}</textarea>
+    </div>
+    <div class="flex justify-end">
+        <button type="submit" 
+                class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-200 transform hover:scale-105">
+            Update Application
+        </button>
+    </div>
+</form>
 
                         </div>
                     </div>

@@ -101,17 +101,55 @@
                   <th scope="col" class="px-3 py-3 text-left text-sm font-semibold text-gray-900">Course</th>
                   <th scope="col" class="px-3 py-3 text-left text-sm font-semibold text-gray-900">Certificate No</th>
                   <th scope="col" class="px-3 py-3 text-left text-sm font-semibold text-gray-900">Issue Date</th>
+                  <th scope="col" class="px-3 py-3 text-left text-sm font-semibold text-gray-900">Status</th>
                   <th scope="col" class="px-3 py-3 text-left text-sm font-semibold text-gray-900">Actions</th>
                 </tr>
               </thead>
+              
               <tbody class="divide-y divide-gray-200 bg-white">
+                <!-- Session Rows -->
+                @foreach (session('rel_rows', []) as $index => $row)
+                <tr class="bg-yellow-50">
+                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-900">{{ $row['rel_institution_name'] }}</td>
+                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $row['rel_course'] }}</td>
+                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $row['rel_certificate_no'] }}</td>
+                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    {{ \Carbon\Carbon::parse($row['rel_issue_date'])->format('M d, Y') }}
+                  </td>
+                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                      Not Submitted
+                    </span>
+                  </td>
+                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    <form action="{{ route('remove.relsession.row') }}" method="POST">
+                      @csrf
+                      <input type="hidden" name="index" value="{{ $index }}">
+                      <button type="submit" class="text-red-600 hover:text-red-900">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+                @endforeach
+
+                <!-- Database Rows -->
                 @foreach ($relevantCourses as $datum)
                 <tr>
                   <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-900">{{ $datum->rel_institution_name }}</td>
                   <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $datum->rel_course }}</td>
                   <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $datum->rel_certificate_no }}</td>
-                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $datum->rel_issue_date }}</td>
                   <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    {{ \Carbon\Carbon::parse($datum->rel_issue_date)->format('M d, Y') }}
+                  </td>
+                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                      Submitted
+                    </span>
+                  </td>
+                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                     <div class="flex items-center space-x-2">
                       <a href="{{ route('edit.rel.info', $datum->id) }}" 
                          class="text-[#3a4f29] hover:text-[#D68C3C]">

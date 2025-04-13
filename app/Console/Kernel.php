@@ -16,6 +16,8 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('listings:archive-expired')->everyMinute();
+        $schedule->command('logs:clean')->daily();
+
 
     }
 

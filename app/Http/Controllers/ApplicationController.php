@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\PersonalInfo;
 use App\Models\AcademicInfo;
 use App\Models\ProfInfo;
+use App\Models\User;
+
 use App\Models\RelevantCourses;
 use Illuminate\Support\Facades\Log;
 class ApplicationController extends Controller
@@ -20,7 +22,7 @@ class ApplicationController extends Controller
         // Paginate the results, showing 10 applications per page
         $applications = Application::where('user_id', Auth::id())
             ->with('listing')
-            ->paginate(7); // Change get() to paginate(10)
+            ->paginate(5); // Change get() to paginate(10)
 
         return view('applications.index', compact('applications'));
     }
@@ -68,6 +70,8 @@ class ApplicationController extends Controller
             $application->remarks = null;
             $application->job_status = 'Processing';
             $application->save();
+      
+    
     
             // Send email confirmation to the user
             Mail::to(Auth::user()->email)->send(new ApplicationSubmitted($application));
@@ -78,6 +82,7 @@ class ApplicationController extends Controller
             Log::error('Application submission failed: ' . $e->getMessage());
             return redirect()->back()->with('error', 'An error occurred while submitting your application. Please try again.');
         }
+    
     }
     
 }

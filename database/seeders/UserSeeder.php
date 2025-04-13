@@ -18,13 +18,20 @@ class UserSeeder extends Seeder
     {
         // Create one user with the specified email and role as admin
         User::factory()->create([
-            'name' => fake()->name(), // Generate a random name
-            'email' => 'obititan21@gmail.com', // Specific email
-            'email_verified_at' => now(),
-            'role' => 'admin', // Admin role
-            'password' => bcrypt('password'), // Password for the user
+            'name' => 'Super Admin',
+            'email' => 'ombimatitus7@gmail.com',
+            'password' => bcrypt('password'), // Use a secure password
+            'role' => 'superadmin',
+            'permissions' => [
+                'manage_users',
+                'manage_listings',
+                'manage_internships',
+                'manage_pupillages',
+                'manage_post_pupillages',
+                
+            ],
         ]);
-
-        User::factory()->count(100)->create();
+       
+        User::factory()->count(10)->create();
     }
 }

@@ -33,6 +33,14 @@ public function showAttachmentForm()
 public function uploadAttachment(Request $request)
 {
     $user_id = Auth::id();
+
+    $maxDocuments = 5;
+    $currentCount = Attachment::where('user_id', $user_id)->count();
+    
+    if ($currentCount >= $maxDocuments) {
+        return redirect()->back()
+            ->with('error', 'Maximum of 5 documents allowed. Delete existing documents to add new ones.');
+    }
     
     // Determine if the user selected "Other"
     $document_name = $request->document_name === 'other' 

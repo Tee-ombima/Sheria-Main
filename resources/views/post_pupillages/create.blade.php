@@ -7,7 +7,9 @@
             </svg>
             Back
         </a>
-
+<div class="alert alert-warning">
+        <strong>Note:</strong> Once you submit your application, you will not be able to edit it.
+    </div>
         <!-- Header -->
         <h1 class="text-3xl font-bold text-center mb-8 text-gray-900">Apply for Post Pupillage Program</h1>
 

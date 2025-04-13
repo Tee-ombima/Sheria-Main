@@ -48,6 +48,8 @@ return new class extends Migration
             // Application Status
             $table->string('status')->default('Pending');
             $table->text('remarks')->nullable();
+            $table->boolean('deleted_by_admin')->default(false);
+        $table->softDeletes();
 
             $table->timestamps();
         });

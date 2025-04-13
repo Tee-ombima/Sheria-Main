@@ -30,12 +30,16 @@ public function collection()
         ->map(function($application, $index) {
             return [
                 'Table Number' => $index + 1,
-                'ID Number' => $application->user->personalInfo->idno,
-                'Name' => $application->user->personalInfo->firstname . ' ' . $application->user->personalInfo->lastname,
-                'Email' => $application->user->email,
-                'Mobile Number' => $application->user->personalInfo->mobile_num,
-                'Alternate Contact' => $application->user->personalInfo->alt_contact_person . ': ' . $application->user->personalInfo->alt_contact_telephone_num,
-                'Job Applied For' => $application->listing->title,
+                    'ID Number' => $application->user->personalInfo->idno ?? 'N/A',
+                    'Name' => $application->user->personalInfo->firstname . ' ' . $application->user->personalInfo->lastname,
+                    'Gender' => $application->user->personalInfo->gender ?? 'N/A',
+                    'County' => $application->user->personalInfo->homecounty->name ?? 'N/A',
+                    'Subcounty' => $application->user->personalInfo->subcounty->name ?? 'N/A',
+                    'Constituency' => $application->user->personalInfo->constituency->name ?? 'N/A',
+                    'Email' => $application->user->email,
+                    'Mobile Number' => $application->user->personalInfo->mobile_num ?? 'N/A',
+                    'Alternate Contact' => $application->user->personalInfo->alt_contact_person . ': ' . $application->user->personalInfo->alt_contact_telephone_num,
+                    'Job Applied For' => $application->listing->title ?? 'N/A',
             ];
         });
 }
@@ -45,12 +49,16 @@ public function collection()
     {
         return [
             'Table Number',
+            'Job Title',
             'ID Number',
             'Name',
+            'Gender',
+            'County',
+            'Subcounty',
+            'Constituency',
             'Email',
-            'Mobile Number',
-            'Alternate Contact',
-            'Job Applied For',
+            'Phone Number',
+            'Alternate Phone Number'
         ];
     }
 }

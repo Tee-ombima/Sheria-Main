@@ -27,8 +27,14 @@ return new class extends Migration
             $table->string('good_conduct'); // Add this line
             $table->string('cv'); // Add this line
             $table->string('status')->default('Pending');
+
+            $table->unsignedBigInteger('department_id')->nullable();
+        $table->foreign('department_id')->references('id')->on('departments')->onDelete('set null');
             
+        $table->boolean('deleted_by_admin')->default(false);
+        $table->softDeletes();
             $table->timestamps();
+
         });
         
     }

@@ -55,7 +55,14 @@ return new class extends Migration
             $table->string('status')->default('Pending');
             $table->text('remarks')->nullable();
             $table->timestamps();
+            $table->string('are_you_employed')->nullable();
+        $table->string('employer_institution_name')->nullable();
+        $table->decimal('gross_salary', 10, 2)->nullable();
+        $table->boolean('deleted_by_admin')->default(false);
+        $table->softDeletes();
         });
+
+        
     }
 
 

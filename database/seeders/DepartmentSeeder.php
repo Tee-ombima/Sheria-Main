@@ -41,5 +41,6 @@ class DepartmentSeeder extends Seeder
                 'user_id' => \App\Models\User::factory(), // Create a user for the application
             ]);
         }
+        
     }
 }

@@ -34,27 +34,35 @@
     <div class="bg-white p-6 rounded-lg shadow-sm mb-8">
       <table class="w-full border-collapse">
         <thead class="bg-gray-50">
-          <tr>
-            <th class="p-4 text-left text-sm font-semibold text-gray-700 border-b">ID Number</th>
-            <th class="p-4 text-left text-sm font-semibold text-gray-700 border-b">Name</th>
-            <th class="p-4 text-left text-sm font-semibold text-gray-700 border-b">Email</th>
-            <th class="p-4 text-left text-sm font-semibold text-gray-700 border-b">Mobile Number</th>
-            <th class="p-4 text-left text-sm font-semibold text-gray-700 border-b">Alternate Contact</th>
-          </tr>
-        </thead>
+  <tr>
+    <th class="p-4 text-left text-sm font-semibold text-gray-700 border-b">ID Number</th>
+    <th class="p-4 text-left text-sm font-semibold text-gray-700 border-b">Name</th>
+    <th class="p-4 text-left text-sm font-semibold text-gray-700 border-b">Gender</th>
+    <th class="p-4 text-left text-sm font-semibold text-gray-700 border-b">County</th>
+    <th class="p-4 text-left text-sm font-semibold text-gray-700 border-b">Subcounty</th>
+    <th class="p-4 text-left text-sm font-semibold text-gray-700 border-b">Constituency</th>
+    <th class="p-4 text-left text-sm font-semibold text-gray-700 border-b">Email</th>
+    <th class="p-4 text-left text-sm font-semibold text-gray-700 border-b">Mobile Number</th>
+    <th class="p-4 text-left text-sm font-semibold text-gray-700 border-b">Alternate Contact</th>
+  </tr>
+</thead>
         <tbody class="divide-y divide-gray-200">
-          @foreach($applications as $application)
-            <tr class="hover:bg-gray-50 transition-colors">
-              <td class="p-4 text-gray-700">{{ $application->user->personalInfo->idno }}</td>
-              <td class="p-4 text-gray-700">{{ $application->user->personalInfo->firstname }} {{ $application->user->personalInfo->lastname }}</td>
-              <td class="p-4 text-gray-700">{{ $application->user->email }}</td>
-              <td class="p-4 text-gray-700">{{ $application->user->personalInfo->mobile_num }}</td>
-              <td class="p-4 text-gray-700">
-                {{ $application->user->personalInfo->alt_contact_person }}: {{ $application->user->personalInfo->alt_contact_telephone_num }}
-              </td>
-            </tr>
-          @endforeach
-        </tbody>
+  @foreach($applications as $application)
+    <tr class="hover:bg-gray-50 transition-colors">
+      <td class="p-4 text-gray-700">{{ $application->user->personalInfo->idno }}</td>
+      <td class="p-4 text-gray-700">{{ $application->user->personalInfo->firstname }} {{ $application->user->personalInfo->lastname }}</td>
+      <td class="p-4 text-gray-700">{{ $application->user->personalInfo->gender ?? 'N/A' }}</td>
+      <td class="p-4 text-gray-700">{{ $application->user->personalInfo->homecounty->name ?? 'N/A' }}</td>
+      <td class="p-4 text-gray-700">{{ $application->user->personalInfo->subcounty->name ?? 'N/A' }}</td>
+      <td class="p-4 text-gray-700">{{ $application->user->personalInfo->constituency->name ?? 'N/A' }}</td>
+      <td class="p-4 text-gray-700">{{ $application->user->email }}</td>
+      <td class="p-4 text-gray-700">{{ $application->user->personalInfo->mobile_num }}</td>
+      <td class="p-4 text-gray-700">
+        {{ $application->user->personalInfo->alt_contact_person }}: {{ $application->user->personalInfo->alt_contact_telephone_num }}
+      </td>
+    </tr>
+  @endforeach
+</tbody>
       </table>
     </div>
 
@@ -68,13 +76,7 @@
         Export CSV
       </a>
       
-      <a href="{{ route('export.pdf', ['type' => 'selected', 'job_title' => $jobTitle]) }}" 
-         class="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors shadow-sm">
-        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-        </svg>
-        Download PDF
-      </a>
+      
     </div>
   </x-card>
 </x-layout>

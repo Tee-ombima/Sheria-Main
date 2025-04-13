@@ -89,27 +89,55 @@
         </form>
 
         <!-- Enhanced Table -->
-        <div class="overflow-x-auto rounded-lg border border-gray-200">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                    @forelse ($users as $user)
-                    <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="px-6 py-4 whitespace-nowrap">{{ $user->name }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">{{ $user->email }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                {{ $user->role === 'admin' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800' }}">
-                                {{ ucfirst($user->role) }}
-                            </span>
-                        </td>
+    <div class="overflow-x-auto rounded-lg border border-gray-200">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                    <!-- Add Permissions column -->
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Permissions</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                @forelse ($users as $user)
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 whitespace-nowrap">{{ $user->name }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">{{ $user->email }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                            {{ $user->role === 'admin' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800' }}">
+                            {{ ucfirst($user->role) }}
+                        </span>
+                    </td>
+                    <!-- Permissions Column -->
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex flex-wrap gap-2">
+                            @foreach($user->permissions ?? [] as $permission)
+                                <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">
+                                    {{ $permission }}
+                                </span>
+                            @endforeach
+                            @if(!$user->permissions)
+                                <span class="text-gray-400 text-xs">No permissions</span>
+                            @endif
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap flex items-center gap-3">
+                        <!-- Add Permissions Edit Button (Visible only to superadmin) -->
+                        @if(auth()->user()->isSuperAdmin())
+                        <button onclick="openPermissionsModal({{ $user->id }})" 
+                                class="p-2 text-[#D68C3C] hover:text-[#bf7a2e] transition-colors"
+                                title="Edit Permissions">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                            </svg>
+                                    <span class="ml-1">Edit Permissions</span>
+
+                        </button>
+                        @endif
                         <td class="px-6 py-4 whitespace-nowrap flex items-center gap-3">
                             <!-- Toggle Role Switch with Confirmation -->
                             <form id="toggle-role-form-{{ $user->id }}" method="POST" action="{{ route('admin.role-management.toggleRole', $user->id) }}">
@@ -119,6 +147,8 @@
                                            {{ $user->role === 'admin' ? 'checked' : '' }}
                                            onchange="confirmRoleChange(event, {{ $user->id }}, '{{ $user->role }}')">
                                     <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D68C3C]"></div>
+                                                                        <span class="ml-1">Change Role</span>
+
                                 </label>
                             </form>
 
@@ -142,14 +172,83 @@
                     @endforelse
                 </tbody>
             </table>
-        </div>
 
-        <!-- Enhanced Pagination -->
-        <div class="mt-6">
-            {{ $users->appends(['search' => $search])->links('pagination::tailwind') }}
         </div>
+        
+
+         <!-- Permissions Modal -->
+    @if(auth()->user()->isSuperAdmin())
+    <div id="permissionsModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
+        <div class="bg-white rounded-lg p-6 max-w-md w-full">
+            <h3 class="text-lg font-bold mb-4">Edit Permissions</h3>
+            <form id="permissionsForm" method="POST">
+                @csrf
+                    @method('PUT') <!-- Add this line -->
+
+                <div class="space-y-2">
+                    @foreach(['manage_listings', 'manage_internships', 'manage_pupillages', 'manage_post_pupillages'] as $permission)
+                    <label class="flex items-center space-x-2">
+                        <input type="checkbox" name="permissions[]" value="{{ $permission }}" 
+                               class="rounded border-gray-300 text-[#D68C3C] focus:ring-[#D68C3C]">
+                        <span class="text-gray-700">{{ ucwords(str_replace('_', ' ', $permission)) }}</span>
+                    </label>
+                @endforeach
+                </div>
+                <div class="mt-6 flex justify-end gap-3">
+                    <button type="button" onclick="closePermissionsModal()" 
+                            class="px-4 py-2 text-gray-600 hover:text-gray-800">
+                        Cancel
+                    </button>
+                    <button type="submit" 
+                            class="px-4 py-2 bg-[#D68C3C] text-white rounded hover:bg-[#bf7a2e]">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    @endif
+
+
+@if($users->hasPages())
+    <div class="mt-6">
+        {{ $users->appends(['search' => $search])->onEachSide(3)->links('pagination::tailwind') }}
+    </div>
+@endif
+        <x-unified-log :logs="\Spatie\Activitylog\Models\Activity::latest()->paginate(10)" />
+
     </x-card>
 
+</x-layout>
+
+    <script>
+        // Permissions Modal Functions
+        function openPermissionsModal(userId) {
+            const user = @json($users->keyBy('id')->toArray());
+            const userData = user[userId];
+            
+            // Set form action
+            document.getElementById('permissionsForm').action = `/users/${userId}/permissions`;
+            
+            // Check checkboxes
+            document.querySelectorAll('#permissionsForm input[type="checkbox"]').forEach(checkbox => {
+                checkbox.checked = userData.permissions?.includes(checkbox.value) || false;
+            });
+            
+            document.getElementById('permissionsModal').classList.remove('hidden');
+        }
+
+        function closePermissionsModal() {
+            document.getElementById('permissionsModal').classList.add('hidden');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('permissionsModal').addEventListener('click', (e) => {
+            if(e.target.id === 'permissionsModal') closePermissionsModal();
+        });
+    </script>
+
+    
     <script>
         // Confirmation before toggling user role
         function confirmRoleChange(event, userId, currentRole) {
@@ -183,4 +282,3 @@
             });
         });
     </script>
-</x-layout>

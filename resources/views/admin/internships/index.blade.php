@@ -13,14 +13,6 @@
     <div class="flex justify-between items-center mb-8">
       <h1 class="text-3xl font-bold text-gray-900">Attachee Applications</h1>
       <div class="flex space-x-4">
-        <!-- Back to Dashboard Button -->
-        <a href="{{ route('admin.dashboard') }}" class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors shadow-sm">
-          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-          </svg>
-          Dashboard
-        </a>
-
         <!-- Manage Departments Button -->
         @if(isset($department))
           <a href="{{ route('admin.departments.show', $department->id) }}" class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors shadow-sm">
@@ -37,40 +29,67 @@
             Manage Departments
           </a>
         @endif
-
-        <!-- View Accepted Applications Button -->
-        <a href="{{ route('admin.internships.accepted') }}" class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors shadow-sm">
-          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-          </svg>
-          Accepted
-        </a>
-
-        <!-- View Not Accepted Applications Button -->
-        <a href="{{ route('admin.internships.not_accepted') }}" class="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors shadow-sm">
-          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
-          Not Accepted
-        </a>
       </div>
     </div>
 
-    <!-- Filter Form -->
-    <div class="mb-6 bg-white p-4 rounded-lg shadow-sm">
-      <form method="GET" action="{{ route('admin.internships.index') }}" class="flex items-center space-x-4">
-        <label for="assignment_filter" class="text-sm font-medium text-gray-700">Filter by Assignment:</label>
-        <select name="assignment_filter" id="assignment_filter" class="border border-gray-300 rounded-md p-2 focus:border-[#D68C3C] focus:ring-[#D68C3C]">
-          <option value="">All</option>
-          <option value="assigned" {{ request('assignment_filter') == 'assigned' ? 'selected' : '' }}>Assigned to Department</option>
-          <option value="not_assigned" {{ request('assignment_filter') == 'not_assigned' ? 'selected' : '' }}>Not Assigned to Department</option>
-        </select>
+    <!-- Total Applications & Search Bar -->
+    <div class="flex justify-between items-center mb-6">
+      @if($showTotal)
+    <span class="px-3 py-1 bg-[#D68C3C] text-white rounded-full text-sm">
+        Total Applications: {{ number_format($totalApplications) }}
+    </span>
+@endif
+      
+      <!-- Search Form -->
+      <form method="GET" action="{{ route('admin.internships.index') }}" class="flex items-center gap-4">
+        <div class="relative">
+        
+          <input type="text" 
+                 name="search_email" 
+                 placeholder="Search by Email" 
+                 class="pl-10 pr-4 py-2 border rounded-md focus:border-[#D68C3C] focus:ring-[#D68C3C]"
+                 value="{{ request('search_email') }}">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center">
+            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+          </div>
+        </div>
         <button type="submit" class="px-4 py-2 bg-[#D68C3C] text-white rounded-md hover:bg-[#bf7a2e] transition-colors shadow-sm">
-          Filter
+          Search
         </button>
       </form>
     </div>
 
+<!-- Filter Form -->
+<div class="mb-6 bg-white p-4 rounded-lg shadow-sm">
+  <form method="GET" action="{{ route('admin.internships.index') }}" class="flex flex-wrap items-center gap-4">
+    <!-- Assignment Filter -->
+    <div class="flex items-center space-x-2">
+      <label for="assignment_filter" class="text-sm font-medium text-gray-700">Assignment:</label>
+      <select name="assignment_filter" id="assignment_filter" class="border border-gray-300 rounded-md p-2 focus:border-[#D68C3C] focus:ring-[#D68C3C]">
+        <option value="">All</option>
+        <option value="assigned" {{ request('assignment_filter') == 'assigned' ? 'selected' : '' }}>Assigned</option>
+        <option value="not_assigned" {{ request('assignment_filter') == 'not_assigned' ? 'selected' : '' }}>Not Assigned</option>
+      </select>
+    </div>
+
+    <!-- Status Filter -->
+    <div class="flex items-center space-x-2">
+      <label for="status_filter" class="text-sm font-medium text-gray-700">Status:</label>
+      <select name="status_filter" id="status_filter" class="border border-gray-300 rounded-md p-2 focus:border-[#D68C3C] focus:ring-[#D68C3C]">
+        <option value="">All</option>
+        <option value="Pending" {{ request('status_filter') == 'Pending' ? 'selected' : '' }}>Pending</option>
+        <option value="Accepted" {{ request('status_filter') == 'Accepted' ? 'selected' : '' }}>Accepted</option>
+        <option value="Not_Successful" {{ request('status_filter') == 'Not_Successful' ? 'selected' : '' }}>Not Successful</option>
+      </select>
+    </div>
+
+    <button type="submit" class="px-4 py-2 bg-[#D68C3C] text-white rounded-md hover:bg-[#bf7a2e] transition-colors shadow-sm">
+      Filter
+    </button>
+  </form>
+</div>
     <!-- Applications Table -->
     <div class="bg-white rounded-lg shadow-sm overflow-hidden">
       <table class="min-w-full divide-y divide-gray-200">
@@ -78,7 +97,8 @@
           <tr>
             <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Email</th>
             <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Status</th>
-            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Assigned Department</th>
+            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Department</th>
+            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Actions</th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
@@ -95,12 +115,23 @@
               </span>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-              @if($application->department)
-                {{ $application->department->name }}
-              @else
-                <span class="text-gray-500">Not Assigned</span>
-              @endif
+              {{ $application->department->name ?? 'Not Assigned' }}
             </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm">
+  @if($application->status !== 'Pending')
+  <form action="{{ route('admin.internships.destroy', $application->id) }}" method="POST">
+    @csrf
+    @method('DELETE')
+    <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('Are you sure?')">
+      Delete
+    </button>
+  </form>
+  @endif
+  <a href="{{ route('admin.internships.show', $application->id) }}" class="ml-2 text-[#D68C3C] hover:text-[#bf7a2e]">
+    View
+  </a>
+</td>
+
           </tr>
           @endforeach
         </tbody>

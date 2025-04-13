@@ -12,7 +12,7 @@ class Department extends Model
     use SoftDeletes;
 
     // Allow mass assignment for the 'name' field
-    protected $fillable = ['name','archived'];
+    protected $fillable = ['name', 'email', 'archived'];
     public function applications()
     {
         return $this->hasMany(InternshipApplication::class); // Assuming Attachment is the model for applications

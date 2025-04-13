@@ -17,12 +17,18 @@ use App\Models\Subcounty;
 use App\Models\Constituency;
 use App\Models\Homecounty;
 use Carbon\Carbon;
+use App\Exports\FullListingExport;
+use Illuminate\Support\Facades\Cache;
+use App\Models\InternshipApplication;
 
+use App\Models\PostPupillage;
+use App\Models\Pupillage;
 
 
 
 class AdminController extends Controller
 {
+  
     public function index(Request $request)
 {
     // Fetch distinct values for filters
@@ -143,8 +149,60 @@ public function updateStatus(Request $request)
     // Redirect back with a success message
     return redirect()->back()->with('message', 'Application updated successfully.');
 }
+public function updateStatusBulk(Request $request, $jobId)
+{
+    $validated = $request->validate([
+        'emails' => 'required|string',
+        'status' => 'required|in:Processing,Selected,Appointed,Not_Successful',
+        'remarks' => 'nullable|string|max:500',
+        'handle_remaining' => 'nullable'
+    ]);
 
+    // Get the job listing (optional, if needed for further logic)
+    $listing = Listing::findOrFail($jobId);
 
+    // Process emails: split, trim and filter out empty values
+    $emails = array_filter(array_map('trim', explode(',', $validated['emails'])));
+
+    $updatedCount = 0;
+    foreach ($emails as $email) {
+        // Update all applications for each email
+        $applications = Application::whereHas('user', function($query) use ($email) {
+            $query->where('email', $email);
+        })
+        ->where('job_id', $jobId)
+        ->get();
+
+        foreach ($applications as $application) {
+            $application->update([
+                'job_status' => $validated['status'],
+                'remarks' => $validated['remarks']
+            ]);
+            $updatedCount++;
+        }
+    }
+
+    $remainingCount = 0;
+    if ($request->filled('handle_remaining')) {
+        // Get the IDs of users matching the emails
+        $userIds = User::whereIn('email', $emails)->pluck('id')->toArray();
+
+        // Update remaining applications
+        $remainingCount = Application::where('job_id', $jobId)
+            ->whereNotIn('user_id', $userIds)
+            ->update([
+                'job_status' => 'Not_Successful',
+                'remarks' => 'Not successful'
+            ]);
+    }
+
+    $message = "Updated {$updatedCount} applications";
+    if ($remainingCount > 0) {
+        $message .= " and {$remainingCount} remaining applications marked as not successful";
+    }
+
+    return redirect()->back()->with('message', $message);
+}
 
 
 public function showSelectedForInterview(Request $request)
@@ -210,4 +268,10 @@ public function showAppointed(Request $request)
     {
         return view('admin.dashboard');
     }
+    public function exportFullListing($listingId)
+{
+    return Excel::download(new FullListingExport($listingId), 'applicants.xlsx');
+}
+
+
 }

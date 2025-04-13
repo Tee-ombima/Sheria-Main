@@ -146,7 +146,25 @@
         transform: rotate(360deg);
     }
 }
+.badge {
+    @apply px-2 py-1 rounded-full text-xs font-medium;
+}
 
+.badge-system {
+    @apply bg-gray-100 text-gray-600;
+}
+
+.badge-user {
+    @apply bg-blue-100 text-blue-600;
+}
+
+.badge-permissions {
+    @apply bg-purple-100 text-purple-600;
+}
+
+.badge-application {
+    @apply bg-green-100 text-green-600;
+}
     </style>
 <style>
 .rotate-90 {
@@ -161,6 +179,20 @@
 .hover\:bg-green-800:hover {
     background-color: #2d3f1f;
 }
+.status-badge {
+    @apply px-2 py-1 rounded text-sm;
+    
+    &.Accepted { @apply bg-green-100 text-green-800; }
+    &.Not_Accepted { @apply bg-red-100 text-red-800; }
+    &.Pending { @apply bg-yellow-100 text-yellow-800; }
+}
+
+.application-card {
+    @apply p-4 mb-4 border rounded transition-all;
+    
+    &:hover { @apply shadow-md; }
+}
+[x-cloak] { display: none !important; }
 </style>
 </head>
 
@@ -309,7 +341,7 @@
       @endif
       
 
-      @if(auth()->user()->role === 'admin')
+      @if(auth()->user()->role === 'admin' || auth()->user()->role === 'superadmin')
 <!-- Admin Menu Section -->
 <li class="relative group">
     <!-- Manage Users -->
@@ -319,7 +351,7 @@
     </a>
 </li>
 
-@if(auth()->user()->role === 'admin')
+@if(auth()->user()->role === 'admin' || auth()->user()->role === 'superadmin')
 <li class="relative group ml-6">
     <button class="hover:text-laravel text-white flex items-center gap-1 group">
         <i class="fa-solid fa-briefcase"></i>
@@ -344,8 +376,9 @@
             <a class="flex items-center px-4 py-2 text-sm text-white hover:bg-green-800" 
                href="/listings">
                 <i class="fa-solid fa-list-check mr-2"></i>
-                Manage existing Careers
+                Manage Job & Applicants
             </a>
+            
         </div>
     </div>
 </li>
@@ -390,21 +423,21 @@
                         <a class="flex items-center px-4 py-2 text-sm text-white hover:bg-green-800" 
                            href="{{ route('admin.departments.index') }}">
                             <i class="fa-solid fa-building mr-2"></i>
-                            Create Department
+                            Add Department Email
                         </a>
-                        <form action="{{ route('admin.internships.toggleApply') }}" method="POST">
-                            @csrf
-                            <button type="submit" class="w-full text-left flex items-center px-4 py-2 text-sm text-white hover:bg-green-800">
-                                <i class="fa-solid fa-toggle-{{ $internshipApplicationsEnabled ? 'on' : 'off' }} mr-2"></i>
-                                {{ $internshipApplicationsEnabled ? 'Disable' : 'Enable' }} Applications
-                            </button>
-                        </form>
+                        
                         <a class="flex items-center px-4 py-2 text-sm text-white hover:bg-green-800" 
                            href="{{ route('admin.internships.index') }}">
                             <i class="fa-solid fa-list-check mr-2"></i>
-                            Manage Applications
+                            Manage Internship/attachement Applications
                         </a>
+                       <a class="flex items-center px-4 py-2 text-sm text-white hover:bg-green-800" 
+                       href="{{ route('admin.settings.edit') }}">
+                        <i class="fa-solid fa-gear mr-2"></i>
+                        Internship/Attachment Program Capacity
+                    </a>
                     </div>
+                   
                 </div>
             </div>
 
@@ -425,13 +458,11 @@
                             <i class="fa-solid fa-gear mr-2"></i>
                             Manage Pupillages
                         </a>
-                        <form action="{{ route('admin.pupillages.toggleApply') }}" method="POST">
-                            @csrf
-                            <button type="submit" class="w-full text-left flex items-center px-4 py-2 text-sm text-white hover:bg-green-800">
-                                <i class="fa-solid fa-toggle-{{ $pupillageApplicationsEnabled ? 'on' : 'off' }} mr-2"></i>
-                                {{ $pupillageApplicationsEnabled ? 'Disable' : 'Enable' }} Applications
-                            </button>
-                        </form>
+                        <a class="flex items-center px-4 py-2 text-sm text-white hover:bg-green-800" 
+                       href="{{ route('admin.pupillage.edit') }}">
+                        <i class="fa-solid fa-gear mr-2"></i>
+                        Pupillage Program Capacity
+                    </a>
                     </div>
                 </div>
             </div>
@@ -453,13 +484,12 @@
                             <i class="fa-solid fa-gear mr-2"></i>
                             Manage Post Pupillage
                         </a>
-                        <form action="{{ route('admin.postPupillages.toggleApply') }}" method="POST">
-                            @csrf
-                            <button type="submit" class="w-full text-left flex items-center px-4 py-2 text-sm text-white hover:bg-green-800">
-                                <i class="fa-solid fa-toggle-{{ $postPupillageApplicationsEnabled ? 'on' : 'off' }} mr-2"></i>
-                                {{ $postPupillageApplicationsEnabled ? 'Disable' : 'Enable' }} Applications
-                            </button>
-                        </form>
+                        <a class="flex items-center px-4 py-2 text-sm text-white hover:bg-green-800" 
+                       href="{{ route('admin.postpupillage.edit') }}">
+                        <i class="fa-solid fa-gear mr-2"></i>
+                       PostPupillage Program Capacity
+                    </a>
+                        
                         <a class="flex items-center px-4 py-2 text-sm text-white hover:bg-green-800" 
                            href="{{ route('admin.postPupillages.editVacancyNumber') }}">
                             <i class="fa-solid fa-pen-to-square mr-2"></i>
@@ -580,19 +610,7 @@
 
 
 
-    <!-- Admin Actions -->
-@auth
-    @if(auth()->user()->role === 'admin')
-        <div class="flex space-x-2">
-            <!-- Post Job Button for Admin -->
-            <a href="/listings/create" class="bg-[#D68C3C] text-white py-2 px-5 hover:bg-[#bf7a2e] rounded-md">
-                Post Job
-            </a>
 
-            
-        </div>
-    @endif
-@endauth
 
 
 </footer>
@@ -836,7 +854,7 @@ $(document).ready(function(){
     }
   });
 </script>
-
+{{-- 
   <script>
         // Load form data from LocalStorage on page load
         document.addEventListener('DOMContentLoaded', function() {
@@ -866,7 +884,7 @@ $(document).ready(function(){
 
             localStorage.setItem('formData', JSON.stringify(formData));
         });
-    </script>
+    </script> --}}
 
 
 
@@ -1008,47 +1026,6 @@ $(document).ready(function(){
 
 
 
-<!--2 AJAX scripts for Load More -->
-    <script>
-        $(document).ready(function() {
-            $('#load-more').on('click', function() {
-                var button = $(this);
-                var page = button.data('page');
-                var url = "{{ route('admin.index') }}" + '?page=' + (page + 1) + '&' + decodeURIComponent($('form').serialize());
-
-                $.ajax({
-                    url: url,
-                    type: 'GET',
-                    beforeSend: function() {
-                        button.prop('disabled', true).text('Loading...');
-                    },
-                    success: function(response) {
-                        $('#listings-container').append(response);
-                        button.data('page', page + 1).prop('disabled', false).text('Load More');
-                    },
-                    error: function() {
-                        alert('Could not load more listings.');
-                        button.prop('disabled', false).text('Load More');
-                    }
-                });
-            });
-        });
-    </script>
-
-    <!-- Script to handle Load More functionality -->
-<script>
-    document.getElementById('load-more').addEventListener('click', function () {
-        const hiddenRows = document.querySelectorAll('.application-row[style*="display: none"]');
-        for (let i = 0; i < 6 && i < hiddenRows.length; i++) {
-            hiddenRows[i].style.display = 'block';
-        }
-        if (hiddenRows.length <= 6) {
-            document.getElementById('load-more-container').style.display = 'none';
-        }
-
-        
-    });
-</script>
 
 <!-- Script to handle dropdown and details toggle -->
 <script>
@@ -1328,6 +1305,7 @@ $(document).ready(function() {
         }
     }
 </script>
+
 
 </body>
 

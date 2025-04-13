@@ -20,6 +20,10 @@ return new class extends Migration
             $table->integer('vacancies')->default(0); // Add vacancies column
             
             $table->string('file')->nullable();
+            $table->dateTime('deadline')->nullable();
+
+            $table->boolean('archived')->default(false);
+
             $table->timestamps();
         });
     }

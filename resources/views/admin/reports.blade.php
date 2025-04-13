@@ -3,7 +3,6 @@
 <x-layout>
     <h1 class="text-center font-bold">Job Application Reports</h1>
 
-        <a href="{{ route('reports.download') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-500 hover:bg-green-600" >Download PDF</a>
 
 
     <table class="min-w-full bg-white border border-gray-200">
@@ -12,6 +11,10 @@
                 <th class="px-4 py-2 border-b">Job Title</th>
                 <th class="px-4 py-2 border-b">ID Number</th>
                 <th class="px-4 py-2 border-b">Name</th>
+                <th class="px-4 py-2 border-b">Gender</th>
+                <th class="px-4 py-2 border-b">County</th>
+                <th class="px-4 py-2 border-b">Subcounty</th>
+                <th class="px-4 py-2 border-b">Constituency</th>
                 <th class="px-4 py-2 border-b">Email</th>
                 <th class="px-4 py-2 border-b">Phone Number</th>
                 <th class="px-4 py-2 border-b">Alternate Phone Number</th>
@@ -23,6 +26,10 @@
                     <td class="px-4 py-2 border-b">{{ $report->job_title }}</td>
                     <td class="px-4 py-2 border-b">{{ $report->idno }}</td>
                     <td class="px-4 py-2 border-b">{{ $report->name }}</td>
+                    <td class="px-4 py-2 border-b">{{ $report->gender ?? 'N/A' }}</td>
+                    <td class="px-4 py-2 border-b">{{ $report->homecounty->name ?? 'N/A' }}</td>
+                    <td class="px-4 py-2 border-b">{{ $report->subcounty->name ?? 'N/A' }}</td>
+                    <td class="px-4 py-2 border-b">{{ $report->constituency->name ?? 'N/A' }}</td>
                     <td class="px-4 py-2 border-b">{{ $report->email }}</td>
                     <td class="px-4 py-2 border-b">{{ $report->phone_num }}</td>
                     <td class="px-4 py-2 border-b">{{ $report->altphone_num }}</td>

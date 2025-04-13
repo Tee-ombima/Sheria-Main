@@ -23,35 +23,47 @@ class UserFactory extends Factory
      * @return array<string, mixed>
      */
     public function definition()
-    {
+{
+    return [
+        'name' => $this->faker->name(),
+        'email' => $this->faker->unique()->safeEmail(),
+        'email_verified_at' => now(),
+        'password' => bcrypt('password'),
+    ];
+}
+
+public function configure()
+{
+    return $this->afterCreating(function (User $user) {
+        // Create all required profile sections
+        PersonalInfo::factory()->create(['user_id' => $user->id]);
+        AcademicInfo::factory()->create(['user_id' => $user->id]);
+        ProfInfo::factory()->create(['user_id' => $user->id]);
+        RelevantCourses::factory()->create(['user_id' => $user->id]);
+        Attachment::factory()->create(['user_id' => $user->id]);
+    });
+}
+
+    public function superadmin()
+{
+    return $this->state(function (array $attributes) {
         return [
-            'name' => $this->faker->name(),
-            'email' => $this->faker->unique()->safeEmail(),
-            'email_verified_at' => now(),
-            'password' => bcrypt('password'),
-            'role' => 'user',
-            
+            'name' => 'Super Admin',
+            'email' => 'ombimatitus7@gmail.com',
+            'password' => bcrypt('securepassword'),
+            'role' => 'superadmin',
+            'permissions' => [
+                'manage_users',
+                'manage_listings',
+                'manage_internships',
+                'manage_pupillages',
+                'manage_post_pupillages',
+                
+            ]
         ];
-    }
-    public function configure()
-    {
-        return $this->afterCreating(function (User $user) {
-            // Create personal info
-            PersonalInfo::factory()->create(['user_id' => $user->id]);
-
-            // Create academic info
-            AcademicInfo::factory()->count(2)->create(['user_id' => $user->id]);
-
-            // Create professional info
-            ProfInfo::factory()->count(2)->create(['user_id' => $user->id]);
-
-            // Create relevant courses
-            RelevantCourses::factory()->count(2)->create(['user_id' => $user->id]);
-
-            // Create attachments
-            Attachment::factory()->count(3)->create(['user_id' => $user->id]);
-        });
-    }
+    });
+}
+   
 
     /**
      * Indicate that the model's email address should be unverified.

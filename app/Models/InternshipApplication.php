@@ -4,10 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB; // Add this import
+use Illuminate\Support\Facades\Cache;
 
 class InternshipApplication extends Model
 {
     use HasFactory;
+    use SoftDeletes;
+
 
     protected $fillable = [
         'user_id',
@@ -23,6 +28,10 @@ class InternshipApplication extends Model
         'good_conduct',
         'cv',
         'status',
+        'deleted_by_admin',
+        'department_id', // Make sure this is included
+
+
     ];
 
     // Status Constants
@@ -45,4 +54,7 @@ class InternshipApplication extends Model
     {
         return $this->belongsTo(Department::class);
     }
+    // In InternshipApplication model
+    // app/Models/InternshipApplication.php
+
 }
