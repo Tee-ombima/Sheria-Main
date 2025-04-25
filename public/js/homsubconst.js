@@ -1,4 +1,3 @@
- 
 $(document).ready(function(){
 
     function toggleHomeCountyOther() {
@@ -33,47 +32,59 @@ $(document).ready(function(){
         }
     }
 
-    $('#homecounty').change(function(){
-        toggleHomeCountyOther();
+    // Update the change event for Home County to reset dependent fields and load subcounties.
+    $('#homecounty').change(function() {
         var homecountyID = $(this).val();
-        if (homecountyID && homecountyID !== 'other') {
-            $.ajax({
-                type:"GET",
-                url:"/getSubcounties/"+homecountyID, // Changed endpoint
-                success:function(res){               
-                    if(res){
-                        $("#subcounty").empty();
-                        $("#subcounty").append('<option value="" disabled selected>Select Subcounty</option>');
-                        $.each(res,function(key,value){
-                            $("#subcounty").append('<option value="'+value.id+'">'+value.name+'</option>');
-                        });
-                        $("#subcounty").append('<option value="other">Other</option>');
-                        $("#constituency").empty(); // Clear constituency when subcounty changes
-                    } else {
-                        $("#subcounty").empty();
-                    }
-                }
-            });
+        if (homecountyID === 'other') {
+            // Automatically set Subcounty & Constituency to 'other'
+            $('#subcounty').val('other').trigger('change');
+            $('#constituency').val('other').trigger('change');
         } else {
-            $("#subcounty").empty();
-            $("#subcounty").append('<option value="" disabled selected>Select Subcounty</option>');
-            $("#subcounty").append('<option value="other">Other</option>');
-            $("#constituency").empty();
-        }      
+            // Reset Subcounty and Constituency selections
+            $('#subcounty').val('').trigger('change');
+            $('#constituency').val('').trigger('change');
+
+            if (homecountyID) {
+                $.ajax({
+                    type: "GET",
+                    url: "/getSubcounties/" + homecountyID,
+                    success: function(res){               
+                        if(res) {
+                            $("#subcounty").empty();
+                            $("#subcounty").append('<option value="" disabled selected>Select Subcounty</option>');
+                            $.each(res, function(key, value) {
+                                $("#subcounty").append('<option value="'+value.id+'">'+value.name+'</option>');
+                            });
+                            $("#subcounty").append('<option value="other">Other</option>');
+                            $("#constituency").empty(); // Clear Constituency when Subcounty changes
+                        } else {
+                            $("#subcounty").empty();
+                        }
+                    }
+                });
+            } else {
+                $("#subcounty").empty();
+                $("#subcounty").append('<option value="" disabled selected>Select Subcounty</option>');
+                $("#subcounty").append('<option value="other">Other</option>');
+                $("#constituency").empty();
+            }
+        }
+        toggleHomeCountyOther();
     });
 
-    $('#subcounty').change(function(){ // Changed from #constituency to #subcounty
+    // Change event for Subcounty: load Constituencies and toggle "Other"
+    $('#subcounty').change(function(){ 
         toggleSubcountyOther();
         var subcountyID = $(this).val();
         if (subcountyID && subcountyID !== 'other') {
             $.ajax({
-                type:"GET",
-                url:"/getConstituencies/"+subcountyID, // Changed endpoint
-                success:function(res){               
-                    if(res){
+                type: "GET",
+                url: "/getConstituencies/" + subcountyID,
+                success: function(res){               
+                    if(res) {
                         $("#constituency").empty();
                         $("#constituency").append('<option value="" disabled selected>Select Constituency</option>');
-                        $.each(res,function(key,value){
+                        $.each(res, function(key, value) {
                             $("#constituency").append('<option value="'+value.id+'">'+value.name+'</option>');
                         });
                         $("#constituency").append('<option value="other">Other</option>');
@@ -89,13 +100,8 @@ $(document).ready(function(){
         }
     });
 
-    $('#subcounty').change(function(){
-        toggleSubcountyOther();
-    });
-
-    // Initial load
+    // Initial load: call toggle functions
     toggleHomeCountyOther();
     toggleConstituencyOther();
     toggleSubcountyOther();
-
 });

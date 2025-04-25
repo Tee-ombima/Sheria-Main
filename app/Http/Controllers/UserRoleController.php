@@ -30,46 +30,48 @@ class UserRoleController extends Controller
     return back()->with('message', 'Permissions updated successfully updated.');
 }
 
-
 public function index(Request $request)
 {
     $search = $request->input('search');
+    $filter = $request->input('filter', 'verified');
 
-    $query = User::whereNotNull('email_verified_at');
+    $query = User::query();
 
-    if ($search) {
-        $query->where('email', 'like', '%' . $search . '%');
+    // Apply filters
+    switch ($filter) {
+        case 'admins':
+            $query->where('role', 'admin');
+            break;
+        case 'unverified':
+            $query->whereNull('email_verified_at');
+            break;
+        case 'verified':
+            $query->whereNotNull('email_verified_at');
+            break;
+        case 'all':
+        default:
+            // No filter
+            break;
     }
 
-    $users = $query->paginate(10);
+    // Apply search
+    if ($search) {
+        $query->where(function ($q) use ($search) {
+            $q->where('email', 'like', "%{$search}%")
+              ->orWhere('name', 'like', "%{$search}%");
+        });
+    }
 
-    // Update index method statistics
-$totalUsers = Cache::remember('total_users', 3600, function () {
-    return Cache::lock('total_users_lock')->block(5, function () {
-        return User::count();
-    });
-});
+    $users = $query->paginate(10)->appends(['filter' => $filter]);
 
-$verifiedUsers = Cache::remember('verified_users', 3600, function () {
-    return Cache::lock('verified_users_lock')->block(5, function () {
-        return User::whereNotNull('email_verified_at')->count();
-    });
-});
-
-$unverifiedUsers = Cache::remember('unverified_users', 3600, function () {
-    return Cache::lock('unverified_users_lock')->block(5, function () {
-        return User::whereNull('email_verified_at')->count();
-    });
-});
-
-$adminUsers = Cache::remember('admin_users', 3600, function () {
-    return Cache::lock('admin_users_lock')->block(5, function () {
-        return User::where('role', 'admin')->count();
-    });
-});
+    // Keep existing cache logic for statistics
+    $totalUsers = Cache::remember('total_users', 3600, fn() => User::count());
+    $verifiedUsers = Cache::remember('verified_users', 3600, fn() => User::verified()->count());
+    $unverifiedUsers = Cache::remember('unverified_users', 3600, fn() => User::unverified()->count());
+    $adminUsers = Cache::remember('admin_users', 3600, fn() => User::admin()->count());
 
 
-    return view('admin.role-management', compact('users', 'search', 'totalUsers', 'verifiedUsers', 'unverifiedUsers', 'adminUsers'));
+    return view('admin.role-management', compact('users', 'search', 'filter', 'totalUsers', 'verifiedUsers', 'unverifiedUsers', 'adminUsers'));
 }
     /**
      * Toggle the role of the user between 'admin' and 'user'.

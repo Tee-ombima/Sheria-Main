@@ -67,26 +67,31 @@
             <span class="text-green-700">{{ session('message') }}</span>
         </div>
         @endif
-
-        <!-- Enhanced Search Form (Same as before) -->
-        <form method="GET" action="{{ route('admin.role-management') }}" class="mb-6">
-            <div class="flex gap-2">
-                <div class="flex-1 relative">
-                    <input type="text" name="search" value="{{ $search ?? '' }}" 
-                           placeholder="Search users by name or email..." 
-                           class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-200 focus:border-[#D68C3C] focus:ring-2 focus:ring-[#D68C3C]">
-                    <svg class="w-5 h-5 absolute left-3 top-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                    </svg>
-                </div>
-                <button type="submit" class="px-6 bg-[#D68C3C] text-white rounded-lg hover:bg-[#bf7a2e] transition-colors flex items-center">
-                    <span class="hidden md:inline">Search</span>
-                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                    </svg>
-                </button>
-            </div>
-        </form>
+<!-- Modify the search form in role-management.blade.php -->
+<form method="GET" action="{{ route('admin.role-management') }}" class="mb-6">
+    <div class="flex gap-2">
+        <div class="flex-1 relative">
+            <input type="text" name="search" value="{{ $search ?? '' }}" 
+                   placeholder="Search users by name or email..." 
+                   class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-200 focus:border-[#D68C3C] focus:ring-2 focus:ring-[#D68C3C]">
+            <svg class="w-5 h-5 absolute left-3 top-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+        </div>
+        <select name="filter" class="rounded-lg border border-gray-200 focus:border-[#D68C3C] focus:ring-2 focus:ring-[#D68C3C]">
+            <option value="all" {{ request('filter') === 'all' ? 'selected' : '' }}>All Users</option>
+            <option value="admins" {{ request('filter') === 'admins' ? 'selected' : '' }}>Admins Only</option>
+            <option value="unverified" {{ request('filter') === 'unverified' ? 'selected' : '' }}>Unverified</option>
+            <option value="verified" {{ request('filter') === 'verified' ? 'selected' : '' }}>Verified Only</option>
+        </select>
+        <button type="submit" class="px-6 bg-[#D68C3C] text-white rounded-lg hover:bg-[#bf7a2e] transition-colors flex items-center">
+            <span class="hidden md:inline">Search</span>
+            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+        </button>
+    </div>
+</form>
 
         <!-- Enhanced Table -->
     <div class="overflow-x-auto rounded-lg border border-gray-200">
@@ -212,73 +217,93 @@
 
 @if($users->hasPages())
     <div class="mt-6">
-        {{ $users->appends(['search' => $search])->onEachSide(3)->links('pagination::tailwind') }}
+        {{ $users->appends(['search' => $search,
+    'filter' => $filter])->onEachSide(3)->links('pagination::tailwind') }}
     </div>
 @endif
-        <x-unified-log :logs="\Spatie\Activitylog\Models\Activity::latest()->paginate(10)" />
+<!-- Add to your unified-log.blade.php -->
+<div class="mb-4 flex justify-between items-center">
+    <h2 class="text-2xl font-bold">Activity Logs</h2>
+    <a href="{{ route('logs.export') }}" 
+       class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg">
+        <i class="fas fa-download mr-2"></i> Export Logs
+    </a>
+</div>
+        <x-unified-log :logs="\Spatie\Activitylog\Models\Activity::latest()->take(20)->get()" />
 
     </x-card>
+<script>
+  // ————————————————
+  // 1) Confirm before toggling user role
+  // ————————————————
+  function confirmRoleChange(event, userId, currentRole) {
+    event.preventDefault(); // stop the checkbox/form for now
+
+    const form = document.getElementById(`toggle-role-form-${userId}`);
+    const checkbox = form.querySelector('input[type="checkbox"]');
+    const newRole = currentRole === 'admin' ? 'user' : 'admin';
+    const confirmMsg = `Are you sure you want to change this user's role from ${currentRole} to ${newRole}?`;
+
+    if (!confirm(confirmMsg)) {
+      // user cancelled → revert the checkbox
+      checkbox.checked = (currentRole === 'admin');
+      return;
+    }
+
+    // user confirmed → submit the form
+    form.submit();
+  }
+
+  // ————————————————
+  // 2) Permissions modal open/close
+  // ————————————————
+  const users = @json($users->keyBy('id')->toArray());
+
+  function openPermissionsModal(userId) {
+    const userData = users[userId] || {};
+    const form     = document.getElementById('permissionsForm');
+
+    // set form action
+    form.action = `/users/${userId}/permissions`;
+
+    // tick the boxes that this user already has
+    form.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+      cb.checked = Array.isArray(userData.permissions) && userData.permissions.includes(cb.value);
+    });
+
+    document.getElementById('permissionsModal').classList.remove('hidden');
+  }
+
+  function closePermissionsModal() {
+    document.getElementById('permissionsModal').classList.add('hidden');
+  }
+
+  // click outside the dialog closes it
+  document.getElementById('permissionsModal')
+          .addEventListener('click', e => {
+    if (e.target.id === 'permissionsModal') {
+      closePermissionsModal();
+    }
+  });
+
+  // ————————————————
+  // 3) Loading spinner on every form submit
+  // ————————————————
+  document.querySelectorAll('form').forEach(form => {
+    form.addEventListener('submit', () => {
+      const btn = form.querySelector('button[type="submit"]');
+      if (!btn) return;
+
+      btn.innerHTML = `
+        <svg class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+        </svg>
+        Processing...
+      `;
+      btn.disabled = true;
+    });
+  });
+</script>
 
 </x-layout>
-
-    <script>
-        // Permissions Modal Functions
-        function openPermissionsModal(userId) {
-            const user = @json($users->keyBy('id')->toArray());
-            const userData = user[userId];
-            
-            // Set form action
-            document.getElementById('permissionsForm').action = `/users/${userId}/permissions`;
-            
-            // Check checkboxes
-            document.querySelectorAll('#permissionsForm input[type="checkbox"]').forEach(checkbox => {
-                checkbox.checked = userData.permissions?.includes(checkbox.value) || false;
-            });
-            
-            document.getElementById('permissionsModal').classList.remove('hidden');
-        }
-
-        function closePermissionsModal() {
-            document.getElementById('permissionsModal').classList.add('hidden');
-        }
-
-        // Close modal when clicking outside
-        document.getElementById('permissionsModal').addEventListener('click', (e) => {
-            if(e.target.id === 'permissionsModal') closePermissionsModal();
-        });
-    </script>
-
-    
-    <script>
-        // Confirmation before toggling user role
-        function confirmRoleChange(event, userId, currentRole) {
-            const newRole = currentRole === 'admin' ? 'user' : 'admin';
-            const confirmation = confirm(`Are you sure you want to change this user's role from ${currentRole} to ${newRole}?`);
-
-            if (!confirmation) {
-                event.preventDefault(); // Prevent form submission
-                const form = document.getElementById(`toggle-role-form-${userId}`);
-                const checkbox = form.querySelector('input[type="checkbox"]');
-                checkbox.checked = currentRole === 'admin'; // Reset checkbox state
-            } else {
-                // Submit the form if confirmed
-                document.getElementById(`toggle-role-form-${userId}`).submit();
-            }
-        }
-
-        // Add loading state for form submissions
-        document.querySelectorAll('form').forEach(form => {
-            form.addEventListener('submit', (e) => {
-                const submitBtn = form.querySelector('button[type="submit"]');
-                if(submitBtn) {
-                    submitBtn.innerHTML = `
-                        <svg class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                        </svg>
-                        Processing...`;
-                    submitBtn.disabled = true;
-                }
-            });
-        });
-    </script>

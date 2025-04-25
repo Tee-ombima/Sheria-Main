@@ -118,17 +118,12 @@
           <p class="text-sm text-gray-600">Status</p>
           <p class="text-lg font-medium text-gray-900">{{ $postpupillage->status }}</p>
         </div>
-        @if($postpupillage->remarks)
-          <div>
-            <p class="text-sm text-gray-600">Remarks</p>
-            <p class="text-lg font-medium text-gray-900">{{ $postpupillage->remarks }}</p>
-          </div>
-        @endif
+        
       </div>
     </div>
 
     <!-- Form to Update Application (For Admin) -->
-    @if(Auth::check() && Auth::user()->role === 'admin')
+@if(Auth::check() && in_array(Auth::user()->role, ['admin', 'superadmin']))
       <div class="bg-white p-6 rounded-lg shadow-sm">
         @if ($errors->any())
           <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-md mb-6">

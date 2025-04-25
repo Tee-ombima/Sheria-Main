@@ -38,22 +38,22 @@ class DepartmentController extends Controller
 ],
         ]);
 
-        // Create and save department
-        Department::create($request->only('name','email'));
-        $department = Department::create($request->only('name','email'));
-activity()
-    ->causedBy(auth()->user())
-    ->performedOn($department)
-    ->withProperties([
-        'admin_email' => auth()->user()->email,
-        'department_email' => $request->email
-    ])
-    ->log('New department created');
+       // Only one create() call now
+       $department = Department::create($request->only('name', 'email'));
 
-        // Redirect with success message
-        return redirect()->route('admin.departments.index')->with('message', 'Department created successfully.');
-    }
+       activity()
+           ->causedBy(auth()->user())
+           ->performedOn($department)
+           ->withProperties([
+               'admin_email'      => auth()->user()->email,
+               'department_email' => $department->email,
+           ])
+           ->log('New department created');
 
+       return redirect()
+           ->route('admin.departments.index')
+           ->with('message', 'Department created successfully.');
+   }
     // Other methods (index, edit, etc.)
     // List all departments (index method)
     public function index()

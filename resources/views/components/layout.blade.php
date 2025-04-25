@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+
 <link href="{{ asset('css/app.css') }}" rel="stylesheet">
 <script src="//unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
@@ -39,9 +40,7 @@
         },
       }
   </script>
-  <title>Sheriaportal | Find AG Jobs & Programmes</title>
-  <style>
-  .text-lg ul,
+  <style>.text-lg ul,
 .text-lg ol {
     margin-left: 20px;
     list-style: disc outside; /* For bullets */
@@ -165,8 +164,7 @@
 .badge-application {
     @apply bg-green-100 text-green-600;
 }
-    </style>
-<style>
+   
 .rotate-90 {
     transform: rotate(90deg);
 }
@@ -192,8 +190,9 @@
     
     &:hover { @apply shadow-md; }
 }
-[x-cloak] { display: none !important; }
-</style>
+[x-cloak] { display: none !important; }</style>
+  <title>Office Of The Attorney General | Jobs & Programmes</title>
+  
 </head>
 
 <body class="mb-48 mt-16"> <!-- Adjust the margin-top to match the height of your navbar -->
@@ -620,693 +619,85 @@
         document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("loader").style.display = "none";
         });
-    </script>
-<script>
-  //overall tick listener
-    function toggleUserProfileDropdown() {
-        const dropdownMenu = document.getElementById('dropdownMenu');
-        dropdownMenu.classList.toggle('hidden');
-    }
-    </script>
-    
 
-  
-<script>
-$(document).ready(function(){
-
-    function toggleHomeCountyOther() {
-        if ($('#homecounty').val() === 'other') {
-            $('#homecounty_other_div').show();
-            $('#constituency_div').hide();
-            $('#constituency_other_div').hide();
-            $('#subcounty_div').hide();
-            $('#subcounty_other_div').hide();
-        } else {
-            $('#homecounty_other_div').hide();
-            $('#constituency_div').show();
-        }
-    }
-
-    function toggleConstituencyOther() {
-        if ($('#constituency').val() === 'other') {
-            $('#constituency_other_div').show();
-            $('#subcounty_div').hide();
-            $('#subcounty_other_div').hide();
-        } else {
-            $('#constituency_other_div').hide();
-            $('#subcounty_div').show();
-        }
-    }
-
-    function toggleSubcountyOther() {
-        if ($('#subcounty').val() === 'other') {
-            $('#subcounty_other_div').show();
-        } else {
-            $('#subcounty_other_div').hide();
-        }
-    }
-
-    $('#homecounty').change(function(){
-        toggleHomeCountyOther();
-        var homecountyID = $(this).val();
-        if (homecountyID && homecountyID !== 'other') {
-            $.ajax({
-                type:"GET",
-                url:"/getSubcounties/"+homecountyID, // Changed endpoint
-                success:function(res){               
-                    if(res){
-                        $("#subcounty").empty();
-                        $("#subcounty").append('<option value="" disabled selected>Select Subcounty</option>');
-                        $.each(res,function(key,value){
-                            $("#subcounty").append('<option value="'+value.id+'">'+value.name+'</option>');
-                        });
-                        $("#subcounty").append('<option value="other">Other</option>');
-                        $("#constituency").empty(); // Clear constituency when subcounty changes
-                    } else {
-                        $("#subcounty").empty();
-                    }
-                }
-            });
-        } else {
-            $("#subcounty").empty();
-            $("#subcounty").append('<option value="" disabled selected>Select Subcounty</option>');
-            $("#subcounty").append('<option value="other">Other</option>');
-            $("#constituency").empty();
-        }      
-    });
-
-    $('#subcounty').change(function(){ // Changed from #constituency to #subcounty
-        toggleSubcountyOther();
-        var subcountyID = $(this).val();
-        if (subcountyID && subcountyID !== 'other') {
-            $.ajax({
-                type:"GET",
-                url:"/getConstituencies/"+subcountyID, // Changed endpoint
-                success:function(res){               
-                    if(res){
-                        $("#constituency").empty();
-                        $("#constituency").append('<option value="" disabled selected>Select Constituency</option>');
-                        $.each(res,function(key,value){
-                            $("#constituency").append('<option value="'+value.id+'">'+value.name+'</option>');
-                        });
-                        $("#constituency").append('<option value="other">Other</option>');
-                    } else {
-                        $("#constituency").empty();
-                    }
-                }
-            });
-        } else {
-            $("#constituency").empty();
-            $("#constituency").append('<option value="" disabled selected>Select Constituency</option>');
-            $("#constituency").append('<option value="other">Other</option>');
-        }
-    });
-
-    $('#subcounty').change(function(){
-        toggleSubcountyOther();
-    });
-
-    // Initial load
-    toggleHomeCountyOther();
-    toggleConstituencyOther();
-    toggleSubcountyOther();
-
-});
-</script>
-
-<script>
-$(document).ready(function(){
-    function toggleOtherField(selectId, otherDivId) {
-        if ($('#' + selectId).val() === 'other') {
-            $('#' + otherDivId).show();
-        } else {
-            $('#' + otherDivId).hide();
-        }
-    }
-
-    $('#ethnicity').change(function(){
-        toggleOtherField('ethnicity', 'ethnicity_other_div');
-    });
-
-    
-
-    $('#salutation').change(function(){
-        toggleOtherField('salutation', 'salutation_other_div');
-    });
-
-    // Initial load to handle pre-selected values
-    toggleOtherField('ethnicity', 'ethnicity_other_div');
-    toggleOtherField('salutation', 'salutation_other_div');
-});
-</script>
-
-<script>
-$(document).ready(function(){
-    function toggleOtherField(selectId, otherDivId) {
-        if ($('#' + selectId).val() === 'other') {
-            $('#' + otherDivId).show();
-        } else {
-            $('#' + otherDivId).hide();
-        }
-    }
-
-    $('#highschool').change(function(){
-        toggleOtherField('highschool', 'highschool_other_div');
-    });
-
-    $('#specialisation').change(function(){
-        toggleOtherField('specialisation', 'specialisation_other_div');
-    });
-
-    $('#course').change(function(){
-        toggleOtherField('course', 'course_other_div');
-    });
-
-    $('#award').change(function(){
-        toggleOtherField('award', 'award_other_div');
-    });
-
-    $('#grade').change(function(){
-        toggleOtherField('grade', 'grade_other_div');
-    });
-
-    // Initial load to handle pre-selected values
-    toggleOtherField('highschool', 'highschool_other_div');
-    toggleOtherField('specialisation', 'specialisation_other_div');
-    toggleOtherField('course', 'course_other_div');
-    toggleOtherField('award', 'award_other_div');
-    toggleOtherField('grade', 'grade_other_div');
-});
-</script>
-
-<!-- Rest of your listing details -->
-
-
-
-<script>
-$(document).ready(function(){
-    function toggleOtherField(selectId, otherDivId) {
-        if ($('#' + selectId).val() === 'other') {
-            $('#' + otherDivId).show();
-        } else {
-            $('#' + otherDivId).hide();
-        }
-    }
-
-    $('#prof_area_of_study_high_school_level').change(function(){
-        toggleOtherField('prof_area_of_study_high_school_level', 'prof_area_of_study_other_div');
-    });
-
-    $('#prof_area_of_specialisation').change(function(){
-        toggleOtherField('prof_area_of_specialisation', 'prof_area_of_specialisation_other_div');
-    });
-
-    $('#prof_award').change(function(){
-        toggleOtherField('prof_award', 'prof_award_other_div');
-    });
-
-    $('#prof_grade').change(function(){
-        toggleOtherField('prof_grade', 'prof_grade_other_div');
-    });
-
-    // Initial load to handle pre-selected values
-    toggleOtherField('prof_area_of_study_high_school_level', 'prof_area_of_study_other_div');
-    toggleOtherField('prof_area_of_specialisation', 'prof_area_of_specialisation_other_div');
-    toggleOtherField('prof_award', 'prof_award_other_div');
-    toggleOtherField('prof_grade', 'prof_grade_other_div');
-});
-</script>
-
-
-<script>
-  function toggleUserProfileDropdown() {
-    document.getElementById('dropdownMenu').classList.toggle('hidden');
-  }
-
-  // Close dropdown if clicked outside
-  document.addEventListener('click', function (event) {
-    var dropdownMenu = document.getElementById('dropdownMenu');
-    var button = document.getElementById('menu-button');
-    
-    // Check if the click is outside the dropdown and button
-    if (!dropdownMenu.contains(event.target) && !button.contains(event.target)) {
-      dropdownMenu.classList.add('hidden');
-    }
-  });
-</script>
-{{-- 
-  <script>
-        // Load form data from LocalStorage on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('personal-info');
-            const formData = JSON.parse(localStorage.getItem('formData')) || {};
-
-            for (const key in formData) {
-                if (formData.hasOwnProperty(key) && form[key]) {
-                    form[key].value = formData[key];
-                }
-            }
-        });
-
-        // Save form data to LocalStorage on form submit
-        document.getElementById('personal-info').addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            const formData = {};
-            const form = event.target;
-
-            for (let i = 0; i < form.elements.length; i++) {
-                const element = form.elements[i];
-                if (element.name) {
-                    formData[element.name] = element.value;
-                }
-            }
-
-            localStorage.setItem('formData', JSON.stringify(formData));
-        });
-    </script> --}}
-
-
-
-
-
-  <script>
-  //select fields n homecounty
-    document.addEventListener('DOMContentLoaded', function () {
-      $(document).ready(function() {
-        $('#specialisation').select2({
-          placeholder: 'Select Specialisation',
-          allowClear: true
-        });
-
-        $('#course').select2({
-          placeholder: 'Select Course',
-          allowClear: true
-        });
-
-        $('#highschool').select2({
-          placeholder: 'Select Highschool',
-          allowClear: true
-        });
-
-        $('#prof_area_of_specialisation').select2({
-          placeholder: 'Select Specialisation',
-          allowClear: true
-        });
-
-        $('#prof_award').select2({
-          placeholder: 'Select Award',
-          allowClear: true
-        });
-
-        $('#prof_area_of_study_high_school_level').select2({
-          placeholder: 'Select Area of Study',
-          allowClear: true
-        });
-      });
-
-      var disabilityQuestion = document.getElementById('disability_question');
-      var natureOfDisabilityContainer = document.getElementById('nature_of_disability_container');
-      var ncpdRegistrationNoContainer = document.getElementById('ncpd_registration_no_container');
-
-      function toggleDisabilityFields() {
-        if (disabilityQuestion.value === 'yes') {
-          natureOfDisabilityContainer.classList.remove('hidden');
-          ncpdRegistrationNoContainer.classList.remove('hidden');
-        } else {
-          natureOfDisabilityContainer.classList.add('hidden');
-          ncpdRegistrationNoContainer.classList.add('hidden');
-        }
-      }
-
-      disabilityQuestion.addEventListener('change', toggleDisabilityFields);
-      toggleDisabilityFields();
-    });
-
-
-  </script>
-
-
-
-
-<script>
-// delete row table
-    $(document).ready(function(){
-        $('.delete-row').click(function(){
-            var index = $(this).data('index');
-            $('tr[data-index="' + index + '"]').remove();
-
-            $.ajax({
-                url: '{{ route("remove.session.row") }}',
-                type: 'POST',
-                data: {
-                    _token: '{{ csrf_token() }}',
-                    index: index
-                },
-                success: function(response) {
-                    console.log(response);
-                },
-                error: function(xhr) {
-                    console.log(xhr.responseText);
-                }
-            });
-        });
-    });
-</script>
-
-
-
-<!--attachment edit button -->
-
-<script>
-        function showOtherField(select) {
-            const otherField = document.getElementById('other-document-name');
-            if (select.value === 'other') {
-                otherField.style.display = 'flex';
-            } else {
-                otherField.style.display = 'none';
-            }
-        }
-
-        function editAttachment(id, documentName) {
-            // Populate modal fields
-            document.getElementById('editAttachmentId').value = id;
-            document.getElementById('edit_document_name').value = documentName;
-
-            // Show the modal
-            document.getElementById('editModal').classList.remove('hidden');
-        }
-
-        function closeEditModal() {
-            // Hide the modal
-            document.getElementById('editModal').classList.add('hidden');
-        }
-    </script>
-
-    
-<!--academic edit button -->
-
- <script>
-        // Function to open the edit modal and populate the form with the selected row's data
-        function openEditModal(datum) {
-            document.getElementById('academic_id').value = datum.id;
-            document.getElementById('edit_institution_name').value = datum.institution_name;
-            document.getElementById('edit_student_admission_no').value = datum.student_admission_no;
-            // Populate other fields as needed
-
-            // Show the modal
-            document.getElementById('editModal').classList.remove('hidden');
-        }
-
-        // Function to close the edit modal
-        function closeEditModal() {
-            document.getElementById('editModal').classList.add('hidden');
-        }
-    </script>
-
-
-
-
-<!-- Script to handle dropdown and details toggle -->
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        function toggleDetails(element) {
-            const detailsSection = element.parentElement.nextElementSibling;
-            if (detailsSection.classList.contains('hidden')) {
-                detailsSection.classList.remove('hidden');
-                element.innerText = '▲';  // Change icon to an up arrow when expanded
-            } else {
-                detailsSection.classList.add('hidden');
-                element.innerText = '▼';  // Change icon to a down arrow when collapsed
-            }
-        }
-
-        document.querySelectorAll('.dropdown-icon').forEach(function (icon) {
-            icon.addEventListener('click', function () {
-                toggleDetails(this);
-            });
-        });
-    });
-</script>
-<script>
-let openDropdown = null;
-let openSubDropdown = null;
-
-function toggleMainDropdown(dropdownId) {
-    const dropdown = document.getElementById(dropdownId);
-    const chevron = document.getElementById('programs-chevron');
-    
-    // Close other dropdowns
-    if (openDropdown && openDropdown !== dropdown) {
-        openDropdown.classList.add('hidden');
-    }
-    if (openSubDropdown) {
-        openSubDropdown.classList.add('hidden');
-        openSubDropdown = null;
-    }
-    
-    // Toggle current dropdown
-    dropdown.classList.toggle('hidden');
-    chevron.classList.toggle('rotate-180');
-    
-    // Update state
-    openDropdown = dropdown.classList.contains('hidden') ? null : dropdown;
-}
-
-function toggleSubDropdown(subDropdownId, button) {
-    const subDropdown = document.getElementById(subDropdownId);
-    const arrow = button.querySelector('.submenu-arrow');
-    
-    // Close other subdropdowns
-    if (openSubDropdown && openSubDropdown !== subDropdown) {
-        openSubDropdown.classList.add('hidden');
-    }
-    
-    // Toggle current subdropdown
-    subDropdown.classList.toggle('hidden');
-    arrow.classList.toggle('rotate-90');
-    
-    // Update state
-    openSubDropdown = subDropdown.classList.contains('hidden') ? null : subDropdown;
-}
-
-// Close dropdowns when clicking outside
-document.addEventListener('click', (e) => {
-    if (!e.target.closest('.relative')) {
-        if (openDropdown) {
-            openDropdown.classList.add('hidden');
-            document.getElementById('programs-chevron').classList.remove('rotate-180');
-            openDropdown = null;
-        }
-        if (openSubDropdown) {
-            openSubDropdown.classList.add('hidden');
-            openSubDropdown = null;
-        }
-    }
-});
-</script>
-
-
-<script>
-$(document).ready(function() {
-    // Function to fetch sub-counties based on selected county
-    $('#home_county').change(function() {
-        var countyID = $(this).val();
-
-        if (countyID == 'Other') {
-            $('#other_home_county').show();
-            $('#sub_county').html('<option value="Other">Other</option>');
-            $('#other_sub_county').show();
-        } else {
-            $('#other_home_county').hide();
-            $('#other_sub_county').hide();
-            if (countyID) {
-                $.ajax({
-                    url: '/getSubCounties/' + countyID,
-                    type: "GET",
-                    dataType: "json",
-                    success: function(data) {
-                        $('#sub_county').empty();
-                        $('#sub_county').append('<option value="">Select Sub County</option>');
-                        $.each(data, function(key, value) {
-                            $('#sub_county').append('<option value="'+ key +'">'+ value +'</option>');
-                        });
-                        $('#sub_county').append('<option value="Other">Other</option>');
-                    }
-                });
-            } else {
-                $('#sub_county').empty();
-                $('#sub_county').append('<option value="">Select Sub County</option>');
-            }
-        }
-    });
-
-    // Show or hide 'Other Sub County' input
-    $('#sub_county').change(function() {
-        var subCounty = $(this).val();
-        if (subCounty == 'Other') {
-            $('#other_sub_county').show();
-        } else {
-            $('#other_sub_county').hide();
-        }
-    });
-
-    // Trigger change event on page load if there's a selected value
-    var selectedCounty = '{{ old('home_county') }}';
-    if (selectedCounty) {
-        $('#home_county').val(selectedCounty).trigger('change');
-    }
-});
-</script>
-
-<script>
-$(document).ready(function() {
-    // Function to fetch sub-countypps based on selected countypp
-    $('#home_countypp').change(function() {
-        var countyppID = $(this).val();
-
-        if (countyppID == 'Other') {
-            $('#other_home_countypp').show();
-            $('#sub_countypp').html('<option value="Other">Other</option>');
-            $('#other_sub_countypp').show();
-        } else {
-            $('#other_home_countypp').hide();
-            $('#other_sub_countypp').hide();
-            if (countyppID) {
-                $.ajax({
-                    url: '/getSubCountypps/' + countyppID,
-                    type: "GET",
-                    dataType: "json",
-                    success: function(data) {
-                        $('#sub_countypp').empty();
-                        $('#sub_countypp').append('<option value="">Select Sub County</option>');
-                        $.each(data, function(key, value) {
-                            $('#sub_countypp').append('<option value="'+ key +'">'+ value +'</option>');
-                        });
-                        $('#sub_countypp').append('<option value="Other">Other</option>');
-                    }
-                });
-            } else {
-                $('#sub_countypp').empty();
-                $('#sub_countypp').append('<option value="">Select Sub County</option>');
-            }
-        }
-    });
-
-    // Show or hide 'Other Sub Countypp' input
-    $('#sub_countypp').change(function() {
-        var subCountypp = $(this).val();
-        if (subCountypp == 'Other') {
-            $('#other_sub_countypp').show();
-        } else {
-            $('#other_sub_countypp').hide();
-        }
-    });
-
-    // Trigger change event on page load if there's a selected value
-    var selectedCountypp = '{{ old('home_countypp') }}';
-    if (selectedCountypp) {
-        $('#home_countypp').val(selectedCountypp).trigger('change');
-    }
-});
-</script>
-
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        function toggleOtherField(selectElement, otherFieldId) {
-            const otherField = document.getElementById(otherFieldId);
-            if (selectElement.value === 'Other') {
-                otherField.style.display = 'block';
-            } else {
-                otherField.style.display = 'none';
-            }
-        }
-
-        const ksceGradeSelect = document.getElementById('ksce_grade');
-        ksceGradeSelect.addEventListener('change', function () {
-            toggleOtherField(this, 'other_ksce_grade');
-        });
-        toggleOtherField(ksceGradeSelect, 'other_ksce_grade'); // Initialize on page load
-
-        const institutionNameSelect = document.getElementById('institution_name');
-        institutionNameSelect.addEventListener('change', function () {
-            toggleOtherField(this, 'other_institution_name');
-        });
-        toggleOtherField(institutionNameSelect, 'other_institution_name');
-
-        const institutionGradeSelect = document.getElementById('institution_grade');
-        institutionGradeSelect.addEventListener('change', function () {
-            toggleOtherField(this, 'other_institution_grade');
-        });
-        toggleOtherField(institutionGradeSelect, 'other_institution_grade');
-    });
-</script>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var areYouEmployed = document.getElementById('are_you_employed');
-        var employmentDetails = document.getElementById('employment_details');
-
-        function toggleEmploymentDetails() {
-            if (areYouEmployed.value == 'Yes') {
-                employmentDetails.style.display = 'block';
-            } else {
-                employmentDetails.style.display = 'none';
-            }
-        }
-
-        areYouEmployed.addEventListener('change', toggleEmploymentDetails);
-
-        // Call the function on page load to set the correct state
-        toggleEmploymentDetails();
-    });
-</script>
-
-
-<script>
-    // Function to show or hide the "Other" options for constituency and subcounty
-    function toggleOtherOptions() {
-        const homecounty = document.getElementById('homecounty').value;
-        const otherOptionConstituency = document.querySelector('#constituency option[value="other"]');
-        const otherOptionSubcounty = document.querySelector('#subcounty option[value="other"]');
         
-        // Show/hide the "Other" option based on home county selection
-        if (homecounty && homecounty !== "other") {
-            otherOptionConstituency.style.display = 'block';
-            otherOptionSubcounty.style.display = 'block';
-        } else {
-            otherOptionConstituency.style.display = 'none';
-            otherOptionSubcounty.style.display = 'none';
-        }
-    }
-
-    // Event listener for homecounty selection change
-    document.getElementById('homecounty').addEventListener('change', toggleOtherOptions);
-
-    // Initial call to handle default state (in case of re-render or validation errors)
-    toggleOtherOptions();
-</script>
+    </script>
 
 
 <script>
-    function confirmRoleChange(event, userId, currentRole) {
-        event.preventDefault(); // Prevent the form submission
-
-        const newRole = currentRole === 'admin' ? 'user' : 'admin';
-        const confirmed = confirm(`Are you sure you want to change the role to ${newRole}?`);
-
-        if (confirmed) {
-            // Submit the form for the respective user
-            document.getElementById(`toggle-role-form-${userId}`).submit();
-        } else {
-            // Revert the checkbox state if the action is canceled
-            event.target.checked = !event.target.checked;
-        }
+document.addEventListener('DOMContentLoaded', function() {
+    // ======== Details Toggle ========
+    function handleDetailToggles() {
+        document.querySelectorAll('.dropdown-icon').forEach(icon => {
+            icon.addEventListener('click', function() {
+                const detailsSection = this.parentElement.nextElementSibling;
+                const isHidden = detailsSection.classList.toggle('hidden');
+                this.textContent = isHidden ? '▼' : '▲';
+            });
+        });
     }
+
+    // ======== Dropdown Management ========
+    (function initDropdownSystem() {
+        let openDropdown = null;
+        let openSubDropdown = null;
+
+        // Main dropdown handler
+        window.toggleMainDropdown = function(dropdownId) {
+            const dropdown = document.getElementById(dropdownId);
+            const chevron = document.getElementById('programs-chevron');
+
+            // Close others
+            if (openDropdown && openDropdown !== dropdown) {
+                openDropdown.classList.add('hidden');
+            }
+            if (openSubDropdown) {
+                openSubDropdown.classList.add('hidden');
+                openSubDropdown = null;
+            }
+
+            // Toggle current
+            dropdown.classList.toggle('hidden');
+            chevron.classList.toggle('rotate-180');
+            openDropdown = dropdown.classList.contains('hidden') ? null : dropdown;
+        };
+
+        // Sub dropdown handler
+        window.toggleSubDropdown = function(subDropdownId, button) {
+            const subDropdown = document.getElementById(subDropdownId);
+            const arrow = button.querySelector('.submenu-arrow');
+
+            // Close others
+            if (openSubDropdown && openSubDropdown !== subDropdown) {
+                openSubDropdown.classList.add('hidden');
+            }
+
+            // Toggle current
+            subDropdown.classList.toggle('hidden');
+            arrow.classList.toggle('rotate-90');
+            openSubDropdown = subDropdown.classList.contains('hidden') ? null : subDropdown;
+        };
+
+        // Click-outside handler
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.relative')) {
+                if (openDropdown) {
+                    openDropdown.classList.add('hidden');
+                    document.getElementById('programs-chevron').classList.remove('rotate-180');
+                    openDropdown = null;
+                }
+                if (openSubDropdown) {
+                    openSubDropdown.classList.add('hidden');
+                    openSubDropdown = null;
+                }
+            }
+        });
+    })();
+
+    // Initialize systems
+    handleDetailToggles();
+});
 </script>
-
-
 </body>
 
 </html>

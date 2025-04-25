@@ -40,7 +40,6 @@ class PupillageExport implements FromCollection, WithMapping, WithHeadings
             $application->institution_grade,
             $application->declaration,
             $application->status,
-            $application->remarks,
         ];
     }
 
@@ -70,7 +69,6 @@ class PupillageExport implements FromCollection, WithMapping, WithHeadings
             'Institution Grade',
             'Declaration',
             'Status',
-            'Remarks',
         ];
     }
 }

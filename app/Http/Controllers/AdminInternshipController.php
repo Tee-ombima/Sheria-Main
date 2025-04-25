@@ -205,7 +205,7 @@ public function accepted()
     public function toggleApply()
     {
         // Only allow admins
-        if (Auth::user()->role !== 'admin') {
+        if (Auth::user()->role !== 'admin' && Auth::user()->role !== 'superadmin') {
             abort(403, 'Unauthorized Action');
         }
 

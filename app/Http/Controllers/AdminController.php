@@ -204,13 +204,11 @@ public function updateStatusBulk(Request $request, $jobId)
     return redirect()->back()->with('message', $message);
 }
 
-
 public function showSelectedForInterview(Request $request)
 {
     $jobTitle = $request->input('job_title');
     $jobs = Listing::all();
 
-    // Fetch applications with status "Selected"
     $applications = Application::where('job_status', 'Selected')
         ->when($jobTitle, function($query) use ($jobTitle) {
             return $query->whereHas('listing', function($q) use ($jobTitle) {
@@ -218,17 +216,16 @@ public function showSelectedForInterview(Request $request)
             });
         })
         ->with(['user.personalInfo', 'listing'])
-        ->get();
+        ->paginate(10); // Changed from get() to paginate()
 
     return view('admin.reports.selected', compact('applications', 'jobTitle', 'jobs'));
 }
-
 public function showAppointed(Request $request)
 {
     $jobTitle = $request->input('job_title');
     $jobs = Listing::all();
 
-    // Fetch applications with status "Appointed"
+    // Modified query with pagination
     $applications = Application::where('job_status', 'Appointed')
         ->when($jobTitle, function($query) use ($jobTitle) {
             return $query->whereHas('listing', function($q) use ($jobTitle) {
@@ -236,11 +233,10 @@ public function showAppointed(Request $request)
             });
         })
         ->with(['user.personalInfo', 'listing'])
-        ->get();
+        ->paginate(10); // Changed from get() to paginate()
 
     return view('admin.reports.appointed', compact('applications', 'jobTitle', 'jobs'));
 }
-
     public function exportCSV(Request $request)
     {
         $type = $request->input('type');

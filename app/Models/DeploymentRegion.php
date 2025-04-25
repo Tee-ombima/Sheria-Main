@@ -8,4 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class DeploymentRegion extends Model
 {
     use HasFactory;
+    protected $fillable = ['name', 'slug'];
+
 }

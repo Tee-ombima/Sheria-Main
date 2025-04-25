@@ -76,7 +76,6 @@ class ListingController extends Controller
     if ($request->hasFile('file')) {
         $formFields['file'] = $request->file('file')->store('files', 'public');
     }
-    Listing::create($formFields);
     $listing = Listing::create($formFields);
 activity()
     ->causedBy(auth()->user())

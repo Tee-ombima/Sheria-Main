@@ -40,7 +40,6 @@ class PupillageFactory extends Factory
             'other_institution_grade' => null,
             'declaration' => true,
             
-            'remarks' => $this->faker->optional()->sentence
         ];
     }
 }

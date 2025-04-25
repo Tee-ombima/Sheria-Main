@@ -39,7 +39,6 @@
                             placeholder="Enter emails separated by commas..."></textarea>
                     </div>
 
-                    <!-- Status and Remarks -->
                     <div class="space-y-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -294,5 +293,88 @@
         </div>
     </div>
         </x-card>
+
+    
+
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        function toggleDetails(element) {
+            const detailsSection = element.parentElement.nextElementSibling;
+            if (detailsSection.classList.contains('hidden')) {
+                detailsSection.classList.remove('hidden');
+                element.innerText = '▲';  // Change icon to an up arrow when expanded
+            } else {
+                detailsSection.classList.add('hidden');
+                element.innerText = '▼';  // Change icon to a down arrow when collapsed
+            }
+        }
+
+        document.querySelectorAll('.dropdown-icon').forEach(function (icon) {
+            icon.addEventListener('click', function () {
+                toggleDetails(this);
+            });
+        });
+    });
+</script>
+<script>
+let openDropdown = null;
+let openSubDropdown = null;
+
+function toggleMainDropdown(dropdownId) {
+    const dropdown = document.getElementById(dropdownId);
+    const chevron = document.getElementById('programs-chevron');
+    
+    // Close other dropdowns
+    if (openDropdown && openDropdown !== dropdown) {
+        openDropdown.classList.add('hidden');
+    }
+    if (openSubDropdown) {
+        openSubDropdown.classList.add('hidden');
+        openSubDropdown = null;
+    }
+    
+    // Toggle current dropdown
+    dropdown.classList.toggle('hidden');
+    chevron.classList.toggle('rotate-180');
+    
+    // Update state
+    openDropdown = dropdown.classList.contains('hidden') ? null : dropdown;
+}
+
+function toggleSubDropdown(subDropdownId, button) {
+    const subDropdown = document.getElementById(subDropdownId);
+    const arrow = button.querySelector('.submenu-arrow');
+    
+    // Close other subdropdowns
+    if (openSubDropdown && openSubDropdown !== subDropdown) {
+        openSubDropdown.classList.add('hidden');
+    }
+    
+    // Toggle current subdropdown
+    subDropdown.classList.toggle('hidden');
+    arrow.classList.toggle('rotate-90');
+    
+    // Update state
+    openSubDropdown = subDropdown.classList.contains('hidden') ? null : subDropdown;
+}
+
+// Close dropdowns when clicking outside
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.relative')) {
+        if (openDropdown) {
+            openDropdown.classList.add('hidden');
+            document.getElementById('programs-chevron').classList.remove('rotate-180');
+            openDropdown = null;
+        }
+        if (openSubDropdown) {
+            openSubDropdown.classList.add('hidden');
+            openSubDropdown = null;
+        }
+    }
+});
+</script>
 
 </x-layout>

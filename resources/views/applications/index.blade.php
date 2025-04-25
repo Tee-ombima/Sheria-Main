@@ -17,7 +17,9 @@
                 <tbody class="bg-white divide-y divide-gray-200">
                     @forelse($applications as $application)
                         <tr class="hover:bg-gray-100">
-                            <td class="px-4 py-2 whitespace-nowrap">{{ $loop->iteration }}</td>
+<td class="px-4 py-2 whitespace-nowrap">
+    {{ ($applications->currentPage() - 1) * $applications->perPage() + $loop->iteration }}
+</td>
                             <td class="px-4 py-2 whitespace-nowrap">{{ $application->idno }}</td>
                             <td class="px-4 py-2 whitespace-nowrap">{{ $application->name }}</td>
                             <td class="px-4 py-2 whitespace-nowrap">{{ $application->job_title }}</td>

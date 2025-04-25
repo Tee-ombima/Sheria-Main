@@ -51,7 +51,6 @@ class Pupillage extends Model
         'gross_salary',
 
         'status',
-        'remarks',
     ];
     // In your Pupillage model
 protected $casts = [

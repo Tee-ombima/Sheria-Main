@@ -76,31 +76,14 @@
                             <div class="flex items-start">
                                 <span class="font-medium text-gray-600 w-24">{{ str_replace('_', ' ', ucfirst($key)) }}:</span>
                                 <span class="flex-1 text-gray-800 break-words">
-                                    @if(is_array($value))
-                                        @if($key === 'old' || $key === 'new')
-                                            <div class="flex flex-wrap gap-1">
-                                                @foreach($value as $item)
-                                                    <span class="px-2 py-1 bg-gray-100 rounded text-xs">
-                                                        {{ $item }}
-                                                    </span>
-                                                @endforeach
-                                            </div>
-                                        @else
-                                            @foreach($value as $subKey => $subValue)
-                                                @if(is_array($subValue))
-                                                    <div class="ml-2 border-l-2 pl-2">
-                                                        @foreach($subValue as $k => $v)
-                                                            <div>
-                                                                <span class="font-medium">{{ $k }}:</span>
-                                                                {{ is_array($v) ? json_encode($v) : $v }}
-                                                            </div>
-                                                        @endforeach
-                                                    </div>
-                                                @else
-                                                    <div>{{ $subValue }}</div>
-                                                @endif
+                                    @if(is_array($value) || is_object($value))
+                                        <div class="flex flex-wrap gap-1">
+                                            @foreach((array)$value as $item)
+                                                <span class="px-2 py-1 bg-gray-100 rounded text-xs">
+                                                    {{ is_array($item) || is_object($item) ? json_encode($item) : $item }}
+                                                </span>
                                             @endforeach
-                                        @endif
+                                        </div>
                                     @else
                                         {{ $value ?? 'N/A' }}
                                     @endif
@@ -110,6 +93,7 @@
                     </div>
                 @endif
             </div>
+                
 
             <!-- Associated User -->
             @if($log->subject && $log->subject instanceof \App\Models\User)

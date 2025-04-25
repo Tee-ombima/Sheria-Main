@@ -184,12 +184,9 @@
                                     {{ $county->name }}
                                 </option>
                             @endforeach
-                            <option value="Other" {{ old('home_county') == 'Other' ? 'selected' : '' }}>Other</option>
+                            
                         </select>
-                        <input type="text" name="other_home_county" id="other_home_county" 
-                               value="{{ old('other_home_county') }}"
-                               class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C] hidden"
-                               placeholder="Specify County">
+                        
                     </div>
 
                     <!-- Sub County -->
@@ -200,10 +197,7 @@
                                required>
                             <option value="">Select Sub County</option>
                         </select>
-                        <input type="text" name="other_sub_county" id="other_sub_county"
-                               value="{{ old('other_sub_county') }}"
-                               class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C] hidden"
-                               placeholder="Specify Sub County">
+                        
                     </div>
 
                     <!-- Ethnicity -->
@@ -238,27 +232,23 @@
 
                     <!-- Deployment Region -->
                     <div>
-                        <label for="deployment_region" class="block text-sm font-medium text-gray-700">Deployment Region <span class="text-red-500">*</span></label>
-                        <select name="deployment_region" id="deployment_region"
-                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]"
-                               required>
-                            <option value="">Select Region</option>
-                            <option value="Nakuru" {{ old('deployment_region') == 'Nakuru' ? 'selected' : '' }}>Nakuru</option>
-                            <option value="Kisii" {{ old('deployment_region') == 'Kisii' ? 'selected' : '' }}>Kisii</option>
-                            <option value="Mombasa" {{ old('deployment_region') == 'Mombasa' ? 'selected' : '' }}>Mombasa</option>
-                            <option value="Kisumu" {{ old('deployment_region') == 'Kisumu' ? 'selected' : '' }}>Kisumu</option>
-                            <option value="Kericho" {{ old('deployment_region') == 'Kericho' ? 'selected' : '' }}>Kericho</option>
-                            <option value="Embu" {{ old('deployment_region') == 'Embu' ? 'selected' : '' }}>Embu</option>
-                            <option value="Nyeri" {{ old('deployment_region') == 'Nyeri' ? 'selected' : '' }}>Nyeri</option>
-                            <option value="Kakamega" {{ old('deployment_region') == 'Kakamega' ? 'selected' : '' }}>Kakamega</option>
-                            <option value="Malindi" {{ old('deployment_region') == 'Malindi' ? 'selected' : '' }}>Malindi</option>
-                            <option value="Eldoret" {{ old('deployment_region') == 'Eldoret' ? 'selected' : '' }}>Eldoret</option>
-                            <option value="Meru" {{ old('deployment_region') == 'Meru' ? 'selected' : '' }}>Meru</option>
-                            <option value="Garissa" {{ old('deployment_region') == 'Garissa' ? 'selected' : '' }}>Garissa</option>
-                            <option value="Machakos" {{ old('deployment_region') == 'Machakos' ? 'selected' : '' }}>Machakos</option>
-                            <option value="Other" {{ old('deployment_region') == 'Other' ? 'selected' : '' }}>Other</option>
-                        </select>
-                    </div>
+    <label for="deployment_region" class="block text-sm font-medium text-gray-700">Deployment Region <span class="text-red-500">*</span></label>
+    <select name="deployment_region" id="deployment_region"
+           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]"
+           required>
+        <option value="">Select Region</option>
+        @foreach($deploymentRegions as $region)
+            <option value="{{ $region->id }}" {{ old('deployment_region') == $region->id ? 'selected' : '' }}>
+                {{ $region->name }}
+            </option>
+        @endforeach
+        <option value="other" {{ old('deployment_region') === 'other' ? 'selected' : '' }}>Other</option>
+    </select>
+    <input type="text" name="other_deployment_region" id="other_deployment_region" 
+           value="{{ old('other_deployment_region') }}"
+           class="mt-2 w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C] hidden"
+           placeholder="Specify Region">
+</div>
                 </div>
             </div>
 
@@ -304,10 +294,30 @@
             </div>
         </form>
     </x-card>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
 
-    <script>
-        // Form submission handler
-        document.getElementById("applicationForm").addEventListener("submit", function(event) {
+    // Add to your existing script
+const deploymentRegionSelect = document.getElementById('deployment_region');
+const otherDeploymentRegion = document.getElementById('other_deployment_region');
+
+if (deploymentRegionSelect && otherDeploymentRegion) {
+    deploymentRegionSelect.addEventListener('change', function() {
+        const isOther = this.value === 'other';
+        otherDeploymentRegion.classList.toggle('hidden', !isOther);
+        otherDeploymentRegion.required = isOther;
+        if (!isOther) otherDeploymentRegion.value = '';
+    });
+    
+    // Initialize on page load
+    if (deploymentRegionSelect.value === 'other') {
+        otherDeploymentRegion.classList.remove('hidden');
+    }
+}
+    // Form Submission Handler
+    const form = document.getElementById('applicationForm');
+    if (form) {
+        form.addEventListener('submit', function(event) {
             const submitBtn = this.querySelector('button[type="submit"]');
             submitBtn.disabled = true;
             submitBtn.innerHTML = `
@@ -316,54 +326,96 @@
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
                 </svg>
                 Submitting...`;
-            document.getElementById("loader").classList.remove("hidden");
+            document.getElementById('loader').classList.remove('hidden');
         });
+    }
 
-        // Dynamic field toggling
-        const toggleConfig = {
-            'disability_status': 'nature_of_disability_container',
-            'home_county': 'other_home_county',
-            'deployment_region': 'other_deployment_region'
-        };
+    const homeCountySelect = document.getElementById('home_county');
+    const subCountySelect = document.getElementById('sub_county');
 
-        Object.entries(toggleConfig).forEach(([triggerId, targetId]) => {
-            const trigger = document.getElementById(triggerId);
-            if (trigger) {
-                trigger.addEventListener('change', function() {
-                    const target = document.getElementById(targetId);
-                    if (target) {
-                        target.style.display = this.value === 'Other' || this.value === '1' ? 'block' : 'none';
-                        if (target.tagName === 'INPUT' && this.value !== 'Other') {
-                            target.value = '';
-                        }
-                    }
-                });
-                // Initialize on load
-                if (trigger.value === 'Other' || trigger.value === '1') {
-                    document.getElementById(targetId).style.display = 'block';
+    if (homeCountySelect && subCountySelect) {
+        homeCountySelect.addEventListener('change', async function() {
+            const countyId = this.value;
+            
+            // Clear previous options
+            subCountySelect.innerHTML = '<option value="">Select Sub County</option>';
+            
+            if (countyId) {
+                try {
+                    const response = await fetch(`/getSubcounties/${countyId}`);
+                    const data = await response.json();
+                    
+                    data.forEach(subcounty => {
+                        const option = new Option(subcounty.name, subcounty.id);
+                        subCountySelect.add(option);
+                    });
+                } catch (error) {
+                    console.error('Error loading subcounties:', error);
+                    subCountySelect.innerHTML = '<option value="">Error loading subcounties</option>';
                 }
             }
         });
 
-        // County/Subcounty dynamic loading
-        document.getElementById('home_county').addEventListener('change', function() {
-            const countyId = this.value;
-            const subCountySelect = document.getElementById('sub_county');
-            
-            if (countyId === 'Other') {
-                document.getElementById('other_sub_county').style.display = 'block';
-                subCountySelect.style.display = 'none';
-            } else {
-                fetch(`/api/subcounties/${countyId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        subCountySelect.innerHTML = data.map(sc => 
-                            `<option value="${sc.id}">${sc.name}</option>`
-                        ).join('');
-                        subCountySelect.style.display = 'block';
-                        document.getElementById('other_sub_county').style.display = 'none';
-                    });
-            }
+        // Initialize if county is preselected
+        if (homeCountySelect.value) {
+            homeCountySelect.dispatchEvent(new Event('change'));
+        }
+    }
+
+    // Dynamic Field Toggling
+    function setupToggle(selectId, targetId) {
+        const select = document.getElementById(selectId);
+        const target = document.getElementById(targetId);
+        
+        if (select && target) {
+            const toggle = () => {
+                target.classList.toggle('hidden', select.value !== 'Other');
+                if (select.value !== 'Other') {
+                    target.querySelector('input').value = '';
+                }
+            };
+            select.addEventListener('change', toggle);
+            toggle(); // Initial state
+        }
+    }
+
+    // Setup toggle handlers
+    setupToggle('ksce_grade', 'other_ksce_grade');
+    setupToggle('institution_name', 'other_institution_name');
+    setupToggle('institution_grade', 'other_institution_grade');
+
+    // Disability Status Toggle
+    const disabilityStatus = document.getElementById('disability_status');
+    const disabilityContainer = document.getElementById('nature_of_disability_container');
+    
+    if (disabilityStatus && disabilityContainer) {
+        const toggleDisability = () => {
+            disabilityContainer.classList.toggle('hidden', disabilityStatus.value !== '1');
+        };
+        disabilityStatus.addEventListener('change', toggleDisability);
+        toggleDisability();
+    }
+
+    // Employment Details Toggle
+    const employmentStatus = document.getElementById('are_you_employed');
+    const employmentDetails = document.getElementById('employment_details');
+    
+    if (employmentStatus && employmentDetails) {
+        const toggleEmployment = () => {
+            employmentDetails.classList.toggle('hidden', employmentStatus.value !== 'Yes');
+        };
+        employmentStatus.addEventListener('change', toggleEmployment);
+        toggleEmployment();
+    }
+
+    // Phone Number Formatting
+    document.querySelectorAll('input[type="tel"]').forEach(input => {
+        input.addEventListener('input', function() {
+            this.value = this.value.replace(/\D/g, '').slice(0, 9);
         });
-    </script>
+    });
+});
+
+
+</script>
 </x-layout>

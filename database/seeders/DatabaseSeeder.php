@@ -55,7 +55,8 @@ class DatabaseSeeder extends Seeder
         KSCEGradeSeeder::class,
         InstitutionSeeder::class,
         InstitutionGradeSeeder::class,
-        
+        DeploymentRegionSeeder::class,
+
         
 
         

@@ -1,19 +1,37 @@
 <x-layout>
-  <!-- Main card with creamy background -->
   <x-card class="p-8 max-w-6xl mx-auto mt-24 bg-[#FFF5E6] rounded-lg shadow-lg">
-    <!-- Back Button -->
-    <a href="{{ url()->previous() }}" class="inline-flex items-center px-4 py-2 bg-[#D68C3C] text-white rounded-md hover:bg-[#bf7a2e] transition-colors shadow-sm mb-6">
-      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-      </svg>
-      Back
-    </a>
+    <!-- Header Section -->
+    <div class="mb-6">
+      <div class="flex justify-between items-start mb-6">
+        <a href="{{ url()->previous() }}" class="inline-flex items-center px-4 py-2 bg-[#D68C3C] text-white rounded-md hover:bg-[#bf7a2e] transition-colors shadow-sm">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+          </svg>
+          Back
+        </a>
+        <a href="{{ route('export.csv', ['type' => 'selected', 'job_title' => $jobTitle]) }}" 
+           class="inline-flex items-center px-4 py-2 bg-[#D68C3C] text-white rounded-md hover:bg-[#bf7a2e] transition-colors shadow-sm">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+          </svg>
+          Export CSV
+        </a>
+      </div>
 
-    <!-- Page Title -->
-    <h1 class="text-3xl font-bold mb-8 text-gray-900">Selected for Interview</h1>
+      <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
+        <h1 class="text-3xl font-bold text-gray-900">Selected for Interview</h1>
+        <div class="text-sm text-gray-500">
+          @if($applications->count())
+            Showing {{ $applications->firstItem() }} - {{ $applications->lastItem() }} of {{ $applications->total() }} results
+          @else
+            No results found
+          @endif
+        </div>
+      </div>
+    </div>
 
     <!-- Filter Form -->
-    <form method="GET" action="{{ url()->current() }}" class="mb-8 bg-white p-6 rounded-lg shadow-sm">
+    <form method="GET" action="{{ url()->current() }}" class="mb-6 bg-white p-4 rounded-lg shadow-sm">
       <div class="flex flex-wrap items-center gap-4">
         <label for="job_title" class="block text-sm font-medium text-gray-700">Filter by Job Title:</label>
         <select name="job_title" id="job_title" class="p-2 border border-gray-300 rounded-md shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]">
@@ -30,53 +48,64 @@
       </div>
     </form>
 
-    <!-- Applications Table -->
-    <div class="bg-white p-6 rounded-lg shadow-sm mb-8">
-      <table class="w-full border-collapse">
-        <thead class="bg-gray-50">
-  <tr>
-    <th class="p-4 text-left text-sm font-semibold text-gray-700 border-b">ID Number</th>
-    <th class="p-4 text-left text-sm font-semibold text-gray-700 border-b">Name</th>
-    <th class="p-4 text-left text-sm font-semibold text-gray-700 border-b">Gender</th>
-    <th class="p-4 text-left text-sm font-semibold text-gray-700 border-b">County</th>
-    <th class="p-4 text-left text-sm font-semibold text-gray-700 border-b">Subcounty</th>
-    <th class="p-4 text-left text-sm font-semibold text-gray-700 border-b">Constituency</th>
-    <th class="p-4 text-left text-sm font-semibold text-gray-700 border-b">Email</th>
-    <th class="p-4 text-left text-sm font-semibold text-gray-700 border-b">Mobile Number</th>
-    <th class="p-4 text-left text-sm font-semibold text-gray-700 border-b">Alternate Contact</th>
-  </tr>
-</thead>
-        <tbody class="divide-y divide-gray-200">
-  @foreach($applications as $application)
-    <tr class="hover:bg-gray-50 transition-colors">
-      <td class="p-4 text-gray-700">{{ $application->user->personalInfo->idno }}</td>
-      <td class="p-4 text-gray-700">{{ $application->user->personalInfo->firstname }} {{ $application->user->personalInfo->lastname }}</td>
-      <td class="p-4 text-gray-700">{{ $application->user->personalInfo->gender ?? 'N/A' }}</td>
-      <td class="p-4 text-gray-700">{{ $application->user->personalInfo->homecounty->name ?? 'N/A' }}</td>
-      <td class="p-4 text-gray-700">{{ $application->user->personalInfo->subcounty->name ?? 'N/A' }}</td>
-      <td class="p-4 text-gray-700">{{ $application->user->personalInfo->constituency->name ?? 'N/A' }}</td>
-      <td class="p-4 text-gray-700">{{ $application->user->email }}</td>
-      <td class="p-4 text-gray-700">{{ $application->user->personalInfo->mobile_num }}</td>
-      <td class="p-4 text-gray-700">
-        {{ $application->user->personalInfo->alt_contact_person }}: {{ $application->user->personalInfo->alt_contact_telephone_num }}
-      </td>
-    </tr>
-  @endforeach
-</tbody>
-      </table>
-    </div>
+    <!-- Table Container -->
+    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full border-collapse">
+          <thead class="bg-gray-50 sticky top-0">
+            <tr>
+              <th class="p-3 text-left text-sm font-semibold text-gray-700">ID Number</th>
+              <th class="p-3 text-left text-sm font-semibold text-gray-700">Name</th>
+              <th class="p-3 text-left text-sm font-semibold text-gray-700">Gender</th>
+              <th class="p-3 text-left text-sm font-semibold text-gray-700">County</th>
+              <th class="p-3 text-left text-sm font-semibold text-gray-700">Subcounty</th>
+              <th class="p-3 text-left text-sm font-semibold text-gray-700">Constituency</th>
+              <th class="p-3 text-left text-sm font-semibold text-gray-700">Email</th>
+              <th class="p-3 text-left text-sm font-semibold text-gray-700">Mobile</th>
+              <th class="p-3 text-left text-sm font-semibold text-gray-700">Alt Contact</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200">
+            @forelse($applications as $application)
+              <tr class="hover:bg-gray-50 transition-colors">
+                <td class="p-3 text-gray-700">{{ $application->user->personalInfo->idno }}</td>
+                <td class="p-3 text-gray-700">{{ $application->user->personalInfo->firstname }} {{ $application->user->personalInfo->lastname }}</td>
+                <td class="p-3 text-gray-700">{{ $application->user->personalInfo->gender ?? 'N/A' }}</td>
+                <td class="p-3 text-gray-700">{{ $application->user->personalInfo->homecounty->name ?? 'N/A' }}</td>
+                <td class="p-3 text-gray-700">{{ $application->user->personalInfo->subcounty->name ?? 'N/A' }}</td>
+                <td class="p-3 text-gray-700">{{ $application->user->personalInfo->constituency->name ?? 'N/A' }}</td>
+                <td class="p-3 text-gray-700 truncate max-w-[160px]" title="{{ $application->user->email }}">{{ $application->user->email }}</td>
+                <td class="p-3 text-gray-700">{{ $application->user->personalInfo->mobile_num }}</td>
+                <td class="p-3 text-gray-700">
+                  <span class="block">{{ $application->user->personalInfo->alt_contact_person }}</span>
+                  <span class="block text-sm text-gray-500">{{ $application->user->personalInfo->alt_contact_telephone_num }}</span>
+                </td>
+              </tr>
+            @empty
+              <tr>
+                <td colspan="9" class="p-6 text-center text-gray-500">No candidates found</td>
+              </tr>
+            @endforelse
+          </tbody>
+        </table>
+      </div>
 
-    <!-- Export Buttons -->
-    <div class="flex gap-4 mt-8">
-      <a href="{{ route('export.csv', ['type' => 'selected', 'job_title' => $jobTitle]) }}" 
-         class="inline-flex items-center px-4 py-2 bg-[#D68C3C] text-white rounded-md hover:bg-[#bf7a2e] transition-colors shadow-sm">
-        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-        </svg>
-        Export CSV
-      </a>
-      
-      
+      <!-- Pagination -->
+      @if($applications->hasPages())
+        <div class="p-4 border-t">
+          {{ $applications->appends(request()->query())->links() }}
+        </div>
+      @endif
     </div>
   </x-card>
+
+  <!-- Mobile Export Button -->
+  <div class="fixed bottom-4 right-4 z-50 md:hidden">
+    <a href="{{ route('export.csv', ['type' => 'selected', 'job_title' => $jobTitle]) }}" 
+       class="inline-flex items-center p-3 bg-[#D68C3C] text-white rounded-full shadow-lg hover:bg-[#bf7a2e] transition-colors">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+      </svg>
+    </a>
+  </div>
 </x-layout>

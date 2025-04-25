@@ -159,98 +159,69 @@
                  value="{{ old('ethnicity_other', $inputData['ethnicity_other'] ?? '') }}">
         </div>
       </div>
+<!-- Location Information -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- Home County Field -->
+    <div class="flex-1">
+        <label for="homecounty" class="block text-sm font-medium text-gray-700">
+            Home County<span class="text-red-500">*</span>
+        </label>
+        <select name="homecounty_id" id="homecounty" required 
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]">
+            <option value="" disabled selected>Select Home County</option>
+            @foreach($homecounties as $homecounty)
+                <option value="{{ $homecounty->id }}" {{ old('homecounty_id', $inputData['homecounty_id'] ?? '') == $homecounty->id ? 'selected' : '' }}>
+                    {{ $homecounty->name }}
+                </option>
+            @endforeach
+        </select>
+        @error('homecounty_id')
+            <span class="text-red-500 text-xs">{{ $message }}</span>
+        @enderror
+    </div>
 
-      <!-- Location Information -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6"> <!-- Home County Field -->
-<div class="flex-1">
-    <label for="homecounty" class="block text-sm font-medium text-gray-700">
-        Home County<span class="text-red-500">*</span>
-    </label>
-    <select name="homecounty_id" id="homecounty" required 
-            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]">
-        <option value="" disabled selected>Select Home County</option>
-        @foreach($homecounties as $homecounty)
-            <option value="{{ $homecounty->id }}" {{ old('homecounty_id', $inputData['homecounty_id'] ?? '') == $homecounty->id ? 'selected' : '' }}>
-                {{ $homecounty->name }}
-            </option>
-        @endforeach
-        <option value="other" {{ old('homecounty_id', $inputData['homecounty_id'] ?? '') == 'other' ? 'selected' : '' }}>Other</option>
-    </select>
-    @error('homecounty_id')
-        <span class="text-red-500 text-xs">{{ $message }}</span>
-    @enderror
-</div>
+    <!-- Subcounty Field -->
+    <div class="flex-1">
+        <label for="subcounty" class="block text-sm font-medium text-gray-700">
+            Subcounty<span class="text-red-500">*</span>
+        </label>
+        <select name="subcounty_id" id="subcounty" required 
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]">
+            <option value="" disabled selected>Select Subcounty</option>
+            @if(isset($subcounties))
+                @foreach($subcounties as $subcounty)
+                    <option value="{{ $subcounty->id }}" {{ old('subcounty_id', $inputData['subcounty_id'] ?? '') == $subcounty->id ? 'selected' : '' }}>
+                        {{ $subcounty->name }}
+                    </option>
+                @endforeach
+            @endif
+        </select>
+        @error('subcounty_id')
+            <span class="text-red-500 text-xs">{{ $message }}</span>
+        @enderror
+    </div>
 
-<!-- Input Field for "Other" Home County -->
-<div class="flex-1" id="homecounty_other_div" style="display: {{ old('homecounty_id', $inputData['homecounty_id'] ?? '') == 'other' ? 'block' : 'none' }};">
-    <label for="homecounty_other" class="block text-sm font-medium text-gray-700">
-        Please Specify Home County<span class="text-red-500">*</span>
-    </label>
-    <input type="text" name="homecounty_other" id="homecounty_other" 
-           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]"
-           value="{{ old('homecounty_other', $inputData['homecounty_other'] ?? '') }}">
-    @error('homecounty_other')
-        <span class="text-red-500 text-xs">{{ $message }}</span>
-    @enderror
+    <!-- Constituency Field -->
+    <div class="flex-1">
+        <label for="constituency" class="block text-sm font-medium text-gray-700">
+            Constituency<span class="text-red-500">*</span>
+        </label>
+        <select name="constituency_id" id="constituency" required 
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]">
+            <option value="" disabled selected>Select Constituency</option>
+            @if(isset($constituencies))
+                @foreach($constituencies as $constituency)
+                    <option value="{{ $constituency->id }}" {{ old('constituency_id', $inputData['constituency_id'] ?? '') == $constituency->id ? 'selected' : '' }}>
+                        {{ $constituency->name }}
+                    </option>
+                @endforeach
+            @endif
+        </select>
+        @error('constituency_id')
+            <span class="text-red-500 text-xs">{{ $message }}</span>
+        @enderror
+    </div>
 </div>
-<!-- Subcounty Field -->
-<div class="flex-1">
-    <label for="subcounty" class="block text-sm font-medium text-gray-700">
-        Subcounty<span class="text-red-500">*</span>
-    </label>
-    <select name="subcounty_id" id="subcounty" required 
-            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]">
-        <option value="" disabled selected>Select Subcounty</option>
-        <option value="other" {{ old('subcounty_id', $inputData['subcounty_id'] ?? '') == 'other' ? 'selected' : '' }}>Other</option>
-    </select>
-    @error('subcounty_id')
-        <span class="text-red-500 text-xs">{{ $message }}</span>
-    @enderror
-</div>
-
-<!-- Input Field for "Other" Subcounty -->
-<div class="flex-1" id="subcounty_other_div" style="display: {{ old('subcounty_id', $inputData['subcounty_id'] ?? '') == 'other' ? 'block' : 'none' }};">
-    <label for="subcounty_other" class="block text-sm font-medium text-gray-700">
-        Please Specify Subcounty<span class="text-red-500">*</span>
-    </label>
-    <input type="text" name="subcounty_other" id="subcounty_other" 
-           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]"
-           value="{{ old('subcounty_other', $inputData['subcounty_other'] ?? '') }}">
-    @error('subcounty_other')
-        <span class="text-red-500 text-xs">{{ $message }}</span>
-    @enderror
-</div>
-<!-- Constituency Field -->
-<div class="flex-1">
-    <label for="constituency" class="block text-sm font-medium text-gray-700">
-        Constituency<span class="text-red-500">*</span>
-    </label>
-    <select name="constituency_id" id="constituency" required 
-            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]">
-        <option value="" disabled selected>Select Constituency</option>
-        <option value="other" {{ old('constituency_id', $inputData['constituency_id'] ?? '') == 'other' ? 'selected' : '' }}>Other</option>
-    </select>
-    @error('constituency_id')
-        <span class="text-red-500 text-xs">{{ $message }}</span>
-    @enderror
-</div>
-
-<!-- Input Field for "Other" Constituency -->
-<div class="flex-1" id="constituency_other_div" style="display: {{ old('constituency_id', $inputData['constituency_id'] ?? '') == 'other' ? 'block' : 'none' }};">
-    <label for="constituency_other" class="block text-sm font-medium text-gray-700">
-        Please Specify Constituency<span class="text-red-500">*</span>
-    </label>
-    <input type="text" name="constituency_other" id="constituency_other" 
-           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C]"
-           value="{{ old('constituency_other', $inputData['constituency_other'] ?? '') }}">
-    @error('constituency_other')
-        <span class="text-red-500 text-xs">{{ $message }}</span>
-    @enderror
-</div>
-      
-
-      </div>
-
       <!-- Contact Information -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <!-- Postal Address -->
@@ -434,104 +405,143 @@
     </form>
   </x-card>
 
-  <script>
+ <script>
+document.addEventListener('DOMContentLoaded', function() {
     // Dynamic Other Fields
     document.querySelectorAll('select[data-other-target]').forEach(select => {
-      const otherDiv = document.querySelector(select.dataset.otherTarget);
-      const toggleVisibility = () => {
-        otherDiv.classList.toggle('hidden', select.value !== 'other');
-        if (select.value !== 'other') {
-          otherDiv.querySelector('input').value = '';
-        }
-      };
-      select.addEventListener('change', toggleVisibility);
-      toggleVisibility(); // Initial check
+        const otherDiv = document.querySelector(select.dataset.otherTarget);
+        const toggleVisibility = () => {
+            otherDiv.classList.toggle('hidden', select.value !== 'other');
+            if (select.value !== 'other') {
+                otherDiv.querySelector('input').value = '';
+            }
+        };
+        select.addEventListener('change', toggleVisibility);
+        toggleVisibility(); // Initial check
     });
 
     // Disability Toggle
     const disabilityQuestion = document.getElementById('disability_question');
     const toggleDisabilityFields = () => {
-      const visible = disabilityQuestion.value === 'yes';
-      document.getElementById('nature_of_disability_container').classList.toggle('hidden', !visible);
-      document.getElementById('ncpd_registration_no_container').classList.toggle('hidden', !visible);
+        const visible = disabilityQuestion.value === 'yes';
+        document.getElementById('nature_of_disability_container').classList.toggle('hidden', !visible);
+        document.getElementById('ncpd_registration_no_container').classList.toggle('hidden', !visible);
     };
     disabilityQuestion.addEventListener('change', toggleDisabilityFields);
     toggleDisabilityFields(); // Initial state
 
     // Phone Number Formatting
     document.querySelectorAll('input[type="tel"]').forEach(input => {
-      input.addEventListener('input', function() {
-        this.value = this.value.replace(/\D/g, '').slice(0, 9);
-      });
+        input.addEventListener('input', function() {
+            this.value = this.value.replace(/\D/g, '').slice(0, 9);
+        });
     });
 
     // Loading State
     document.querySelector('form').addEventListener('submit', (e) => {
-      const submitBtn = document.querySelector('button[type="submit"]');
-      submitBtn.innerHTML = `
-        <svg class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
-        </svg>
-        Saving...`;
+        const submitBtn = document.querySelector('button[type="submit"]');
+        submitBtn.innerHTML = `
+            <svg class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+            </svg>
+            Saving...`;
     });
 
-
     // Location Selector Logic
-document.getElementById('homecounty').addEventListener('change', function() {
-    const homecountyId = this.value;
-    const subcountySelect = document.getElementById('subcounty');
-    
-    // Clear existing options
-    subcountySelect.innerHTML = '<option value="" disabled selected>Select Subcounty</option>';
-    
-    if (homecountyId === 'other') {
-        document.getElementById('homecounty_other_div').style.display = 'block';
-        subcountySelect.innerHTML += '<option value="other">Other</option>';
-    } else {
-        document.getElementById('homecounty_other_div').style.display = 'none';
-        // Fetch subcounties via AJAX
-        fetch(`/get-subcounties/${homecountyId}`)
-            .then(response => response.json())
-            .then(data => {
-                data.forEach(subcounty => {
-                    const option = new Option(subcounty.name, subcounty.id);
-                    subcountySelect.add(option);
-                });
-                subcountySelect.innerHTML += '<option value="other">Other</option>';
-            });
-    }
-});
+    function handleCountyChange() {
+        const homecounty = document.getElementById('homecounty');
+        const subcounty = document.getElementById('subcounty');
+        const constituency = document.getElementById('constituency');
+        
+        homecounty.addEventListener('change', function() {
+            const countyId = this.value;
+            subcounty.value = '';
+            constituency.value = '';
 
-document.getElementById('subcounty').addEventListener('change', function() {
-    const subcountyId = this.value;
-    const constituencySelect = document.getElementById('constituency');
-    
-    // Clear existing options
-    constituencySelect.innerHTML = '<option value="" disabled selected>Select Constituency</option>';
-    
-    if (subcountyId === 'other') {
-        document.getElementById('subcounty_other_div').style.display = 'block';
-        constituencySelect.innerHTML += '<option value="other">Other</option>';
-    } else {
-        document.getElementById('subcounty_other_div').style.display = 'none';
-        // Fetch constituencies via AJAX
-        fetch(`/get-constituencies/${subcountyId}`)
-            .then(response => response.json())
-            .then(data => {
-                data.forEach(constituency => {
-                    const option = new Option(constituency.name, constituency.id);
-                    constituencySelect.add(option);
-                });
-                constituencySelect.innerHTML += '<option value="other">Other</option>';
-            });
-    }
-});
+            if (countyId) {
+                fetch(`/getSubcounties/${countyId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        subcounty.innerHTML = '<option value="" disabled selected>Select Subcounty</option>';
+                        data.forEach(item => {
+                            subcounty.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+                        });
+                        constituency.innerHTML = '';
+                    });
+            } else {
+                subcounty.innerHTML = '';
+                constituency.innerHTML = '';
+            }
+        });
 
-// Constituency Other toggle
-document.getElementById('constituency').addEventListener('change', function() {
-    document.getElementById('constituency_other_div').style.display = 
-        this.value === 'other' ? 'block' : 'none';
+        subcounty.addEventListener('change', function() {
+            const subcountyId = this.value;
+            constituency.value = '';
+
+            if (subcountyId) {
+                fetch(`/getConstituencies/${subcountyId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        constituency.innerHTML = '<option value="" disabled selected>Select Constituency</option>';
+                        data.forEach(item => {
+                            constituency.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+                        });
+                    });
+            } else {
+                constituency.innerHTML = '';
+            }
+        });
+    }
+
+    // Other Field Toggles
+    function setupOtherToggles() {
+        function toggleOtherField(selectId, otherDivId) {
+            const select = document.getElementById(selectId);
+            const otherDiv = document.getElementById(otherDivId);
+            
+            if (select.value === 'other') {
+                otherDiv.style.display = 'block';
+            } else {
+                otherDiv.style.display = 'none';
+            }
+        }
+
+        document.getElementById('ethnicity').addEventListener('change', () => {
+            toggleOtherField('ethnicity', 'ethnicity_other_div');
+        });
+
+        document.getElementById('salutation').addEventListener('change', () => {
+            toggleOtherField('salutation', 'salutation_other_div');
+        });
+
+        // Initial state
+        toggleOtherField('ethnicity', 'ethnicity_other_div');
+        toggleOtherField('salutation', 'salutation_other_div');
+    }
+
+    // Dropdown Menu
+    function setupDropdown() {
+        const dropdownMenu = document.getElementById('dropdownMenu');
+        const menuButton = document.getElementById('menu-button');
+
+        function toggleDropdown() {
+            dropdownMenu.classList.toggle('hidden');
+        }
+
+        menuButton.addEventListener('click', toggleDropdown);
+
+        document.addEventListener('click', function(event) {
+            if (!dropdownMenu.contains(event.target) && !menuButton.contains(event.target)) {
+                dropdownMenu.classList.add('hidden');
+            }
+        });
+    }
+
+    // Initialize all components
+    handleCountyChange();
+    setupOtherToggles();
+    setupDropdown();
 });
-  </script>
+</script>
 </x-layout>

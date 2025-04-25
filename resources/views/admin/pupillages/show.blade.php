@@ -133,12 +133,7 @@
           <p class="text-sm text-gray-600">Status</p>
           <p class="text-lg font-medium text-gray-900">{{ $pupillage->status }}</p>
         </div>
-        @if($pupillage->remarks)
-          <div>
-            <p class="text-sm text-gray-600">Remarks</p>
-            <p class="text-lg font-medium text-gray-900">{{ $pupillage->remarks }}</p>
-          </div>
-        @endif
+        
       </div>
     </div>
 
@@ -179,4 +174,5 @@
       </form>
     </div>
   </x-card>
+  
 </x-layout>

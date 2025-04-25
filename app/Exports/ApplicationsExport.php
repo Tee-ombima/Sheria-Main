@@ -11,39 +11,41 @@ class ApplicationsExport implements FromCollection, WithHeadings
     protected $type;
     protected $jobTitle;
 
-    public function __construct($type, $jobTitle)
-{
-    $this->type = ucfirst($type);
-    $this->jobTitle = $jobTitle;
-}
+    public function __construct(string $type, ?string $jobTitle)
+    {
+        $this->type     = ucfirst($type);
+        $this->jobTitle = $jobTitle;
+    }
 
-public function collection()
-{
-    return Application::where('job_status', $this->type)
-        ->when($this->jobTitle, function($query) {
-            return $query->whereHas('listing', function($q) {
-                $q->where('title', $this->jobTitle);
+    public function collection()
+    {
+        return Application::where('job_status', $this->type)
+            ->when($this->jobTitle, fn($q) =>
+                $q->whereHas('listing', fn($sq) =>
+                    $sq->where('title', $this->jobTitle)
+                )
+            )
+            ->with(['user.personalInfo', 'listing'])
+            ->get()
+            ->map(function($app, $i) {
+                $pi = $app->user->personalInfo;
+                return [
+                    'Table Number'      => $i + 1,
+                    'Job Title'         => $app->listing->title ?? 'N/A',
+                    'ID Number'         => $pi->idno ?? 'N/A',
+                    'Name'              => trim(($pi->firstname ?? '') . ' ' . ($pi->lastname ?? '')),
+                    'Gender'            => $pi->gender  ?? 'N/A',
+                    'County'            => $pi->homecounty->name    ?? 'N/A',
+                    'Subcounty'         => $pi->subcounty->name     ?? 'N/A',
+                    'Constituency'      => $pi->constituency->name  ?? 'N/A',
+                    'Email'             => $app->user->email,
+                    'Mobile Number'     => $pi->mobile_num           ?? 'N/A',
+                    'Alternate Contact' => ($pi->alt_contact_person && $pi->alt_contact_telephone_num)
+                        ? "{$pi->alt_contact_person}: {$pi->alt_contact_telephone_num}"
+                        : 'N/A',
+                ];
             });
-        })
-        ->with(['user.personalInfo', 'listing'])
-        ->get()
-        ->map(function($application, $index) {
-            return [
-                'Table Number' => $index + 1,
-                    'ID Number' => $application->user->personalInfo->idno ?? 'N/A',
-                    'Name' => $application->user->personalInfo->firstname . ' ' . $application->user->personalInfo->lastname,
-                    'Gender' => $application->user->personalInfo->gender ?? 'N/A',
-                    'County' => $application->user->personalInfo->homecounty->name ?? 'N/A',
-                    'Subcounty' => $application->user->personalInfo->subcounty->name ?? 'N/A',
-                    'Constituency' => $application->user->personalInfo->constituency->name ?? 'N/A',
-                    'Email' => $application->user->email,
-                    'Mobile Number' => $application->user->personalInfo->mobile_num ?? 'N/A',
-                    'Alternate Contact' => $application->user->personalInfo->alt_contact_person . ': ' . $application->user->personalInfo->alt_contact_telephone_num,
-                    'Job Applied For' => $application->listing->title ?? 'N/A',
-            ];
-        });
-}
-
+    }
 
     public function headings(): array
     {
@@ -57,8 +59,8 @@ public function collection()
             'Subcounty',
             'Constituency',
             'Email',
-            'Phone Number',
-            'Alternate Phone Number'
+            'Mobile Number',
+            'Alternate Contact',
         ];
     }
 }

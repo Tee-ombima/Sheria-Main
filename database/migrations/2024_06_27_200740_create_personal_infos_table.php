@@ -16,9 +16,9 @@ return new class extends Migration
         Schema::create('personal_infos', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('homecounty_id')->nullable()->default(null);
-            $table->unsignedBigInteger('constituency_id')->nullable()->default(null);
-            $table->unsignedBigInteger('subcounty_id')->nullable()->default(null);
+            $table->unsignedBigInteger('homecounty_id');
+        $table->unsignedBigInteger('subcounty_id');
+        $table->unsignedBigInteger('constituency_id');
             $table->string('surname', 100)->default('Default');
             $table->string('firstname', 100)->default('Default');
             $table->string('lastname', 100)->nullable();

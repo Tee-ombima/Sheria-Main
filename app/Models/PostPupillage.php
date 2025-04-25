@@ -34,7 +34,6 @@ class PostPupillage extends Model
         'deployment_region',
         'declaration',
         'status',
-        'remarks',
         'deleted_by_admin'
 
     ];

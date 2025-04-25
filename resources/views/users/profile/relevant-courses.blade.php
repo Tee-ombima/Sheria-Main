@@ -79,7 +79,7 @@
       </div>
 
       <!-- Form Actions -->
-      <div class="flex justify-end space-x-4">
+      <div class="flex justify-start space-x-4">
         <button type="submit" class="px-6 py-2 bg-[#D68C3C] text-white rounded-md hover:bg-[#bf7a2e] flex items-center">
           <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -196,28 +196,33 @@
       </form>
     </div>
   </x-card>
-
-  <script>
-    // Delete Confirmation
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // ======== Delete Confirmation ========
     document.querySelectorAll('.delete-row').forEach(button => {
-      button.addEventListener('click', (e) => {
-        if (!confirm('Are you sure you want to delete this entry?')) {
-          e.preventDefault();
-        }
-      });
+        button.addEventListener('click', (e) => {
+            if (!confirm('Are you sure you want to delete this entry?')) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        });
     });
 
-    // Loading State
+    // ======== Loading State ========
     document.querySelectorAll('form').forEach(form => {
-      form.addEventListener('submit', () => {
-        const submitBtn = form.querySelector('button[type="submit"]');
-        submitBtn.innerHTML = `
-          <svg class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
-          </svg>
-          Processing...`;
-      });
+        form.addEventListener('submit', () => {
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.innerHTML = `
+                    <svg class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                    </svg>
+                    Processing...`;
+                submitBtn.setAttribute('disabled', 'true');
+            }
+        });
     });
-  </script>
+});
+</script>
 </x-layout>

@@ -87,5 +87,29 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(Attachment::class);
     }
+    public function scopeAdmin($query)
+    {
+        return $query->where('role', 'admin');
+    }
+
+    /**
+     * Scope a query to only include verified users.
+     */
+    public function scopeVerified($query)
+    {
+        return $query->whereNotNull('email_verified_at');
+    }
+
+    /**
+     * Scope a query to only include unverified users.
+     */
+    public function scopeUnverified($query)
+    {
+        return $query->whereNull('email_verified_at');
+    }
+
+    /**
+     * Helper to check superadmin.
+     */
     
 }

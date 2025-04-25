@@ -191,10 +191,8 @@
       </div>
 
       <!-- Form Actions -->
-      <div class="flex justify-end space-x-4 mt-8">
-        <button type="reset" class="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
-          Reset
-        </button>
+      <div class="flex justify-start space-x-4 mt-8">
+       
         <button type="submit" class="px-6 py-2 bg-[#D68C3C] text-white rounded-md hover:bg-[#bf7a2e] flex items-center">
           <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -315,35 +313,93 @@
   </x-card>
 
   <script>
-    // Dynamic Other Fields
+document.addEventListener('DOMContentLoaded', function() {
+    // ======== Dynamic Other Fields ========
+    // Generic handler for data-other-target selects
     document.querySelectorAll('select[data-other-target]').forEach(select => {
-      const otherDiv = document.querySelector(select.dataset.otherTarget);
-      select.addEventListener('change', () => {
-        otherDiv.classList.toggle('hidden', select.value !== 'other');
-      });
+        const otherDiv = document.querySelector(select.dataset.otherTarget);
+        const toggleVisibility = () => {
+            const showOther = select.value === 'other';
+            otherDiv.classList.toggle('hidden', !showOther);
+            if (!showOther) otherDiv.querySelector('input').value = '';
+        };
+        select.addEventListener('change', toggleVisibility);
+        toggleVisibility(); // Initial state
     });
 
-    // Date Validation
-    document.getElementById('prof_end_date').addEventListener('change', function() {
-      const startDate = new Date(document.getElementById('prof_start_date').value);
-      const endDate = new Date(this.value);
-      
-      if (startDate > endDate) {
-        alert('End date cannot be before start date');
-        this.value = '';
-      }
+    // Specific field handlers
+    const otherFields = [
+        { id: 'prof_area_of_study_high_school_level', target: 'prof_area_of_study_other_div' },
+        { id: 'prof_area_of_specialisation', target: 'prof_area_of_specialisation_other_div' },
+        { id: 'prof_award', target: 'prof_award_other_div' },
+        { id: 'prof_grade', target: 'prof_grade_other_div' }
+    ];
+
+    otherFields.forEach(({ id, target }) => {
+        const select = document.getElementById(id);
+        const otherDiv = document.getElementById(target);
+        if (select && otherDiv) {
+            const toggle = () => {
+                const showOther = select.value === 'other';
+                otherDiv.classList.toggle('hidden', !showOther);
+                if (!showOther) otherDiv.querySelector('input').value = '';
+            };
+            select.addEventListener('change', toggle);
+            toggle(); // Initial state
+        }
     });
 
-    // Loading State
+    // ======== Date Validation ========
+    const profEndDate = document.getElementById('prof_end_date');
+    const profStartDate = document.getElementById('prof_start_date');
+    if (profEndDate && profStartDate) {
+        profEndDate.addEventListener('change', function() {
+            const start = new Date(profStartDate.value);
+            const end = new Date(this.value);
+            if (start > end) {
+                alert('End date cannot be before start date');
+                this.value = '';
+            }
+        });
+    }
+
+    // ======== Loading State ========
     document.querySelectorAll('form').forEach(form => {
-      form.addEventListener('submit', () => {
-        form.querySelector('button[type="submit"]').innerHTML = `
-          <svg class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
-          </svg>
-          Processing...`;
-      });
+        form.addEventListener('submit', () => {
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.innerHTML = `
+                    <svg class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                    </svg>
+                    Processing...`;
+            }
+        });
     });
-  </script>
+
+    // ======== Select2 Initialization ========
+    // Initialize Select2 components with jQuery
+    (function initSelect2() {
+        const selects = {
+            '#specialisation': 'Select Specialisation',
+            '#course': 'Select Course',
+            '#highschool': 'Select Highschool',
+            '#prof_area_of_specialisation': 'Select Specialisation',
+            '#prof_award': 'Select Award',
+            '#prof_area_of_study_high_school_level': 'Select Area of Study'
+        };
+
+        Object.entries(selects).forEach(([selector, placeholder]) => {
+            if (document.querySelector(selector)) {
+                $(selector).select2({
+                    placeholder: placeholder,
+                    allowClear: true
+                });
+            }
+        });
+    })();
+});
+</script>
+
 </x-layout>

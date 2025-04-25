@@ -39,7 +39,6 @@ class PostPupillageExport implements FromCollection, WithMapping, WithHeadings
             $application->deployment_region,
             $application->declaration,
             $application->status,
-            $application->remarks,
         ];
     }
 
@@ -68,7 +67,6 @@ class PostPupillageExport implements FromCollection, WithMapping, WithHeadings
             'Deployment Region',
             'Declaration',
             'Status',
-            'Remarks',
         ];
     }
 }

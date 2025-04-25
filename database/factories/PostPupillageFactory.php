@@ -35,7 +35,6 @@ class PostPupillageFactory extends Factory
             'deployment_region' => $this->faker->randomElement(['Nairobi', 'Coast', 'Western', 'Rift Valley']),
             'declaration' => true,
             
-            'remarks' => $this->faker->optional()->sentence
         ];
     }
 }

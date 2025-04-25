@@ -53,7 +53,6 @@ return new class extends Migration
             $table->boolean('declaration');
 
             $table->string('status')->default('Pending');
-            $table->text('remarks')->nullable();
             $table->timestamps();
             $table->string('are_you_employed')->nullable();
         $table->string('employer_institution_name')->nullable();

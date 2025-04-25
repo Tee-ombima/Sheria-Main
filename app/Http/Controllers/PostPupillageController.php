@@ -7,7 +7,7 @@ use App\Models\ApplicationSetting;
 
 use Illuminate\Http\Request;
 use App\Models\PostPupillage;
-use App\Models\Department;
+use App\Models\DeploymentRegion;
 use Illuminate\Support\Facades\Auth;
 use App\Models\SubCountypp;
 use App\Models\Countypp;
@@ -52,6 +52,7 @@ class PostPupillageController extends Controller
         if (!$this->postPupillageApplicationsEnabled()) {
             return redirect()->back()->with('message', 'No Post Pupillage program available at this time.');
         }
+        $deploymentRegions = DeploymentRegion::all();
 
         // Fetch the vacancy number from the settings
         $setting = PostPupillageSetting::first();
@@ -60,7 +61,7 @@ class PostPupillageController extends Controller
         // Fetch the counties
         $countypps = Countypp::all();
 
-        return view('post_pupillages.create', compact('countypps', 'vacancyNo'));
+        return view('post_pupillages.create', compact('countypps', 'vacancyNo', 'deploymentRegions'));
     }
 
 
@@ -110,7 +111,8 @@ class PostPupillageController extends Controller
             'ethnicity' => 'required|string|max:50',
             'disability_status' => 'required|boolean',
             'nature_of_disability' => 'nullable|string|max:50',
-            'deployment_region' => 'required|string|max:50',
+            'deployment_region' => 'required|string|max:255',
+        'other_deployment_region' => 'required_if:deployment_region,other|nullable|string|max:255',
             'declaration' => 'required|accepted',
         ]);
         $homeCounty = $request->home_county == 'Other' ? $request->other_home_county : Countypp::find($request->home_county)->name;
@@ -120,7 +122,10 @@ class PostPupillageController extends Controller
         // Fetch the vacancy number from the settings
         $setting = PostPupillageSetting::first();
         $vacancyNo = $setting ? $setting->vacancy_no : null;
-
+// Determine deployment region value
+$deploymentRegion = $request->deployment_region === 'other' 
+? $request->other_deployment_region 
+: $request->deployment_region;
         // Create the Post Pupillage application
         PostPupillage::create([
             'user_id' => Auth::id(),
@@ -141,7 +146,7 @@ class PostPupillageController extends Controller
             'ethnicity' => $request->ethnicity,
             'disability_status' => $request->disability_status,
             'nature_of_disability' => $request->nature_of_disability,
-            'deployment_region' => $request->deployment_region,
+            'deployment_region' => $deploymentRegion,
             'declaration' => $request->has(key: 'declaration'), // Convert checkbox to boolean
         ]);
     });

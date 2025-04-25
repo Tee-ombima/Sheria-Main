@@ -196,40 +196,82 @@
       </div>
     </div>
 
-    <script>
-      // Toggle custom document field
-      function toggleCustomDocumentField(select) {
-        const container = document.getElementById('custom-document-container');
-        container.classList.toggle('hidden', select.value !== 'other');
-        if (select.value !== 'other') {
-          document.getElementById('custom_document_name').value = '';
-        }
-      }
-
-      // Edit attachment functions
-      function editAttachment(id, name) {
-        document.getElementById('editAttachmentId').value = id;
-        document.getElementById('edit_document_name').value = name;
-        document.getElementById('editModal').classList.remove('hidden');
-      }
-
-      function closeEditModal() {
-        document.getElementById('editModal').classList.add('hidden');
-      }
-
-      // Loading state
-      document.querySelectorAll('form').forEach(form => {
-        form.addEventListener('submit', () => {
-          const submitBtn = form.querySelector('button[type="submit"]');
-          submitBtn.disabled = true;
-          submitBtn.innerHTML = `
-            <svg class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
-            </svg>
-            Processing...`;
-        });
-      });
-    </script>
   </x-card>
+  
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // ======== Document Field Toggles ========
+    function handleDocumentVisibility(select, containerId, inputId) {
+        const container = document.getElementById(containerId);
+        const inputField = document.getElementById(inputId);
+        
+        if (select && container && inputField) {
+            const showContainer = select.value === 'other';
+            container.classList.toggle('hidden', !showContainer);
+            if (!showContainer) inputField.value = '';
+        }
+    }
+
+    // Initialize document visibility handlers
+    function initDocumentToggles() {
+        // For custom document field
+        const docSelect = document.querySelector('select[data-toggle="custom-document"]');
+        if (docSelect) {
+            docSelect.addEventListener('change', () => {
+                handleDocumentVisibility(docSelect, 'custom-document-container', 'custom_document_name');
+            });
+            // Initial state
+            handleDocumentVisibility(docSelect, 'custom-document-container', 'custom_document_name');
+        }
+
+        // For other document name field
+        const otherDocSelect = document.querySelector('select[data-toggle="other-document"]');
+        if (otherDocSelect) {
+            otherDocSelect.addEventListener('change', () => {
+                handleDocumentVisibility(otherDocSelect, 'other-document-name', 'other_document_name_input');
+            });
+            // Initial state
+            handleDocumentVisibility(otherDocSelect, 'other-document-name', 'other_document_name_input');
+        }
+    }
+
+    // ======== Attachment Modal Functions ========
+    window.editAttachment = function(id, documentName) {
+        const editIdField = document.getElementById('editAttachmentId');
+        const editNameField = document.getElementById('edit_document_name');
+        
+        if (editIdField && editNameField) {
+            editIdField.value = id;
+            editNameField.value = documentName;
+            document.getElementById('editModal').classList.remove('hidden');
+        }
+    };
+
+    window.closeEditModal = function() {
+        const modal = document.getElementById('editModal');
+        if (modal) modal.classList.add('hidden');
+    };
+
+    // ======== Loading State ========
+    document.querySelectorAll('form').forEach(form => {
+        form.addEventListener('submit', () => {
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = `
+                    <svg class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                    </svg>
+                    Processing...`;
+            }
+        });
+    });
+
+    // Initialize all components
+    initDocumentToggles();
+});
+</script>
+
 </x-layout>

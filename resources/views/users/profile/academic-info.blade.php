@@ -128,10 +128,8 @@
       </div>
 
       <!-- Form Actions -->
-      <div class="flex justify-end space-x-4 mt-8">
-        <button type="reset" class="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
-          Reset
-        </button>
+      <div class="flex justify-start space-x-4 mt-8">
+       
         <button type="submit" class="px-6 py-2 bg-[#D68C3C] text-white rounded-md hover:bg-[#bf7a2e] flex items-center">
           <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -253,35 +251,115 @@
   </x-card>
 
   <script>
-    // Dynamic Other Fields
+document.addEventListener('DOMContentLoaded', function() {
+    // ======== Dynamic Other Fields ========
+    // For selects with data-other-target attribute
     document.querySelectorAll('select[data-other-target]').forEach(select => {
-      const otherDiv = document.querySelector(select.dataset.otherTarget);
-      select.addEventListener('change', () => {
-        otherDiv.classList.toggle('hidden', select.value !== 'other');
-      });
+        const otherDiv = document.querySelector(select.dataset.otherTarget);
+        const toggleVisibility = () => {
+            const showOther = select.value === 'other';
+            otherDiv.classList.toggle('hidden', !showOther);
+            if (!showOther) {
+                otherDiv.querySelector('input').value = '';
+            }
+        };
+        select.addEventListener('change', toggleVisibility);
+        toggleVisibility(); // Initial check
     });
 
-    // Date Validation
-    document.getElementById('end_date').addEventListener('change', function() {
-      const startDate = new Date(document.getElementById('start_date').value);
-      const endDate = new Date(this.value);
-      
-      if (startDate > endDate) {
-        alert('End date cannot be before start date');
-        this.value = '';
-      }
+    // For specific fields without data attributes
+    const otherFieldConfig = [
+        { selectId: 'highschool', otherDivId: 'highschool_other_div' },
+        { selectId: 'specialisation', otherDivId: 'specialisation_other_div' },
+        { selectId: 'course', otherDivId: 'course_other_div' },
+        { selectId: 'award', otherDivId: 'award_other_div' },
+        { selectId: 'grade', otherDivId: 'grade_other_div' }
+    ];
+
+    otherFieldConfig.forEach(({ selectId, otherDivId }) => {
+        const select = document.getElementById(selectId);
+        const otherDiv = document.getElementById(otherDivId);
+        
+        if (select && otherDiv) {
+            const toggle = () => {
+                const showOther = select.value === 'other';
+                otherDiv.classList.toggle('hidden', !showOther);
+                if (!showOther) {
+                    otherDiv.querySelector('input').value = '';
+                }
+            };
+            
+            select.addEventListener('change', toggle);
+            toggle(); // Initial state
+        }
     });
+
+    // ======== Rest of the code remains the same ========
+    // Date Validation
+    const endDateInput = document.getElementById('end_date');
+    if (endDateInput) {
+        endDateInput.addEventListener('change', function() {
+            const startDate = new Date(document.getElementById('start_date').value);
+            const endDate = new Date(this.value);
+            
+            if (startDate > endDate) {
+                alert('End date cannot be before start date');
+                this.value = '';
+            }
+        });
+    }
 
     // Loading State
     document.querySelectorAll('form').forEach(form => {
-      form.addEventListener('submit', () => {
-        form.querySelector('button[type="submit"]').innerHTML = `
-          <svg class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
-          </svg>
-          Processing...`;
-      });
+        form.addEventListener('submit', () => {
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.innerHTML = `
+                    <svg class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                    </svg>
+                    Processing...`;
+            }
+        });
     });
-  </script>
+
+    // Edit Modal Functions
+    window.openEditModal = function(datum) {
+        document.getElementById('academic_id').value = datum.id;
+        document.getElementById('edit_institution_name').value = datum.institution_name;
+        document.getElementById('edit_student_admission_no').value = datum.student_admission_no;
+        document.getElementById('editModal').classList.remove('hidden');
+    };
+
+    window.closeEditModal = function() {
+        document.getElementById('editModal').classList.add('hidden');
+    };
+
+    // Delete Row Functionality
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('delete-row')) {
+            const index = e.target.dataset.index;
+            const row = document.querySelector(`tr[data-index="${index}"]`);
+            
+            if (row) {
+                row.remove();
+                
+                fetch('{{ route("remove.session.row") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ index: index })
+                })
+                .then(response => response.json())
+                .then(data => console.log(data))
+                .catch(error => console.error('Error:', error));
+            }
+        }
+    });
+});
+</script>
+
 </x-layout>

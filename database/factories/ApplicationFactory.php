@@ -24,8 +24,20 @@ class ApplicationFactory extends Factory
             'name' => $this->faker->name,
             'job_title' => $this->faker->jobTitle,
             'job_reference_number' => $this->faker->unique()->bothify('REF-###-??'),
-            'remarks' => $this->faker->realText(50),
-            'job_status' => $this->faker->randomElement(['Processing', 'Appointed', 'Not_Successful']),
+            'remarks' => sprintf(
+                'Please report for interview at %s on %s at %s.',
+                $this->faker->randomElement([
+                    'Nairobi Law Courts, Haile Selassie Ave',
+                    'Mombasa Law Courts, Jomo Kenyatta Ave',
+                    'Kisumu Law Courts, Oginga Odinga St'
+                ]),
+                $this->faker
+                     ->dateTimeBetween('now', '+1 month')
+                     ->format('F j, Y'),
+                $this->faker
+                     ->time('g:i A')
+            ),
+                        'job_status' => $this->faker->randomElement(['Processing', 'Appointed', 'Not_Successful']),
         ];
     }
     

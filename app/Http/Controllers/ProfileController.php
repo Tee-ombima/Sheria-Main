@@ -53,19 +53,19 @@ class ProfileController extends Controller
             $query->where('added_by_user', false)
                   ->orWhere('user_id', $userId);
         })
-        ->orderByRaw("name = 'other' DESC, name ASC")
+        ->orderByRaw("name ASC")
         ->get();
         $subcounties = Subcounty::where(function ($query) use ($userId) {
             $query->where('added_by_user', false)
                   ->orWhere('user_id', $userId);
         })
-        ->orderByRaw("name = 'other' DESC, name ASC")
+        ->orderByRaw("name ASC")
         ->get();
         $constituencies = Constituency::where(function ($query) use ($userId) {
             $query->where('added_by_user', false)
                   ->orWhere('user_id', $userId);
         })
-        ->orderByRaw("name = 'other' DESC, name ASC")
+        ->orderByRaw("name ASC")
         ->get();
         
         
@@ -107,47 +107,9 @@ class ProfileController extends Controller
             'ethnicity'         => 'required|string|max:50',
             'ethnicity_other'   => 'nullable|string|max:50',
 
-            // Homecounty
-            'homecounty_id' => [
-                'required',
-                function ($attribute, $value, $fail) {
-                    if ($value !== 'other' && !Homecounty::where('id', $value)->exists()) {
-                        $fail('The selected home county is invalid.');
-                    }
-                    if ($value === 'other' && empty(request('homecounty_other'))) {
-                        $fail('Please specify the home county.');
-                    }
-                },
-            ],
-            'homecounty_other'  => 'nullable|required_if:homecounty_id,other|string|max:50',
-
-            // Constituency
-            'constituency_id' => [
-                'required',
-                function ($attribute, $value, $fail) {
-                    if ($value !== 'other' && !Constituency::where('id', $value)->exists()) {
-                        $fail('The selected constituency is invalid.');
-                    }
-                    if ($value === 'other' && empty(request('constituency_other'))) {
-                        $fail('Please specify the constituency.');
-                    }
-                },
-            ],
-            'constituency_other'=> 'nullable|required_if:constituency_id,other|string|max:50',
-
-            // Subcounty
-            'subcounty_id' => [
-                'required',
-                function ($attribute, $value, $fail) {
-                    if ($value !== 'other' && !Subcounty::where('id', $value)->exists()) {
-                        $fail('The selected subcounty is invalid.');
-                    }
-                    if ($value === 'other' && empty(request('subcounty_other'))) {
-                        $fail('Please specify the subcounty.');
-                    }
-                },
-            ],
-            'subcounty_other'   => 'nullable|required_if:subcounty_id,other|string|max:50',
+            'homecounty_id' => 'required|exists:homecounties,id',
+    'subcounty_id' => 'required|exists:subcounties,id',
+    'constituency_id' => 'required|exists:constituencies,id',
 
             'postal_address'             => 'required|string',
             'code'                       => 'required|numeric',
@@ -179,12 +141,7 @@ class ProfileController extends Controller
             'job_group'                  => 'nullable|string|max:100',
             'terms_of_service'           => 'nullable|string',
         ], [
-            // Custom error messages
-            'salutation_other.required_if'  => 'Please specify your salutation.',
-            'ethnicity_other.required_if'    => 'Please specify your ethnicity.',
-            'homecounty_other.required_if'   => 'Please specify your home county.',
-            'constituency_other.required_if' => 'Please specify your constituency.',
-            'subcounty_other.required_if'    => 'Please specify your subcounty.',
+            
         ]);
 
         $user_id = Auth::id();
@@ -199,51 +156,13 @@ class ProfileController extends Controller
         if (strtolower($request->ethnicity) === 'other') {
             $data['ethnicity'] = $request->ethnicity_other;
         }
+        $homecounty = Homecounty::findOrFail($request->homecounty_id);
 
-        // Handle Homecounty – find by ID or create a new one if "other" is chosen
-        if (strtolower($request->homecounty_id) !== 'other') {
-            $homecounty = Homecounty::find($request->homecounty_id);
-        } else {
-            $homecounty = Homecounty::firstOrCreate(
-                ['name' => $request->homecounty_other],
-                [
-                    'added_by_user' => true,
-                    'user_id' => $user_id,
-                ]
-            );
-        }
-
-        // Handle Constituency – find by ID or create a new one linked to the homecounty if "other"
-        if (strtolower($request->constituency_id) !== 'other') {
-            $constituency = Constituency::find($request->constituency_id);
-        } else {
-            
-            $constituency = Constituency::firstOrCreate(
-                ['name' => $request->constituency_other],
-                [
-                    'added_by_user' => true,
-                    'user_id' => $user_id,
-                    'homecounty_id' => $homecounty->id, // Ensure homecounty_id is set
-
-                ]
-            );
-        }
-
-        // Handle Subcounty – find by ID or create a new one linked to the constituency if "other"
-        if (strtolower($request->subcounty_id) !== 'other') {
-            $subcounty = Subcounty::find($request->subcounty_id);
-        } else {
-            $subcounty = Subcounty::firstOrCreate(
-                ['name' => $request->subcounty_other],
-                [
-                    'added_by_user' => true,
-                    'user_id' => $user_id,
-                    'constituency_id' => $constituency->id, // Ensure constituency_id is set
-
-                ]
-            );
-        }
-
+        // Subcounty handling (simple ID-based)
+        $subcounty = Subcounty::findOrFail($request->subcounty_id);
+        
+        // Constituency handling (simple ID-based)
+        $constituency = Constituency::findOrFail($request->constituency_id);
         // Update the IDs in the data array to reference the proper records
         $data['homecounty_id'] = $homecounty->id;
         $data['constituency_id'] = $constituency->id;
@@ -254,9 +173,6 @@ class ProfileController extends Controller
         unset(
             $data['salutation_other'],
             $data['ethnicity_other'],
-            $data['homecounty_other'],
-            $data['constituency_other'],
-            $data['subcounty_other']
         );
 
         // Save (or update) the personal info for this user
@@ -288,9 +204,11 @@ activity()
     ])
     ->log($logMessage);
        
-        return redirect()
-            ->route('profile.academic-info')
-            ->with('message', 'Profile Information submitted successfully!');
+        
+            return view('confirmation', [
+                'message'  => 'Profile Information submitted successfully!',
+                'next_url' => route('profile.academic-info') // Adjust the route as needed.
+            ]);
     }
 
 
@@ -487,6 +405,10 @@ public function saveAcademicInfo(Request $request)
 {
     $rows = session()->get('rows', []);
     $user_id = Auth::id();
+    if (count($rows) > 5) {
+        return redirect()->back()->with('message', 'You are not allowed to submit more than 5 academic records.');
+    }
+    
     if (empty($rows)) {
         return redirect()->back()->with('message','Please add at least one row of data before submitting');
     }
@@ -579,7 +501,11 @@ activity()
     // Clear the session
     session()->forget('rows');
 
-    return redirect()->route('profile.prof-info')->with('message','Academic Information submitted successfully!');
+    
+    return view('confirmation', [
+        'message'  => 'Academic Information submitted successfully!',
+        'next_url' => route('profile.prof-info') // Adjust the route as needed.
+    ]);
 }
 
 public function removeSessionRow(Request $request)
@@ -819,6 +745,9 @@ public function saveProfInfo(Request $request)
 {
     $rows = session()->get('rows', []);
     $user_id = Auth::id();
+    if (count($rows) > 5) {
+        return redirect()->back()->with('message', 'You are not allowed to submit more than 5 academic records.');
+    }
     if (empty($rows)) {
         return redirect()->back()->with('message','Please add at least one row of data before submitting.');
     }
@@ -903,7 +832,12 @@ activity()
     // Clear the session
     session()->forget('rows');
 
-    return redirect()->route('profile.relevant-courses')->with('message','Professional info submitted successfully');
+    
+    return view('confirmation', [
+        'message'  => 'Professional info submitted successfully!',
+        'next_url' => route('profile.relevant-courses') // Adjust the route as needed.
+    ]);
+
 }
 
 public function removeProfSessionRow(Request $request)
@@ -968,6 +902,9 @@ public function saveRelevantCourses(Request $request)
 {
     $rows = session()->get('rel_rows', []);
     $user_id = Auth::id();
+    if (count($rows) > 5) {
+        return redirect()->back()->with('message', 'You are not allowed to submit more than 5 academic records.');
+    }
     if (empty($rows)) {
 
         return redirect()->back()->with('message','Please add at least one row of data before submitting.');
@@ -1009,8 +946,11 @@ activity()
     ])
     ->log("Submitted $createdCount relevant courses");
     // Update the form submission status in local storage
-    echo "<script>localStorage.setItem('relevant-courses-submitted', 'true');</script>";
-    return redirect()->route('profile.attachments')->with('message','Relevant Courses submitted successfully');
+    
+    return view('confirmation', [
+        'message'  => 'Relevant Courses submitted successfully!',
+        'next_url' => route('profile.attachments') // Adjust the route as needed.
+    ]);
 
 
 }

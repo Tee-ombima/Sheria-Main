@@ -22,6 +22,8 @@ class ApplicationController extends Controller
         // Paginate the results, showing 10 applications per page
         $applications = Application::where('user_id', Auth::id())
             ->with('listing')
+            ->orderBy('created_at', 'desc')  // Add this line
+
             ->paginate(5); // Change get() to paginate(10)
 
         return view('applications.index', compact('applications'));

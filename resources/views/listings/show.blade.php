@@ -97,7 +97,7 @@
           @endif
 
           @auth
-            @if(auth()->user()->role !== 'admin')
+            @if(auth()->user()->role !== 'admin' && Auth::user()->role !== 'superadmin')
               @if($listing->isActive)
               <form id="applyForm" method="POST" action="/listings/{{ $listing->id }}/apply" class="text-center">
                 @csrf
@@ -156,71 +156,87 @@
         </div>
         @endif
       </div>
-    </x-card>
   </div>
+    </x-card>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // ======== Countdown Timer ========
+    @if($listing->isActive)
+    (function initCountdown() {
+        const countdownEl = document.getElementById('countdown');
+        const applyButton = document.getElementById('applyButton');
+        const deadline = new Date("{{ $listing->deadline }}").getTime();
+        
+        if (!countdownEl || !deadline) return;
 
-  <script>
-  // Enhanced Countdown Timer
-  @if($listing->isActive)
-  function updateTimer() {
-    const countDownDate = new Date("{{ $listing->deadline }}").getTime();
-    const now = new Date().getTime();
-    const distance = countDownDate - now;
+        function updateTimer() {
+            const now = new Date().getTime();
+            const distance = deadline - now;
 
-    if (distance < 0) {
-      clearInterval(timerInterval);
-      document.getElementById('countdown').innerHTML = `
-        <div class="text-center text-red-600 font-medium">
-          Application deadline has passed
-        </div>`;
-      if (document.getElementById('applyButton')) {
-        document.getElementById('applyButton').disabled = true;
-        document.getElementById('applyButton').innerHTML = `
-          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4"></path>
-          </svg>
-          Applications Closed`;
-        document.getElementById('applyButton').classList.replace('bg-[#3a4f29]', 'bg-gray-500');
-      }
-      return;
+            if (distance < 0) {
+                clearInterval(timerInterval);
+                countdownEl.innerHTML = `
+                    <div class="text-center text-red-600 font-medium">
+                        Application deadline has passed
+                    </div>`;
+                
+                if (applyButton) {
+                    applyButton.disabled = true;
+                    applyButton.innerHTML = `
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4"></path>
+                        </svg>
+                        Applications Closed`;
+                    applyButton.classList.replace('bg-[#3a4f29]', 'bg-gray-500');
+                }
+                return;
+            }
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById('days').textContent = days.toString().padStart(2, '0');
+            document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+            document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+            document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+        }
+
+        const timerInterval = setInterval(updateTimer, 1000);
+        updateTimer(); // Initial call
+    })();
+    @endif
+
+    // ======== Delete Confirmation ========
+    const deleteForm = document.getElementById('deleteForm');
+    if (deleteForm) {
+        deleteForm.addEventListener('submit', function(e) {
+            if (!confirm('Are you sure you want to permanently delete this listing?')) {
+                e.preventDefault();
+            }
+        });
     }
 
-    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-    document.getElementById('days').textContent = days.toString().padStart(2, '0');
-    document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
-    document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
-    document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
-  }
-
-  const timerInterval = setInterval(updateTimer, 1000);
-  updateTimer(); // Initial call
-  @endif
-
-  // Delete Confirmation
-  function confirmDelete() {
-    if (confirm('Are you sure you want to permanently delete this listing?')) {
-      document.getElementById('deleteForm').submit();
-    }
-  }
-
-  // Loading State
-  document.querySelectorAll('form').forEach(form => {
-    form.addEventListener('submit', function() {
-      const loader = document.createElement('div');
-      loader.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
-      loader.innerHTML = `
-        <div class="bg-white p-6 rounded-lg flex items-center">
-          <svg class="animate-spin h-8 w-8 text-[#D68C3C]" viewBox="0 0 24 24">
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-          <span class="ml-3 text-lg">Processing...</span>
-        </div>`;
-      document.body.appendChild(loader);
+    // ======== Loading State ========
+    document.querySelectorAll('form').forEach(form => {
+        form.addEventListener('submit', function() {
+            const loader = document.createElement('div');
+            loader.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            loader.innerHTML = `
+                <div class="bg-white p-6 rounded-lg flex items-center">
+                    <svg class="animate-spin h-8 w-8 text-[#D68C3C]" viewBox="0 0 24 24">
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span class="ml-3 text-lg">Processing...</span>
+                </div>`;
+            
+            // Prevent duplicate loaders
+            if (!document.querySelector('.fixed.inset-0.bg-black')) {
+                document.body.appendChild(loader);
+            }
+        });
     });
-  });
-  </script>
+});
+</script>
 </x-layout>

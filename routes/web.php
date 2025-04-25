@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Models\InternshipApplication;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserRoleController;
-
+use App\Http\Controllers\LogExportController;
 use App\Http\Controllers\InternshipController;
 use App\Http\Controllers\AdminInternshipController;
 
@@ -158,6 +158,9 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
     Route::delete('admin/users/{user}', [UserRoleController::class, 'destroy'])->name('admin.users.destroy');
     Route::match(['post', 'put'], '/users/{user}/permissions', [UserRoleController::class, 'updatePermissions'])
     ->name('users.update-permissions');
+    Route::get('/logs/export', [LogExportController::class, 'export'])
+     ->middleware(['auth', 'can:export_logs'])
+     ->name('logs.export');
 
 
     
@@ -258,10 +261,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/pupillages/non-pending', [AdminPupillageController::class, 'nonPending'])->name('pupillages.nonPending')->middleware(['auth', 'permission:manage_pupillages']);
     // In web.php
 
-Route::post('/admin/pupillages/bulk-update', [AdminPupillageController::class, 'bulkUpdate'])
+Route::post('/pupillages/bulk-update', [AdminPupillageController::class, 'bulkUpdate'])
 ->name('pupillages.bulk-update')->middleware(['auth', 'permission:manage_pupillages']);
 
-Route::delete('/admin/pupillages/bulk-destroy', [AdminPupillageController::class, 'bulkDestroy'])
+Route::delete('/pupillages/bulk-destroy', [AdminPupillageController::class, 'bulkDestroy'])
 ->name('pupillages.bulk-destroy')->middleware(['auth', 'permission:manage_pupillages']);
 
     // Other admin routes...
@@ -307,10 +310,10 @@ Route::put('/admin/settings/post-pupillage', [AdminPostPupillageController::clas
 
 // web.php
 
-Route::post('/admin/post-pupillages/bulk-update', [AdminPostPupillageController::class, 'bulkUpdate'])
+Route::post('/post-pupillages/bulk-update', [AdminPostPupillageController::class, 'bulkUpdate'])
      ->name('postPupillages.bulk-update')->middleware(['auth', 'permission:manage_post_pupillages']);
 
-Route::delete('/admin/post-pupillages/bulk-destroy', [AdminPostPupillageController::class, 'bulkDestroy'])
+Route::delete('/post-pupillages/bulk-destroy', [AdminPostPupillageController::class, 'bulkDestroy'])
      ->name('postPupillages.bulk-destroy')->middleware(['auth', 'permission:manage_post_pupillages']);
 
 });

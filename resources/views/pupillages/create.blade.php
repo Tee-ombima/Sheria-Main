@@ -111,12 +111,9 @@
                                     {{ $county->name }}
                                 </option>
                             @endforeach
-                            <option value="Other" {{ old('home_county') == 'Other' ? 'selected' : '' }}>Other</option>
+                            
                         </select>
-                        <input type="text" name="other_home_county" id="other_home_county" 
-                               value="{{ old('other_home_county') }}"
-                               class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C] hidden"
-                               placeholder="Specify County">
+                        
                     </div>
 
                     <!-- Sub County -->
@@ -127,10 +124,7 @@
                                required>
                             <option value="">Select Sub County</option>
                         </select>
-                        <input type="text" name="other_sub_county" id="other_sub_county"
-                               value="{{ old('other_sub_county') }}"
-                               class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C] hidden"
-                               placeholder="Specify Sub County">
+                        
                     </div>
 
                     <!-- Disability Status -->
@@ -253,7 +247,7 @@
                         </select>
                         <input type="text" name="other_ksce_grade" id="other_ksce_grade" 
                                value="{{ old('other_ksce_grade') }}"
-                               class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C] hidden"
+                               class="mt-2 w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C] hidden"
                                placeholder="Specify Grade">
                     </div>
 
@@ -273,7 +267,7 @@
                         </select>
                         <input type="text" name="other_institution_name" id="other_institution_name" 
                                value="{{ old('other_institution_name') }}"
-                               class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C] hidden"
+                               class="mt-2 w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C] hidden"
                                placeholder="Specify Institution">
                     </div>
 
@@ -293,7 +287,7 @@
                         </select>
                         <input type="text" name="other_institution_grade" id="other_institution_grade" 
                                value="{{ old('other_institution_grade') }}"
-                               class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C] hidden"
+                               class="mt-2 w-full rounded-md border-gray-300 shadow-sm focus:border-[#D68C3C] focus:ring-[#D68C3C] hidden"
                                placeholder="Specify Grade">
                     </div>
                 </div>
@@ -384,10 +378,14 @@
             </div>
         </form>
     </x-card>
-
-    <script>
-        // Form submission handler
-        document.getElementById("pupillageForm").addEventListener("submit", function(event) {
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // ==============================================
+    // Form Submission Handler
+    // ==============================================
+    const form = document.getElementById('pupillageForm');
+    if (form) {
+        form.addEventListener('submit', function(event) {
             const submitBtn = this.querySelector('button[type="submit"]');
             submitBtn.disabled = true;
             submitBtn.innerHTML = `
@@ -396,59 +394,124 @@
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
                 </svg>
                 Submitting...`;
-            document.getElementById("loader").classList.remove("hidden");
+            document.getElementById('loader').classList.remove('hidden');
         });
+    }
+const toggleOtherFields = () => {
+        // Configure fields that need "Other" inputs
+        const otherFieldConfig = [
+            { triggerId: 'ksce_grade', targetId: 'other_ksce_grade' },
+            { triggerId: 'institution_name', targetId: 'other_institution_name' },
+            { triggerId: 'institution_grade', targetId: 'other_institution_grade' }
+        ];
 
-        // Dynamic field toggling
-        const toggleConfig = {
-            'disability_status': 'nature_of_disability_container',
-            'are_you_employed': 'employment_details',
-            'home_county': 'other_home_county',
-            'ksce_grade': 'other_ksce_grade',
-            'institution_name': 'other_institution_name',
-            'institution_grade': 'other_institution_grade',
-            'sub_county': 'other_sub_county'
-        };
+        otherFieldConfig.forEach(config => {
+            const trigger = document.getElementById(config.triggerId);
+            const target = document.getElementById(config.targetId);
 
-        Object.entries(toggleConfig).forEach(([triggerId, targetId]) => {
-            const trigger = document.getElementById(triggerId);
-            if (trigger) {
-                trigger.addEventListener('change', function() {
-                    const target = document.getElementById(targetId);
-                    if (target) {
-                        const showCondition = this.value === 'Other' || this.value === 'Yes';
-                        target.style.display = showCondition ? 'block' : 'none';
-                        if (target.tagName === 'INPUT' && !showCondition) {
-                            target.value = '';
-                        }
+            if (trigger && target) {
+                // Handle initial state
+                target.classList.toggle('hidden', trigger.value !== 'Other');
+                
+                // Add change listener
+                trigger.addEventListener('change', () => {
+                    const isOther = trigger.value === 'Other';
+                    target.classList.toggle('hidden', !isOther);
+                    
+                    // Clear value when hiding
+                    if (!isOther) {
+                        target.value = '';
+                        target.required = false;
+                    } else {
+                        target.required = true;
                     }
                 });
-                // Initialize on load
-                if (trigger.value === 'Other' || trigger.value === 'Yes') {
-                    document.getElementById(targetId).style.display = 'block';
-                }
             }
         });
+    };
 
-        // County/Subcounty dynamic loading
-        document.getElementById('home_county').addEventListener('change', function() {
-            const countyId = this.value;
-            const subCountySelect = document.getElementById('sub_county');
-            
-            if (countyId === 'Other') {
-                document.getElementById('other_sub_county').style.display = 'block';
-                subCountySelect.style.display = 'none';
-            } else {
-                fetch(`/api/subcounties/${countyId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        subCountySelect.innerHTML = data.map(sc => 
-                            `<option value="${sc.id}">${sc.name}</option>`
-                        ).join('');
-                        subCountySelect.style.display = 'block';
-                        document.getElementById('other_sub_county').style.display = 'none';
-                    });
+    toggleOtherFields();
+    // ==============================================
+    // Dynamic Field Toggling
+    // ==============================================
+    const toggleFields = () => {
+        // Disability Status Handling
+        const disabilityStatus = document.getElementById('disability_status');
+        const disabilityContainer = document.getElementById('nature_of_disability_container');
+        
+        if (disabilityStatus && disabilityContainer) {
+            const toggleDisability = () => {
+                disabilityContainer.classList.toggle('hidden', disabilityStatus.value !== '1');
+            };
+            disabilityStatus.addEventListener('change', toggleDisability);
+            toggleDisability();
+        }
+
+        // Employment Details Handling
+        const employmentStatus = document.getElementById('are_you_employed');
+        const employmentDetails = document.getElementById('employment_details');
+        
+        if (employmentStatus && employmentDetails) {
+            const toggleEmployment = () => {
+                employmentDetails.classList.toggle('hidden', employmentStatus.value !== 'Yes');
+            };
+            employmentStatus.addEventListener('change', toggleEmployment);
+            toggleEmployment();
+        }
+    };
+
+    toggleFields();
+
+    // ==============================================
+    // County/Subcounty Dynamic Loading
+    // ==============================================
+    const handleLocationSelect = () => {
+        const countySelect = document.getElementById('home_county');
+        const subCountySelect = document.getElementById('sub_county');
+
+        if (countySelect && subCountySelect) {
+            countySelect.addEventListener('change', async function() {
+                const countyId = this.value;
+                
+                if (countyId) {
+                    try {
+                        const response = await fetch(`/getSubcounties/${countyId}`);
+                        const data = await response.json();
+                        
+                        subCountySelect.innerHTML = '<option value="">Select Sub County</option>';
+                        
+                        data.forEach(subcounty => {
+                            const option = document.createElement('option');
+                            option.value = subcounty.id;
+                            option.textContent = subcounty.name;
+                            subCountySelect.appendChild(option);
+                        });
+                    } catch (error) {
+                        console.error('Error loading subcounties:', error);
+                        subCountySelect.innerHTML = '<option value="">Error loading subcounties</option>';
+                    }
+                } else {
+                    subCountySelect.innerHTML = '<option value="">Select Sub County</option>';
+                }
+            });
+
+            // Trigger initial load if county is already selected
+            if (countySelect.value) {
+                countySelect.dispatchEvent(new Event('change'));
             }
+        }
+    };
+
+    handleLocationSelect();
+
+    // ==============================================
+    // Phone Number Formatting
+    // ==============================================
+    document.querySelectorAll('input[type="tel"]').forEach(input => {
+        input.addEventListener('input', function() {
+            this.value = this.value.replace(/\D/g, '').slice(0, 9);
         });
-    </script>
+    });
+});
+</script>
 </x-layout>
