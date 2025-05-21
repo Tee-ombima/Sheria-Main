@@ -5,7 +5,7 @@ use Illuminate\Support\Str;
 return [
 
     // Session driver - for development use 'file', for production consider 'redis' or 'database'
-    'driver' => env('SESSION_DRIVER', 'file'),
+    'driver' => env('SESSION_DRIVER', 'redis'),
 
     // Session lifetime in minutes
     'lifetime' => env('SESSION_LIFETIME', 120),
