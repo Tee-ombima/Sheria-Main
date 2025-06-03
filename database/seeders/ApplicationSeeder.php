@@ -31,7 +31,7 @@ class ApplicationSeeder extends Seeder
                 ->has('relevantCourses')
                 ->has('attachmentInfo')
                 ->inRandomOrder()
-                ->limit(150)
+                ->limit(100)
                 ->get();
 
             // Create applications

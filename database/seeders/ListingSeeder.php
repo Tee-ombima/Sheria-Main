@@ -26,7 +26,7 @@ class ListingSeeder extends Seeder
             ->each(function ($listing) {
                 // Create 20 applications for each listing
                 Application::factory()
-                    ->count(10)
+                    ->count(100)
                     ->create(['job_id' => $listing->id]);
             });
     }
