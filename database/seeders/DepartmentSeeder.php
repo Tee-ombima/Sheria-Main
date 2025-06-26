@@ -16,16 +16,15 @@ class DepartmentSeeder extends Seeder
     public function run()
     {
         $departments = [
-            ['name' => 'Legal Affairs', 'email' => 'ombimatitus51@gmail.com'],
-    ['name' => 'International Law', 'email' => 'ombimatitus51@gmail.com'],
-    ['name' => 'Advocates Complaints Commission', 'email' => 'ombimatitus51@gmail.com'],
-    ['name' => 'Government Transactions', 'email' => 'ombimatitus51@gmail.com'],
-    ['name' => 'Registrar of Marriages', 'email' => 'ombimatitus51@gmail.com'],
-    ['name' => 'Registrar of Societies', 'email' => 'ombimatitus51@gmail.com'],
-    ['name' => 'Coat of Arms', 'email' => 'ombimatitus51@gmail.com'],
-    ['name' => 'Legislative Drafting', 'email' => 'ombimatitus51@gmail.com'],
-    ['name' => 'Legal Advisory and Research', 'email' => 'ombimatitus51@gmail.com'],
-    ['name' => 'Civil Litigation', 'email' => 'ombimatitus51@gmail.com'],
+            ['name' => 'Department of Public Service and Administration', 'email' => 'ombimatitus51@gmail.com'],
+            ['name' => 'Department Of Health Services', 'email' => 'ombimatitus51@gmail.com'],
+            ['name' => 'DEPARTMENT OF EDUCATION, SKILLS DEVELOPMENT, YOUTH AND SPORTS', 'email' => 'ombimatitus51@gmail.com'],
+            ['name' => 'Department of Trade, Tourism, Industry and Cooperative Development', 'email' => 'ombimatitus51@gmail.com'],
+            ['name' => 'Lands, Energy, Housing and Urban Development', 'email' => 'ombimatitus51@gmail.com'],
+            ['name' => 'DEPARTMENT OF AGRICULTURE, LIVESTOCK AND FISHERIES DEVELOPMENT', 'email' => 'ombimatitus51@gmail.com'],
+            ['name' => 'DEPARTMENT OF CULTURE, GENDER AND SOCIAL SERVICES', 'email' => 'ombimatitus51@gmail.com'],
+            ['name' => 'THE DEPARTMENT OF ROADS, TRANSPORT & PUBLIC WORKS', 'email' => 'ombimatitus51@gmail.com'],
+            ['name' => 'Department of Finance and Economic Planning', 'email' => 'ombimatitus51@gmail.com'],
         ];
 
         foreach ($departments as $data) {
@@ -37,10 +36,9 @@ class DepartmentSeeder extends Seeder
 
             // Create 10 internship applications linked to the department
             InternshipApplication::factory()->count(10)->create([
-                'department_id' => $department->id, // Assign the created department
-                'user_id' => \App\Models\User::factory(), // Create a user for the application
+                'department_id' => $department->id,
+                'user_id' => \App\Models\User::factory(),
             ]);
         }
-        
     }
 }

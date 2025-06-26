@@ -9,7 +9,7 @@
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" href="images/favicon.ico" />
+  <link rel="icon" href="images/faviconn.ico" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
     integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
     crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -34,7 +34,7 @@
         theme: {
           extend: {
             colors: {
-              laravel: '#fbae1b',
+              laravel: '#fac02a',
             },
           },
         },
@@ -214,7 +214,7 @@
         </div>
     @endif
 <nav class="flex justify-between items-center p-4 shadow-md fixed w-full top-0 z-50" style="background-color: #3a4f29;">
-    <a href="/"><img class="w-24" src="{{asset('images/logo.jpg')}}" alt="logo" /></a>
+    <a href="/"><img class="w-24" src="{{asset('images/logoo.png')}}" alt="logo" /></a>
     <button class="text-3xl md:hidden cursor-pointer" onclick="document.getElementById('nav-links').classList.toggle('hidden')">
       <i class="fa-solid fa-bars" style="color: #ffffff;"></i>
     </button>
@@ -336,6 +336,16 @@
             
     </div>
 </li>
+
+<!-- Leadership Section -->
+<li class="ml-6">
+    <a href="{{ route('leadership') }}" class="hover:text-laravel text-white flex items-center gap-1">
+        <i class="fa-solid fa-users" style="color: #ffffff;"></i>
+        Leadership
+    </a>
+</li>
+
+
 
       @endif
       

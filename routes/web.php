@@ -33,7 +33,9 @@ Auth::routes(['verify' => true]);
 
 
 Route::get('/', [ListingController::class, 'index'])->name('index');
+Route::get('/leadership', [ListingController::class, 'leadership'])->name('leadership');
 
+Route::post('/profile/personal-info', [ProfileController::class, 'savePersonalInfo'])->name('profile.save-personal-info');
 Route::middleware(['auth','verified'])->group(function () {
     
 
@@ -55,7 +57,7 @@ Route::get('/getConstituencies/{subcounty_id}', [LocationController::class, 'get
 
     // Add more profile routes here...
     Route::get('/profile/personal-info', [ProfileController::class, 'showPersonalInfo'])->name('profile.personal-info');
-Route::post('/profile/personal-info', [ProfileController::class, 'savePersonalInfo'])->name('profile.save-personal-info');
+
 
 // Repeat for other sections
 Route::get('/profile/academic-info', [ProfileController::class, 'showAcademicInfo'])->name('profile.academic-info');

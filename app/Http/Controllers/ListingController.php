@@ -33,6 +33,11 @@ class ListingController extends Controller
              'listings' => $query->paginate(6)
          ]);
      }
+     public function leadership()
+{
+    return view('leadership');
+}
+
  
      // Show single listing
      public function show(Listing $listing)
