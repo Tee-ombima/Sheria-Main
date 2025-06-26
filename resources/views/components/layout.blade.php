@@ -191,7 +191,7 @@
     &:hover { @apply shadow-md; }
 }
 [x-cloak] { display: none !important; }</style>
-  <title>Office Of The Attorney General | Jobs & Programmes</title>
+  <title>Marsabit Public Service | Jobs & Programmes</title>
   
 </head>
 

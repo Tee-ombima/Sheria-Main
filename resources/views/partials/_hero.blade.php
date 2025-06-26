@@ -7,7 +7,6 @@
       Office Of The Attorney<span class="text-black">General</span>
     </h1> --}}
     {{-- <p class="text-2xl text-black font-bold my-4">
-      Find State Law Office Career Opportunities
     </p> --}}
    
   </div>

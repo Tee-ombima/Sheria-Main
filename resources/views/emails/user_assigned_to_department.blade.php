@@ -16,6 +16,6 @@
 
     <p>Please take the necessary actions.</p>
 
-    <p>Best regards,<br>HR Team (Office of the Attorney General)</p>
+    <p>Best regards,<br>HR Team (Marsabit Public Service)</p>
 </body>
 </html>

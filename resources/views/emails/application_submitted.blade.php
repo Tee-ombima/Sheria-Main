@@ -12,6 +12,6 @@
 
     <p>We appreciate your interest in joining our team.</p>
 
-    <p>Best regards,<br>OFFICE OF THE ATTORNEY GENERAL</p>
+    <p>Best regards,<br>Marsabit Public Service</p>
 </body>
 </html>
